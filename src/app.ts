@@ -1,7 +1,8 @@
 import express, { Request, Response} from "express"
 import {sequelize} from "./Config/config"
+require('dotenv').config();
 const app = express()
-const port = 3000
+const port = process.env.PORT
 
 app.get(`/`, (req: Request, res: Response) => {
     res.send(`Express + TypeScript server`)

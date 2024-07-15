@@ -1,12 +1,11 @@
 import { Sequelize } from "sequelize"
-import * as dotenv from "dotenv"
-dotenv.config({path: __dirname+`.env`})
+require('dotenv').config();
 const name : any = process.env.DB_NAME
-const user : any = process.env.USER
+const user : any = process.env.DB_USER
 const password : any  = process.env.PASSWORD
-
+console.log(name, user, password, process.env.DB_HOST);
 export const sequelize = new Sequelize(name, user, password, {
-    host: process.env.HOST ,
+    host: process.env.DB_HOST ,
     dialect: `mysql`,
     port: 3305,
     define: {

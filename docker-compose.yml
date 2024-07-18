@@ -6,12 +6,12 @@ services:
     container_name: mysql_container
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: task_management_system
-      MYSQL_USER: user
-      MYSQL_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: ${PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${PASSWORD}
     ports:
-      - "3305:3306"
+      - "${DB_PORT}"
     volumes:
       - mysql_data:/var/lib/mysql
     networks:

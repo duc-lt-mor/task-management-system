@@ -1,6 +1,7 @@
 import express, { Request, Response} from "express"
 import {sequelize} from "./Config/config"
-require('dotenv').config();
+import { config } from 'dotenv';
+config();
 const app = express()
 const port = process.env.PORT
 

@@ -24,6 +24,7 @@
     "typescript": "^5.5.3"
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.6",
     "prettier": "^3.3.3"
   }
 }

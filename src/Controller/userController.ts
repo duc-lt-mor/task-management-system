@@ -77,3 +77,17 @@ export const getUsers = async (
     res.status(500).send(err)
   }
 }
+
+export const deleteUser = async (
+  req: express.Request,
+  res: express.Response
+) => {
+  try {
+    const name = req.body.name
+    const deleted = await User.destroy({where: name})
+    if (!name) return res.status(404).send(`User not found`)
+    return res.status(201).send(`Deleted successfully`)
+  } catch(err) {
+    
+  }
+}

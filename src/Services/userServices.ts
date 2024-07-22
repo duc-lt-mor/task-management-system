@@ -3,7 +3,12 @@ import express from 'express';
 import { User } from '../Models/user';
 import { Op } from 'sequelize';
 import bcrypt from 'bcrypt';
-import { System_role } from '../Models/system_role';
+
+export interface UserPayload {
+  id: number;
+  username: string;
+  email: string;
+}
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_SECRET_KEY: Secret = JWT_SECRET as Secret;
@@ -14,7 +19,7 @@ export const register = async (req: express.Request, res: express.Response) => {
   let name = req.body.name;
   let email = req.body.email;
   let phone_number = req.body.phone_number;
-  let system_role_id = req.body.system_role_id
+  let system_role_id = req.body.system_role_id;
   if (!name) {
     throw new Error('Please enter your name');
   }
@@ -54,18 +59,14 @@ export const register = async (req: express.Request, res: express.Response) => {
       email,
       phone_number,
     });
-    return res.status(201).send(`User created`)
+    return res.status(201).send(`User created`);
   } catch (err) {
     return res.status(500).send(`Internal server error`);
   }
 };
 
-export const generateToken = (user: {
-  id: number;
-  username: string;
-  email: string;
-}) => {
-  const payload = {
+export const generateToken = (user: UserPayload) => {
+  const payload: UserPayload = {
     id: user.id,
     username: user.username,
     email: user.email,

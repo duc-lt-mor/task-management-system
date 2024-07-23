@@ -13,6 +13,7 @@ import {
   editMemRole,
   createColum,
   validateColum,
+  editColum,
 } from '../Services/services';
 import express from 'express';
 import { Colum } from '../Models/colum';
@@ -181,28 +182,52 @@ export const create_colum = async (
   let project_id: number = Number(req.params.projectid);
   let col_type: string = req.body.col_type;
   let name: string = req.body.col_name;
-  let index: number = Number(req.body.index);
+  let index: number = Number(req.body.col_index);
 
+  let last_index: number = await Colum.count({
+    where: {
+      project_id: project_id,
+    },
+  });
   let err = await validateColum(col_type, name, project_id);
   if (err.length > 0) {
     res.status(400).send({ message: err });
-  } 
-  else {
-    if (index == null) {
-      const last_index: number = await Colum.count({
-        where: {
-          project_id: project_id
-        }
-      })
-      index = last_index +1;
+  } else {
+    if (isNaN(index)) {
+      index = last_index + 1;
+    } else {
+      for (let i: number = last_index; i >= index; i--) {
+        let col1: any = await Colum.findOne({
+          where: {
+            [Op.and]: [{ col_index: i }, { project_id: project_id }],
+          },
+        });
+        await col1.update({
+          col_index: i + 1,
+        });
+      }
     }
-      await createColum(
-        col_type,
-        name,
-        index,
-        project_id,
-      );
-      res.status(201).send({ message: 'create success' });
+    await createColum(col_type, name, index, project_id);
+    res.status(201).send({ message: 'create success' });
   }
+};
 
+export const edit_colum = async (
+  req: express.Request,
+  res: express.Response,
+) => {
+  let project_id: number = Number(req.params.projectid);
+  let col_type: string = req.body.col_type;
+  let name: string = req.body.col_name;
+  let index: number = Number(req.body.col_index);
+  let col_id: number = Number(req.body.col_id);
+
+  let respons: Array<string> = await editColum(
+    col_type,
+    name,
+    index,
+    col_id,
+    project_id,
+  );
+  res.status(201).send(respons);
 };

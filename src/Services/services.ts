@@ -152,7 +152,7 @@ export const createColum = async (
   await Colum.create({
     col_type: col_type,
     name: name,
-    index: index,
+    col_index: index,
     project_id: project_id,
   });
 };
@@ -178,4 +178,99 @@ export const validateColum = async (
     err.push('colum name already exit');
   }
   return err;
+};
+
+export const editColum = async (
+  col_type: string,
+  name: string,
+  index: number,
+  col_id: number,
+  project_id: number,
+)  => {
+
+  let colum: any = await Colum.findOne({
+    where: {
+      id: col_id,
+    },
+  });
+
+  let colum2: any = await Colum.findOne({
+    where: {
+      [Op.and]: [{ name: name }, { project_id: project_id }, {id: { [Op.ne]: col_id }}],
+    },
+  });
+
+  let respons: Array<string> = [];
+
+  if (colum2) {
+    respons.push('colum name already been used')
+  }
+  else {
+    if (!name) {
+      respons.push('colum name remain');
+    } else if (name === colum.name) {
+      respons.push('colum name remain');
+    } else {
+      await colum.update({
+        name: name,
+      });
+      respons.push('colum name updated');
+    }
+  }
+
+  if (!col_type) {
+    respons.push('colum type remain');
+  } else if (col_type === colum.col_type) {
+    respons.push('colum type remain');
+  } else {
+    await colum.update({
+      col_type: col_type,
+    });
+    respons.push('colum type updated');
+  }
+
+  if (isNaN(index)) {
+    respons.push('colum index remain');
+  } else if (index == colum.col_index || index == 0) {
+    respons.push('colum index remain');
+  } else {
+   
+    let last_index: number = await Colum.count({
+      where: {
+        project_id: project_id,
+      },
+    });
+
+    if (index < colum.col_index) {
+      for (let i: number = last_index - 1; i >= index; i--) {
+        let col1: any = await Colum.findOne({
+          where: {
+            [Op.and]: [{ col_index: i }, { project_id: project_id }],
+          },
+        });
+        await col1.update({
+          col_index: i + 1,
+        });
+      }
+    }
+    else {
+      for (let i: number = colum.col_index + 1; i <= index; i++) {
+        let col1: any = await Colum.findOne({
+          where: {
+            [Op.and]: [{ col_index: i }, { project_id: project_id }],
+          },
+        });
+        await col1.update({
+          col_index: i - 1,
+        });
+      }
+    }
+    
+    await colum.update({
+      col_index: index,
+    });
+    respons.push('colum index updated');
+  }
+
+  return respons;
 };

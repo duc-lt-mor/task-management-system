@@ -25,9 +25,9 @@ export const getLogin = async (req: express.Request, res: express.Response) => {
       return res.status(401).send('Invalid username or password');
     }
     const token: string = services.generateToken({
-      id: user.id,
-      username: user.username,
+      name: user.name,
       email: user.email,
+      role: user.role,
     });
 
     return res.status(200).json({
@@ -41,7 +41,7 @@ export const getLogin = async (req: express.Request, res: express.Response) => {
 
 export const postRegister = async (
   req: express.Request,
-  res: express.Response
+  res: express.Response,
 ) => {
   try {
     await services.register(req, res);
@@ -50,44 +50,36 @@ export const postRegister = async (
   }
 };
 
-export const getUser = async (
-  req: express.Request,
-  res: express.Response
-) => {
-  try{
-    const name = req.params.name
-    const user = await User.findOne({where: {name: name}})
-    if (!user) {
-      return res.status(404).send(`User not exist`)
-    }
-    return res.send(200).send(user)
-  } catch(err) {
-    return res.status(500).send(`Internal server error`)
-  }
-}
-
-export const getUsers = async (
-  req: express.Request,
-  res: express.Response
-) => {
+export const getUser = async (req: express.Request, res: express.Response) => {
   try {
-    const users = await User.findAll()
-    res.status(201).send(users)
+    const name = req.params.name;
+    const user = await User.findOne({ where: { name: name } });
+    if (!user) {
+      return res.status(404).send(`User not exist`);
+    }
+    return res.send(200).send(user);
   } catch (err) {
-    res.status(500).send(err)
+    return res.status(500).send(`Internal server error`);
   }
-}
+};
+
+export const getUsers = async (req: express.Request, res: express.Response) => {
+  try {
+    const users = await User.findAll();
+    res.status(201).send(users);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+};
 
 export const deleteUser = async (
   req: express.Request,
-  res: express.Response
+  res: express.Response,
 ) => {
   try {
-    const name = req.body.name
-    const deleted = await User.destroy({where: name})
-    if (!name) return res.status(404).send(`User not found`)
-    return res.status(201).send(`Deleted successfully`)
-  } catch(err) {
-    
-  }
-}
+    const name = req.body.name;
+    const deleted = await User.destroy({ where: name });
+    if (!name) return res.status(404).send(`User not found`);
+    return res.status(201).send(`Deleted successfully`);
+  } catch (err) {}
+};

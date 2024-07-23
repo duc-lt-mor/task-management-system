@@ -5,9 +5,9 @@ import { Op } from 'sequelize';
 import bcrypt from 'bcrypt';
 
 export interface UserPayload {
-  id: number;
-  username: string;
-  email: string;
+  name: string,
+  email: string,
+  role: string
 }
 
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -67,9 +67,9 @@ export const register = async (req: express.Request, res: express.Response) => {
 
 export const generateToken = (user: UserPayload) => {
   const payload: UserPayload = {
-    id: user.id,
-    username: user.username,
+    name: user.name,
     email: user.email,
+    role: user.role
   };
 
   const options: SignOptions = {

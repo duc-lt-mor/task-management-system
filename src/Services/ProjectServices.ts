@@ -1,14 +1,7 @@
-import { System_role } from '../Models/system_role';
-import { Role } from '../Models/role';
-import { User } from '../Models/user';
 import { Project } from '../Models/project';
-import { Task } from '../Models/task';
-import { Comment } from '../Models/comment';
-import { Login } from '../Models/login';
 import { Member } from '../Models/member';
 import { Colum } from '../Models/colum';
 import express from 'express';
-import  Op   from 'sequelize';
 
 // lay ra 1 project
 export const getProjectById = async (id: number) => {
@@ -42,18 +35,42 @@ export const Create = async function (req: express.Request) {
       { col_type: 'done', name: 'DONE', col_index: 3, project_id: project.id },
     ]);
   } catch (err) {
-    throw new Error('Create fail' + err);
+    throw new Error('Create failed' + err);
   }
 };
 
 // sua project
 export const Edit = async function (req: express.Request) {
+  try {
+    let project: any = await getProjectById(Number(req.params.project_id));
+    await project.update({
+      name: req.body.name,
+      decripstion: req.body.decripstion,
+      expected_end_date: req.body.expected_end_date,
+    });
+  } catch (err) {
+    throw new Error('edit failed ' + err);
+  }
+};
+// xoa project
+export const Delete = async (req: express.Request) => {
   let project: any = await getProjectById(Number(req.params.project_id));
-  await project.update({
-    name: req.body.name,
-    decripstion: req.body.decripstion,
-    expected_end_date: req.body.expected_end_date,
+
+  await Member.destroy({
+    where: {
+      project_id: Number(req.params.project_id),
+    },
+  });
+
+  await Colum.destroy({
+    where: {
+      project_id: Number(req.params.project_id),
+    },
+  });
+
+  await Project.destroy({
+    where: {
+      id: Number(req.params.project_id),
+    },
   });
 };
-
-

@@ -1,4 +1,4 @@
-import * as user from "../Controller/userController"
+import * as user from "../Controller/UserController"
 import * as task from "../Controller/TaskController"
 import express from "express"
 const router = express.Router()

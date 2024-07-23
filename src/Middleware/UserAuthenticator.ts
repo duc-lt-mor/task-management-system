@@ -1,6 +1,6 @@
 import jwt, { Secret, SignOptions } from 'jsonwebtoken';
-import { UserPayload } from '../Services/UserServices';
 import express from 'express';
+import { UserPayload } from '../Services/UserServices';
 
 const JWT_SECRET_KEY: Secret = process.env.JWT_SECRET as Secret;
 

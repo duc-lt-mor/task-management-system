@@ -2,28 +2,31 @@ import express from 'express';
 import { User } from '../Models/user';
 import bcrypt from 'bcrypt';
 import { generateToken } from '../Middleware/UserAuthenticator';
-import * as services from '../Services/UserServices'
+import * as services from '../Services/UserServices';
 
-export const getLogin = async function (req: express.Request, res: express.Response) {
+export const getLogin = async function (
+  req: express.Request,
+  res: express.Response,
+) {
   let email = req.body.email;
   let password = req.body.password;
   if (!email) {
-    return res.status(400).send(`Please enter your username`);
+    return res.status(400).json(`Please enter your username`);
   }
 
   if (!password) {
-    return res.status(400).send(`Please enter your password`);
+    return res.status(400).json(`Please enter your password`);
   }
 
   try {
     const user: any = await User.findOne({ where: { email: email } });
     if (!user) {
-      res.status(401).send(`Invalid username or password`);
+      res.status(401).json(`Invalid username or password`);
     }
 
     const compare: boolean = await bcrypt.compare(password, user.password);
     if (!compare) {
-      return res.status(401).send('Invalid username or password');
+      return res.status(401).json('Invalid username or password');
     }
     const token: string = generateToken({
       name: user.name,
@@ -36,7 +39,7 @@ export const getLogin = async function (req: express.Request, res: express.Respo
       token,
     });
   } catch (err) {
-    res.status(500).send(`Internal server error`);
+    res.status(500).json(`Internal server error`);
   }
 };
 
@@ -46,41 +49,10 @@ export const postRegister = async function (
 ) {
   try {
     await services.register(req, res);
+    res.status(201).json({message: `User created`})
   } catch (err) {
-    res.status(500).send(`Internal server error`);
+    res.status(500).json({message:`Internal server error`});
   }
 };
 
-export const getUser = async function (req: express.Request, res: express.Response) {
-  try {
-    const name = req.params.name;
-    const user = await User.findOne({ where: { name: name } });
-    if (!user) {
-      return res.status(404).send(`User not exist`);
-    }
-    return res.send(200).send(user);
-  } catch (err) {
-    return res.status(500).send(`Internal server error`);
-  }
-};
 
-export const getUsers = async function (req: express.Request, res: express.Response) {
-  try {
-    const users = await User.findAll();
-    res.status(201).send(users);
-  } catch (err) {
-    res.status(500).send(err);
-  }
-};
-
-export const deleteUser = async function (
-  req: express.Request,
-  res: express.Response,
-) {
-  try {
-    const name = req.body.name;
-    const deleted = await User.destroy({ where: name });
-    if (!name) return res.status(404).send(`User not found`);
-    return res.status(201).json({message:`Deleted successfully`, deleted});
-  } catch (err) {}
-};

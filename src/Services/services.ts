@@ -152,7 +152,7 @@ export const createColum = async (
   await Colum.create({
     col_type: col_type,
     name: name,
-    index: index,
+    col_index: index,
     project_id: project_id,
   });
 };
@@ -178,4 +178,48 @@ export const validateColum = async (
     err.push('colum name already exit');
   }
   return err;
+};
+
+export const editColum = async (
+  col_id: number,
+  col_type: string,
+  name: string,
+  index: number,
+) => {
+  let colum: any = await Colum.findOne({
+    where: {
+      id: col_id,
+    },
+  });
+  let respons: Array<string> = [];
+  if (!name) {
+    respons.push('name remain');
+  } else if (name === colum.name) {
+    respons.push('name remain');
+  } else {
+    await colum.update({
+      name: name,
+    });
+  }
+
+  if (!col_type) {
+    respons.push('colum type remain');
+  } else if (col_type === colum.col_type) {
+    respons.push('colum type remain');
+  } else {
+    await colum.update({
+      col_type: col_type,
+    });
+  }
+
+  if (!index) {
+    respons.push('index remain');
+  } else if (index === colum.index) {
+    respons.push('index remain');
+  } else {
+    await colum.update({
+      col_index: index,
+    });
+  }
+  return respons;
 };

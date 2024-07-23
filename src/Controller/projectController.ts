@@ -13,6 +13,7 @@ import {
   editMemRole,
   createColum,
   validateColum,
+  editColum,
 } from '../Services/services';
 import express from 'express';
 import { Colum } from '../Models/colum';
@@ -183,26 +184,38 @@ export const create_colum = async (
   let name: string = req.body.col_name;
   let index: number = Number(req.body.index);
 
+  console.log(col_type, name);
   let err = await validateColum(col_type, name, project_id);
   if (err.length > 0) {
     res.status(400).send({ message: err });
-  } 
-  else {
-    if (index == null) {
+  } else {
+    if (isNaN(index)) {
       const last_index: number = await Colum.count({
         where: {
-          project_id: project_id
-        }
-      })
-      index = last_index +1;
+          project_id: project_id,
+        },
+      });
+      index = last_index + 1;
     }
-      await createColum(
-        col_type,
-        name,
-        index,
-        project_id,
-      );
-      res.status(201).send({ message: 'create success' });
+    await createColum(col_type, name, index, project_id);
+    res.status(201).send({ message: 'create success' });
   }
+};
 
+export const edit_colum = async (
+  req: express.Request,
+  res: express.Response,
+) => {
+  let col_type: string = req.body.col_type;
+  let name: string = req.body.col_name;
+  let index: number = Number(req.body.index);
+  let col_id: number = Number(req.params.col_id);
+
+  let respons = await editColum(col_id, col_type, name, index);
+  console.log(respons);
+  if (respons.length > 0) {
+    res.status(200).send({ message: respons });
+  } else {
+    res.status(200).send('update colum success');
+  }
 };

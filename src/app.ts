@@ -1,15 +1,14 @@
-import express, { Request, Response } from 'express';
-import { sequelize } from './Config/config';
+import express from 'express';
 import { config } from 'dotenv';
+import { router } from './Routers/routers';
 config();
 const app = express();
 const port = process.env.PORT;
 
-app.get(`/`, (req: Request, res: Response) => {
-  res.send(`Express + TypeScript server`);
-  sequelize.authenticate();
-  console.log('Connection has been established successfully.');
-});
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use(`/`, router);
 
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);

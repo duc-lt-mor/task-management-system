@@ -1,10 +1,10 @@
 import express from 'express';
 import { User } from '../Models/user';
 import bcrypt from 'bcrypt';
-import * as services from '../Services/userServices';
-import { generateToken } from '../Middleware/authenticator';
+import { generateToken } from '../Middleware/UserAuthenticator';
+import * as services from '../Services/UserServices'
 
-export const getLogin = async (req: express.Request, res: express.Response) => {
+export const getLogin = async function (req: express.Request, res: express.Response) {
   let email = req.body.email;
   let password = req.body.password;
   if (!email) {
@@ -40,10 +40,10 @@ export const getLogin = async (req: express.Request, res: express.Response) => {
   }
 };
 
-export const postRegister = async (
+export const postRegister = async function (
   req: express.Request,
   res: express.Response,
-) => {
+) {
   try {
     await services.register(req, res);
   } catch (err) {
@@ -51,7 +51,7 @@ export const postRegister = async (
   }
 };
 
-export const getUser = async (req: express.Request, res: express.Response) => {
+export const getUser = async function (req: express.Request, res: express.Response) {
   try {
     const name = req.params.name;
     const user = await User.findOne({ where: { name: name } });
@@ -64,7 +64,7 @@ export const getUser = async (req: express.Request, res: express.Response) => {
   }
 };
 
-export const getUsers = async (req: express.Request, res: express.Response) => {
+export const getUsers = async function (req: express.Request, res: express.Response) {
   try {
     const users = await User.findAll();
     res.status(201).send(users);
@@ -73,10 +73,10 @@ export const getUsers = async (req: express.Request, res: express.Response) => {
   }
 };
 
-export const deleteUser = async (
+export const deleteUser = async function (
   req: express.Request,
   res: express.Response,
-) => {
+) {
   try {
     const name = req.body.name;
     const deleted = await User.destroy({ where: name });

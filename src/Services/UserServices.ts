@@ -1,17 +1,13 @@
-import jwt, { Secret, SignOptions } from 'jsonwebtoken';
 import express from 'express';
 import { User } from '../Models/user';
 import { Op } from 'sequelize';
 import bcrypt from 'bcrypt';
 
 export interface UserPayload {
-  name: string,
-  email: string,
-  role: number
+  name: string;
+  email: string;
+  role: number;
 }
-
-const JWT_SECRET = process.env.JWT_SECRET;
-const JWT_SECRET_KEY: Secret = JWT_SECRET as Secret;
 
 export const register = async (req: express.Request, res: express.Response) => {
   let password = req.body.password;
@@ -41,40 +37,22 @@ export const register = async (req: express.Request, res: express.Response) => {
   if (!phone_number) {
     throw new Error('Please fill in the right number format');
   }
-  try {
-    const existing = await User.findOne({
-      where: {
-        [Op.or]: [{ name }, { email }],
-      },
-    });
-    if (existing) {
-      return res.status(409).send(`Username/Email already taken.`);
-    }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    await User.create({
-      name,
-      password: hashedPassword,
-      system_role_id,
-      email,
-      phone_number,
-    });
-    return res.status(201).send(`User created`);
-  } catch (err) {
-    return res.status(500).send(`Internal server error`);
+  const existing = await User.findOne({
+    where: {
+      [Op.or]: [{ name }, { email }],
+    },
+  });
+  if (existing) {
+    return res.status(409).send(`Username/Email already taken.`);
   }
-};
 
-export const generateToken = (user: UserPayload) => {
-  const payload: UserPayload = {
-    name: user.name,
-    email: user.email,
-    role: user.role
-  };
-
-  const options: SignOptions = {
-    expiresIn: '1h',
-  };
-
-  return jwt.sign(payload, JWT_SECRET_KEY, options);
+  const hashedPassword = await bcrypt.hash(password, 10);
+  await User.create({
+    name,
+    password: hashedPassword,
+    system_role_id,
+    email,
+    phone_number,
+  });
 };

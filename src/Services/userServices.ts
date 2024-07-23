@@ -7,7 +7,7 @@ import bcrypt from 'bcrypt';
 export interface UserPayload {
   name: string,
   email: string,
-  role: string
+  role: number
 }
 
 const JWT_SECRET = process.env.JWT_SECRET;

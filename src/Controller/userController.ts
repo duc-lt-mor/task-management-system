@@ -2,6 +2,7 @@ import express from 'express';
 import { User } from '../Models/user';
 import bcrypt from 'bcrypt';
 import * as services from '../Services/userServices';
+import { generateToken } from '../Middleware/authenticator';
 
 export const getLogin = async (req: express.Request, res: express.Response) => {
   let email = req.body.email;
@@ -24,7 +25,7 @@ export const getLogin = async (req: express.Request, res: express.Response) => {
     if (!compare) {
       return res.status(401).send('Invalid username or password');
     }
-    const token: string = services.generateToken({
+    const token: string = generateToken({
       name: user.name,
       email: user.email,
       role: user.role,
@@ -80,6 +81,6 @@ export const deleteUser = async (
     const name = req.body.name;
     const deleted = await User.destroy({ where: name });
     if (!name) return res.status(404).send(`User not found`);
-    return res.status(201).send(`Deleted successfully`);
+    return res.status(201).json({message:`Deleted successfully`, deleted});
   } catch (err) {}
 };

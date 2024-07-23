@@ -56,3 +56,17 @@ export const register = async (req: express.Request, res: express.Response) => {
     phone_number,
   });
 };
+
+export const getUser =  function (req: express.Request) {
+  const name = req.params.name;
+  return User.findOne({ where: { name: name } });
+};
+
+export const getUsers = function () {
+  return User.findAll();
+};
+
+export const deleteUser = function (req: express.Request) {
+  const name = req.body.name;
+  return User.destroy({ where: name });
+};

@@ -92,23 +92,28 @@ export const editProject = async (
 };
 //xoa project
 export const deleteProject = async (id: number) => {
+
+  // xoa cac thanh vien khoi project
+  await Member.destroy({
+    where: {
+      project_id: id,
+    },
+  });
+
+  //xoa cac cot co trong project
+   await Colum.destroy({
+    where: {
+      project_id: id,
+    },
+  });
+
   await Project.destroy({
     where: {
       id: id,
     },
   });
-  // xoa cac thanh vien khoi project
-  const n = await Member.destroy({
-    where: {
-      project_id: id,
-    },
-  });
-  //xoa cac cot co trong project
-  const nn = await Colum.destroy({
-    where: {
-      project_id: id,
-    },
-  });
+  
+  
 };
 //them thanh vien vafo project
 export const addMember = async (

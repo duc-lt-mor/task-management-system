@@ -7,7 +7,9 @@ import {
   edit_member_role,
   show_member,
   create_colum, 
-  edit_colum
+  edit_colum,
+  delete_colum,
+  move_task
 } from '../Controller/projectController';
 import express from 'express';
 const router = express.Router();
@@ -23,4 +25,6 @@ router.get('/member/:projectid', show_member);
 
 router.post('/colum/:projectid', create_colum);
 router.put('/colum/:projectid', edit_colum);
+router.delete('/colum/:col_id', delete_colum);
+router.put('/task/:col_id', move_task)
 export default router;

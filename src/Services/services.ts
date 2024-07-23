@@ -9,6 +9,7 @@ import { Member } from '../Models/member';
 import { Colum } from '../Models/colum';
 const { Op } = require('sequelize');
 
+// lay ra 1 project
 export const getProjectById = async (id: number) => {
   let project = await Project.findOne({
     where: {
@@ -17,7 +18,7 @@ export const getProjectById = async (id: number) => {
   });
   return project;
 };
-
+// tao 1 project
 export const createProject = async (
   name: String,
   key: String,
@@ -33,6 +34,7 @@ export const createProject = async (
       creator_id: creator_id,
       expected_end_date: expected_end_date,
     });
+    // khoi tao 3 cot mac dinh (todo, inprogress, done)
     await Colum.bulkCreate([
       { col_type: 'todo', name: 'TO DO', col_index: 1, project_id: project.id },
       {
@@ -47,7 +49,7 @@ export const createProject = async (
     throw new Error('Create fail' + err);
   }
 };
-
+//xac thuc du lieu dau vao
 export const validateProject = async (
   name: String,
   key: String,
@@ -74,7 +76,7 @@ export const validateProject = async (
   }
   return err;
 };
-
+// sua project
 export const editProject = async (
   name: String,
   decripstion: String,
@@ -88,25 +90,27 @@ export const editProject = async (
     expected_end_date: expected_end_date,
   });
 };
-
+//xoa project
 export const deleteProject = async (id: number) => {
   await Project.destroy({
     where: {
       id: id,
     },
   });
+  // xoa cac thanh vien khoi project
   const n = await Member.destroy({
     where: {
       project_id: id,
     },
   });
+  //xoa cac cot co trong project
   const nn = await Colum.destroy({
     where: {
       project_id: id,
     },
   });
 };
-
+//them thanh vien vafo project
 export const addMember = async (
   project_id: number,
   user_id: number,
@@ -118,7 +122,7 @@ export const addMember = async (
     role_id: role_id,
   });
 };
-
+//xoa thanh vien khoi project
 export const removeMember = async (user_id: number, project_id: number) => {
   await Member.destroy({
     where: {
@@ -126,7 +130,7 @@ export const removeMember = async (user_id: number, project_id: number) => {
     },
   });
 };
-
+//cap nhat role cua thanh vien trong project
 export const editMemRole = async (
   project_id: number,
   user_id: number,
@@ -142,7 +146,7 @@ export const editMemRole = async (
     role_id: role_id,
   });
 };
-
+//tao cot
 export const createColum = async (
   col_type: string,
   name: string,
@@ -156,7 +160,7 @@ export const createColum = async (
     project_id: project_id,
   });
 };
-
+//kiem tra du lieu dau vao cua cot
 export const validateColum = async (
   col_type: string,
   name: string,
@@ -179,33 +183,35 @@ export const validateColum = async (
   }
   return err;
 };
-
+//chinh sua cot
 export const editColum = async (
   col_type: string,
   name: string,
   index: number,
   col_id: number,
   project_id: number,
-)  => {
-
+) => {
+  let respons: Array<string> = [];
+  //lay ra cot can sua
   let colum: any = await Colum.findOne({
     where: {
       id: col_id,
     },
   });
-
+  //tim trong bang xem co cot nao thuoc cung project co ten bi trung voi ten vua nhap hay khong
   let colum2: any = await Colum.findOne({
     where: {
-      [Op.and]: [{ name: name }, { project_id: project_id }, {id: { [Op.ne]: col_id }}],
+      [Op.and]: [
+        { name: name },
+        { project_id: project_id },
+        { id: { [Op.ne]: col_id } },
+      ],
     },
   });
 
-  let respons: Array<string> = [];
-
   if (colum2) {
-    respons.push('colum name already been used')
-  }
-  else {
+    respons.push('colum name already been used');
+  } else {
     if (!name) {
       respons.push('colum name remain');
     } else if (name === colum.name) {
@@ -231,18 +237,13 @@ export const editColum = async (
 
   if (isNaN(index)) {
     respons.push('colum index remain');
-  } else if (index == colum.col_index || index == 0) {
+  } else if (index == colum.col_index || index <= 0) {
     respons.push('colum index remain');
   } else {
-   
-    let last_index: number = await Colum.count({
-      where: {
-        project_id: project_id,
-      },
-    });
-
+    //neu vi tri moi nho hon vi tri hien tai
     if (index < colum.col_index) {
-      for (let i: number = last_index - 1; i >= index; i--) {
+      //tang gia tri col_index cua cac cot tu vi tri hien tai den vi tri moi
+      for (let i: number = colum.col_index - 1; i >= index; i--) {
         let col1: any = await Colum.findOne({
           where: {
             [Op.and]: [{ col_index: i }, { project_id: project_id }],
@@ -253,7 +254,9 @@ export const editColum = async (
         });
       }
     }
+    //neu vi tri moi lon hon vi tri hien tai
     else {
+      //giam gia tri col_index cua cac cot tu vi tri hien tai den vi tri moi
       for (let i: number = colum.col_index + 1; i <= index; i++) {
         let col1: any = await Colum.findOne({
           where: {
@@ -265,7 +268,7 @@ export const editColum = async (
         });
       }
     }
-    
+
     await colum.update({
       col_index: index,
     });
@@ -273,4 +276,12 @@ export const editColum = async (
   }
 
   return respons;
+};
+//xoa cot 
+export const deleteColum = async (id: number) => {
+  await Colum.destroy({
+    where: {
+      id: id,
+    },
+  });
 };

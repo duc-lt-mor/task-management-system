@@ -8,8 +8,8 @@ export const getLogin = async function (
   req: express.Request,
   res: express.Response,
 ) {
-  let email = req.body.email;
-  let password = req.body.password;
+  const email = req.body.email;
+  const password = req.body.password;
   if (!email) {
     return res.status(400).json(`Please enter your username`);
   }
@@ -36,7 +36,7 @@ export const getLogin = async function (
 
     return res.status(200).json({
       message: 'Login successful',
-      token,
+      token
     });
   } catch (err) {
     res.status(500).json(`Internal server error`);
@@ -48,7 +48,10 @@ export const postRegister = async function (
   res: express.Response,
 ) {
   try {
-    await services.register(req, res);
+    const result = await services.register(req.body);
+    if (result) {
+      res.status(201).json({ message: 'User created', user: result });
+    }
     res.status(201).json({message: `User created`})
   } catch (err) {
     res.status(500).json({message:`Internal server error`});

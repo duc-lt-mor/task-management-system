@@ -1,12 +1,11 @@
-import { Project } from '../Models/project';
 import { User } from '../Models/user';
 import { Member } from '../Models/member';
 import * as ProjectServices from '../Services/ProjectServices';
 import { Op } from 'sequelize';
 import express from 'express';
 
-//xac thuc du lieu cho them thanh vien
-export const validate_add_user = async function (
+
+export const add_user = async function (
   req: express.Request,
   res: express.Response,
   next: express.NextFunction,
@@ -34,22 +33,26 @@ export const validate_add_user = async function (
     //kiem tra project co ton tai hay khong
     err.push('project is not exit or already been deleted');
   }
+
   if (!user) {
     //kiem ta user co ton tai hay khong truoc khi them vao project
     err.push('user not exit');
   }
+
   if (member) {
     //kiem tra xem user da duoc add vao project hay chua
     err.push('user already been added');
   }
 
-  next();
+  if (err.length > 0) {
+    return res.status(400).send(err);
+  }
 
-  return res.status(400).send(err);
+  next();
 };
 
-//xac thuc cho xoa thanh vien
-export const validate_move_user = async function (
+
+export const move_user = async function (
   req: express.Request,
   res: express.Response,
   next: express.NextFunction,
@@ -60,9 +63,11 @@ export const validate_move_user = async function (
       id: id,
     },
   });
+
   if (!member) {
     //kiem tra xem member da bi xoa khoi project hay chua
     return res.status(404).send('user already been remove');
   }
+
   next();
 };

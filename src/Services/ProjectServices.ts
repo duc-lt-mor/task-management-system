@@ -1,7 +1,8 @@
 import { Project } from '../Models/project';
 import { Member } from '../Models/member';
 import { Colum } from '../Models/colum';
-import express from 'express';
+import { ProjectData } from '../Interfaces/ProjectInterface';
+import { sequelize } from '../Config/config';
 
 // lay ra 1 project
 export const getProjectById = async (id: number) => {
@@ -14,63 +15,102 @@ export const getProjectById = async (id: number) => {
 };
 
 // tao 1 project
-export const Create = async function (req: express.Request) {
+export const Create = async function (data: ProjectData) {
+  const t = await sequelize.transaction();
+
   try {
-    let project: any = await Project.create({
-      name: req.body.name,
-      key: req.body.key,
-      decripstion: req.body.decripstion,
-      creator_id: req.body.creator_id,
-      expected_end_date: req.body.expected_end_date,
-    });
-    // khoi tao 3 cot mac dinh (todo, inprogress, done)
-    await Colum.bulkCreate([
-      { col_type: 'todo', name: 'TO DO', col_index: 1, project_id: project.id },
+    let project: any = await Project.create(
       {
-        col_type: 'in_progress',
-        name: 'IN PROGRESS',
-        col_index: 2,
-        project_id: project.id,
+        name: data.name,
+        key: data.key,
+        decripstion: data.decriptstion,
+        creator_id: data.creator_id,
+        expected_end_date: data.expected_end_date,
       },
-      { col_type: 'done', name: 'DONE', col_index: 3, project_id: project.id },
-    ]);
+      { transaction: t },
+    );
+    // khoi tao 3 cot mac dinh (todo, inprogress, done)
+    await Colum.bulkCreate(
+      [
+        {
+          type: 'todo',
+          name: 'TO DO',
+          index: 1,
+          project_id: project.id,
+        },
+        {
+          type: 'in_progress',
+          name: 'IN PROGRESS',
+          index: 2,
+          project_id: project.id,
+        },
+        {
+          type: 'done',
+          name: 'DONE',
+          index: 3,
+          project_id: project.id,
+        },
+      ],
+      { transaction: t },
+    );
+
+    await t.commit();
   } catch (err) {
-    throw new Error('Create failed' + err);
+    await t.rollback();
+    throw err;
   }
 };
 
 // sua project
-export const Edit = async function (req: express.Request) {
+export const Edit = async function (id: number, data: ProjectData) {
+  const t = await sequelize.transaction();
+
   try {
-    let project: any = await getProjectById(Number(req.params.project_id));
-    await project.update({
-      name: req.body.name,
-      decripstion: req.body.decripstion,
-      expected_end_date: req.body.expected_end_date,
-    });
+    let project: any = await getProjectById(id);
+    await project.update(
+      {
+        name: data.name,
+        decripstion: data.decriptstion,
+        expected_end_date: data.expected_end_date,
+      },
+      { transaction: t },
+    );
+
+    await t.commit();
   } catch (err) {
-    throw new Error('edit failed ' + err);
+    await t.rollback();
+    throw err;
   }
 };
 // xoa project
-export const Delete = async (req: express.Request) => {
-  let project: any = await getProjectById(Number(req.params.project_id));
+export const Delete = async (id: number) => {
+  const t = await sequelize.transaction();
 
-  await Member.destroy({
-    where: {
-      project_id: Number(req.params.project_id),
-    },
-  });
+  try {
+    await Member.destroy({
+      where: {
+        project_id: id,
+      },
+      transaction: t,
+    });
 
-  await Colum.destroy({
-    where: {
-      project_id: Number(req.params.project_id),
-    },
-  });
+    await Colum.destroy({
+      where: {
+        project_id: id,
+      },
+      transaction: t,
+    });
 
-  await Project.destroy({
-    where: {
-      id: Number(req.params.project_id),
-    },
-  });
+    await Project.destroy({
+      where: {
+        id: id,
+      },
+      transaction: t,
+    });
+
+    await t.commit();
+  } catch (error) {
+    await t.rollback();
+    throw error;
+  }
 };

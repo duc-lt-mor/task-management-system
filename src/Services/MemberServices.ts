@@ -1,14 +1,14 @@
-import { where } from 'sequelize';
 import { Member } from '../Models/member';
-import express from 'express';
+import { User } from '../Models/user';
+import { MemberData } from '../Interfaces/MemberInterface';
 
 //them thanh vien vao project
-export const Add = async function (req: express.Request) {
+export const Add = async function (id: number, data: MemberData) {
   try {
     await Member.create({
-      user_id: req.params.user_id,
-      project_id: req.body.project_id,
-      role_id: req.body.role_id,
+      user_id: id,
+      project_id: data.project_id,
+      role_id: data.role_id,
     });
   } catch (err) {
     throw new Error('remove failed ' + err);
@@ -16,8 +16,7 @@ export const Add = async function (req: express.Request) {
 };
 
 //xoa thanh vien khoi project
-export const Remove = async function (req: express.Request) {
-  let id: number = Number(req.params.id);
+export const Remove = async function (id: number) {
   try {
     await Member.destroy({
       where: { id: id },
@@ -28,12 +27,36 @@ export const Remove = async function (req: express.Request) {
 };
 
 //cap nhat role cua thanh vien trong project
-export const EditRole = async function (req: express.Request) {
+export const EditRole = async function (id: number, data: MemberData) {
   try {
     await Member.update(
-      { role_id: Number(req.body.role_id) },
-      { where: { id: Number(req.params.id) } },
+      { role_id: Number(data.role_id) },
+      { where: { id: id } },
     );
+  } catch (error) {
+    throw new Error('update failed ' + error);
+  }
+};
+
+//xem danh sach thanh vien cua project
+export const Show = async function (data: MemberData) {
+  try {
+    let project_id: number = Number(data.project_id);
+    let members: any = await Member.findAll({
+      where: {
+        project_id: project_id,
+      },
+      attributes: {
+        exclude: ['id'],
+      },
+      include: [
+        {
+          model: User,
+        },
+      ],
+    });
+
+    return members;
   } catch (error) {
     throw new Error('update failed ' + error);
   }

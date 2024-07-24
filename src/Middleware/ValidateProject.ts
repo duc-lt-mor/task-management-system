@@ -4,7 +4,7 @@ import { Op } from 'sequelize';
 import express from 'express';
 
 //xac thuc du lieu dau vao cho khoi tao project
-export const create = async function (
+export const validate_create = async function (
   req: express.Request,
   res: express.Response,
   next: express.NextFunction,
@@ -40,13 +40,15 @@ export const create = async function (
     err.push('project name or project key already been used');
   }
 
+  if(err.length > 0){
+    return res.status(400).send(err);
+  }
+  
   next();
-
-  return res.status(400).send(err);
 };
 
 //xac thuc du lieu dau vao cho sua project
-export const update = async function (
+export const validate_update = async function (
   req: express.Request,
   res: express.Response,
   next: express.NextFunction,
@@ -74,7 +76,9 @@ export const update = async function (
     err.push(`expected end date must later than ${current_date}`);
   }
 
+  if(err.length > 0){
+    return res.status(400).send(err);
+  }
+  
   next();
-
-  return res.status(400).send(err);
 };

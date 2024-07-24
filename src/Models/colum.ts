@@ -8,7 +8,7 @@ export const Colum = sequelize.define('colums', {
     autoIncrement: true,
     primaryKey: true,
   },
-  col_type: {
+  type: {
     type: DataTypes.STRING,
     allowNull: false,
   },
@@ -16,7 +16,7 @@ export const Colum = sequelize.define('colums', {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  col_index: {
+  index: {
     type: DataTypes.INTEGER,
     allowNull: true,
   },

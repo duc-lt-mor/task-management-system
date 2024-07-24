@@ -57,7 +57,7 @@ export const EditRole = async function (id: number, data: MemberData) {
 
 //xem danh sach thanh vien cua project
 export const Show = async function (data: MemberData) {
-  try {
+
     let project_id: number = Number(data.project_id);
     let members: any = await Member.findAll({
       where: {
@@ -74,7 +74,4 @@ export const Show = async function (data: MemberData) {
     });
 
     return members;
-  } catch (error) {
-    throw error;
-  }
 };

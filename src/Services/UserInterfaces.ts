@@ -9,6 +9,6 @@ export interface UserData {
   email: string;
   password: string;
   passwordConfirm: string;
-  phone_number: string;
-  system_role_id: string;
+  phoneNumber: number;
+  systemRoleID: number;
 }

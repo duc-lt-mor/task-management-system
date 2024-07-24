@@ -3,7 +3,7 @@ import * as ProjectServices from '../Services/ProjectServices';
 import { Op } from 'sequelize';
 import express from 'express';
 
-//xac thuc du lieu dau vao cho khoi tao project
+
 export const validate_create = async function (
   req: express.Request,
   res: express.Response,

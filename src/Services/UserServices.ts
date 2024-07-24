@@ -30,29 +30,3 @@ export const deleteUser = function (name: any) {
   return User.destroy({where: {name}})
 };
 
-export const update = async (req: express.Request, res: express.Response) => {
-  try {
-    
-
-    const userId = req.params.id; // Assuming the user ID is in the request parameters
-    const updates = req.body;
-
-    // Check if user exists
-    const user = await User.findByPk(userId);
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    // If password is being updated, hash it
-    if (updates.password) {
-      updates.password = await bcrypt.hash(updates.password, 10);
-    }
-
-    // Update user details
-    await user.update(updates);
-
-    res.status(200).json({ message: 'User updated successfully', user });
-  } catch (err) {
-    res.status(500).json({ message: 'Internal server error', err });
-  }
-};

@@ -44,7 +44,7 @@ export const verifyToken = async function (
       return res.status(401).send(`No token provided`);
     }
     const decoded = jwt.verify(token, JWT_SECRET_KEY);
-    req.user = decoded as { name: string, email: string, role: number };
+    req.user = decoded as UserPayload;
     next();
   } catch (err) {
     res.status(401).json({ message: 'Token verification failed' });

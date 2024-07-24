@@ -19,9 +19,9 @@ export const Edit = async function (
 ) {
   try {
     await ColumServices.Edit(Number(req.params.col_id), req.body);
-    res.status(200).send();
+    res.status(200).send("edit success");
   } catch (error) {
-    res.status(500).send('create failed');
+    res.status(500).send('edit failed');
   }
 };
 
@@ -31,8 +31,8 @@ export const Delete = async function (
 ) {
   try {
     await ColumServices.Delete(Number(req.params.col_id));
-    res.status(200).send();
+    res.status(200).send("delete success");
   } catch (error) {
-    res.status(500).send('create failed');
+    res.status(500).send('delete failed');
   }
 };

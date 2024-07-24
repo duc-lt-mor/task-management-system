@@ -27,7 +27,20 @@ export const Edit = async function (id: number, data: ColumData) {
   const t = await sequelize.transaction();
 
   let indexs: any = data.index;
+  //lay ra cot can sua
+  let colum: any = await Colum.findOne({
+    where: {
+      id: id,
+    },
+  });
+  
+  if (data.name == colum.name || !data.name) {
+    data.name = colum.name;
+  }
 
+  if (!data.type || data.type == colum.type) {
+    data.type = colum.type;
+  }
   try {
     for (let x in indexs) {
       await Colum.update(

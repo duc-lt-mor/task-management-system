@@ -41,15 +41,6 @@ export const validate_update = async function (
   res: express.Response,
   next: express.NextFunction,
 ) {
-  let respons: Array<string> = [];
-
-  //lay ra cot can sua
-  let colum: any = await Colum.findOne({
-    where: {
-      id: Number(req.params.col_id),
-    },
-  });
-
   //tim trong bang xem co cot nao thuoc cung project co ten bi trung voi ten vua nhap hay khong
   let check_name: any = await Colum.findOne({
     where: {
@@ -60,24 +51,11 @@ export const validate_update = async function (
   });
 
   if (check_name) {
-    respons.push('colum name already been used');
-  }
-
-  if (req.body.name == colum.name) {
-    respons.push('colum name remain');
-  }
-
-  if (req.body.type == colum.col_type) {
-    respons.push('colum type remain');
-  }
-
-  if (respons.length > 0) {
-    return res.status(400).send(respons);
+    return res.status(400).send('colum name already been used');
   }
 
   next();
 };
-
 
 export const validate_delete = async function (
   req: express.Request,

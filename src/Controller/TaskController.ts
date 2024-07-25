@@ -1,11 +1,22 @@
 import express from 'express';
 import * as services from '../Services/TaskServices';
+import { accessControl } from '../Middleware/UserAuthenticator';
+import { CustomRequest } from '../Middleware/UserAuthenticator';
+
 
 export const generateTask = async function (
-  req: express.Request,
+  req: CustomRequest,
   res: express.Response,
 ) {
   try {
+    if (!req.user) {
+      return res.status(401).json({ message: 'User not authenticated' });
+    }
+    const userRole: any  = req.user.role
+
+    if (!accessControl(userRole, 'create_task')) {
+      return res.status(403).json({ message: 'Unauthorized access' });
+    }
     const taskData = {
       name: req.body.name,
       description: req.body.name,
@@ -16,7 +27,7 @@ export const generateTask = async function (
       real_end_date: req.body.real_end_date,
       colum_id: 1,
     };
-
+    
     const task = await services.generate({ taskData });
     return res
       .status(201)

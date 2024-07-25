@@ -1,5 +1,4 @@
 import express from 'express';
-import { User } from '../Models/user';
 import bcrypt from 'bcrypt';
 import { generateToken } from '../Middleware/UserAuthenticator';
 import * as services from '../Services/UserServices';
@@ -20,7 +19,7 @@ export const getLogin = async function (
   }
 
   try {
-    const user: any = await User.findOne({ where: { email: email } });
+    const user: any = await services.find(email);
     if (!user) {
       res.status(401).json(`Invalid username or password`);
     }
@@ -63,9 +62,7 @@ export const postRegister = async function (
       systemRoleID: req.body.system_role_id,
     };
 
-    const existedUser = await User.findOne({
-      where: { email: data.email },
-    });
+    const existedUser = await services.find(data.email);
 
     if (existedUser) {
       return res.status(401).json({ message: `Email is already taken` });
@@ -86,10 +83,9 @@ export const deleteUser = async function (
   res: express.Response,
 ) {
   try {
-    const name = req.body.name;
-    console.log(name);
-    const deleted = await services.deleteUser(name);
-    if (deleted) return res.status(200).json({ message: `Deleted user` });
+    const email = req.body.email;
+    const deleted = await services.deleteUser(email);
+    return res.status(200).json({ message: `Deleted user`, deleted });
   } catch (err) {
     return res.status(500).json(err);
   }

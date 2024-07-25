@@ -18,15 +18,26 @@ export const register = async function (data: UserData) {
   }
 };
 
-export const getUser = function (name: string) {
-  return User.findOne({ where: { name } });
+export const find = function (email: string) {
+  return User.findOne({ where: { email } });
 };
 
-export const getUsers = function () {
+export const get = function () {
   return User.findAll();
 };
 
-export const deleteUser = function (name: any) {
-  return User.destroy({where: {name}})
+export const setPhone = async function (email: string, phone: number) {
+  const user: any = await find(email);
+  
+  if (!user) {
+    return { success: false };
+  }
+
+  Object.assign(user, phone);
+  await user.save();
+  return user;
 };
 
+export const deleteUser = function (email: any) {
+  return User.destroy({ where: { email } });
+};

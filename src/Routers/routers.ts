@@ -7,17 +7,17 @@ import * as MemberController from '../Controller/MemberController';
 import express from 'express';
 const router = express.Router();
 
-router.post('/project', ValidateProject.validate_create, ProjectController.Create);
-router.put('/project/:project_id', ValidateProject.validate_update, ProjectController.Edit);
-router.delete('/project/:project_id', ProjectController.Delete);
+router.post('/project', ...ValidateProject.validateCreate(), ProjectController.create);
+router.put('/project/:project_id', ValidateProject.validateUpdate, ProjectController.edit);
+router.delete('/project/:project_id', ProjectController.destroy);
 
-router.post('/member', ValidateMember.add_user, MemberController.Add);
-router.delete('/member/:id', ValidateMember.move_user, MemberController.Remove);
-router.put('/member/:id', MemberController.EditRole);
-router.get('/member', MemberController.Show);
+router.post('/member', ValidateMember.addUser, MemberController.add);
+router.delete('/member/:id', ValidateMember.moveUser, MemberController.remove);
+router.put('/member/:id', MemberController.editRole);
+router.get('/member', MemberController.show);
 
-router.post('/colum', ValidateColum.validate_create ,ColumController.Create);
-router.put('/colum/:col_id', ValidateColum.validate_update ,ColumController.Edit);
-router.delete('/colum/:col_id', ValidateColum.validate_delete, ColumController.Delete);
+router.post('/colum', ...ValidateColum.validateCreate() ,ColumController.create);
+router.put('/colum/:col_id', ...ValidateColum.validateUpdate() ,ColumController.edit);
+router.delete('/colum/:col_id', ...ValidateColum.validateDelete(), ColumController.destroy);
 
 export default router;

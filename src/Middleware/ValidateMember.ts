@@ -5,7 +5,7 @@ import { Op } from 'sequelize';
 import express from 'express';
 
 
-export const add_user = async function (
+export const addUser = async function (
   req: express.Request,
   res: express.Response,
   next: express.NextFunction,
@@ -20,7 +20,7 @@ export const add_user = async function (
     },
   });
 
-  let project: any = await ProjectServices.getProjectById(project_id);
+  let project: any = await ProjectServices.findProjectById(project_id);
 
   let member: any = await Member.findOne({
     where: {
@@ -52,7 +52,7 @@ export const add_user = async function (
 };
 
 
-export const move_user = async function (
+export const moveUser = async function (
   req: express.Request,
   res: express.Response,
   next: express.NextFunction,

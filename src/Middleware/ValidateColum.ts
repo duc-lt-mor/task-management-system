@@ -2,98 +2,86 @@ import { Colum } from '../Models/colum';
 import { Task } from '../Models/task';
 import express from 'express';
 import { Op } from 'sequelize';
+import { body, param } from 'express-validator';
 
-export const validate_create = async function (
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction,
-) {
-  let err: Array<string> = [];
+export const validateCreate = function () {
+  return [
+    body('name').custom(async (name, { req }) => {
+      // Check if 'name' is not empty before querying the database
+      if (!name) {
+        throw new Error('please enter column name'); // Add message for empty name
+      }
 
-  if (!req.body.type) {
-    err.push('please enter colum type');
-  }
+      let colum: any = await Colum.findOne({
+        where: {
+          name: name.replace(/\s+/g, ' ').trim(),
+          project_id: Number(req.body.project_id),
+        },
+      });
 
-  if (!req.body.name) {
-    err.push('please enter colum name');
-  }
-
-  let colum: any = await Colum.findOne({
-    where: {
-      name: req.body.name,
-      project_id: Number(req.body.project_id),
-    },
-  });
-
-  if (colum) {
-    err.push('colum name already exit');
-  }
-
-  if (err.length > 0) {
-    return res.status(400).send(err);
-  }
-
-  next();
+      if (colum) {
+        throw new Error('name already been used');
+      }
+    }),
+  ];
 };
 
-export const validate_update = async function (
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction,
-) {
-  //tim trong bang xem co cot nao thuoc cung project co ten bi trung voi ten vua nhap hay khong
-  let check_name: any = await Colum.findOne({
-    where: {
-      name: req.body.name,
-      project_id: Number(req.body.project_id),
-      id: { [Op.ne]: Number(req.params.col_id) },
-    },
-  });
+export const validateUpdate = function () {
+  return [
+    body('project_id').custom(async (project_id, { req }) => {
+      // Check if project_id is not a number
+      if (isNaN(req.body.project_id) || !req.body.project_id) {
+        throw new Error('Project ID must be a number');
+      }
 
-  if (check_name) {
-    return res.status(400).send('colum name already been used');
-  }
+      // Check for column name uniqueness within the same project, excluding the current column ID
+      const check_name = await Colum.findOne({
+        where: {
+          name: req.body.name.replace(/\s+/g, ' ').trim(),
+          project_id: Number(project_id),
+          id: { [Op.ne]: Number(req.params?.col_id) },
+        },
+      });
 
-  next();
+      if (check_name) {
+        throw new Error('Column name already in use within the project');
+      }
+    }),
+  ];
 };
 
-export const validate_delete = async function (
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction,
-) {
-  let err: Array<string> = [];
-  let id: number = Number(req.params.col_id);
+export const validateDelete = function () {
+  return [
+    param('col_id').custom(async (col_id) => {
+      let id: number = Number(col_id);
 
-  //dem so task hien co trong mot cot
-  let tasknum: number = await Task.count({
-    where: {
-      colum_id: id,
-    },
-  });
+      //dem so task hien co trong mot cot
+      let tasks: number = await Task.count({
+        where: {
+          colum_id: id,
+        },
+      });
 
-  //lay ra thong tin cot can xoa
-  let colum: any = await Colum.findOne({
-    where: {
-      id: id,
-    },
-  });
+      //lay ra thong tin cot can xoa
+      let colum: any = await Colum.findOne({
+        where: {
+          id: id,
+        },
+      });
 
-  if (colum.col_type != 'custom') {
-    //kiem tra xem cot can xoa co phai cot default khong
-    err.push("you can't delete default colum");
-  }
+      await Promise.all([tasks, colum]);
 
-  if (tasknum > 0) {
-    //kiem tra xem con task nao trong cot khong
-    err.push(
-      'you have move all tasks of this colum to other colum before you delete it',
-    );
-  }
+      if (colum.col_type != 'custom') {
+        //kiem tra xem cot can xoa co phai cot default khong
+        throw new Error("you can't delete default colum");
+      }
 
-  if (err.length > 0) {
-    return res.status(400).send(err);
-  }
-
-  next();
+      if (tasks > 0) {
+        //kiem tra xem con task nao trong cot khong
+        throw new Error(
+          'you have move all tasks of this colum to other colum before you delete it',
+        );
+      }
+    }),
+  ];
 };

@@ -4,7 +4,7 @@ import { MemberData } from '../Interfaces/MemberInterface';
 import { sequelize } from '../Config/config';
 
 //them thanh vien vao project
-export const Add = async function (id: number, data: MemberData) {
+export const add = async function (id: number, data: MemberData) {
   const t = await sequelize.transaction();
 
   try {
@@ -24,7 +24,7 @@ export const Add = async function (id: number, data: MemberData) {
 };
 
 //xoa thanh vien khoi project
-export const Remove = async function (id: number) {
+export const remove = async function (id: number) {
   const t = await sequelize.transaction();
 
   try {
@@ -40,7 +40,7 @@ export const Remove = async function (id: number) {
 };
 
 //cap nhat role cua thanh vien trong project
-export const EditRole = async function (id: number, data: MemberData) {
+export const editRole = async function (id: number, data: MemberData) {
   const t = await sequelize.transaction();
 
   try {
@@ -56,22 +56,21 @@ export const EditRole = async function (id: number, data: MemberData) {
 };
 
 //xem danh sach thanh vien cua project
-export const Show = async function (data: MemberData) {
-
-    let project_id: number = Number(data.project_id);
-    let members: any = await Member.findAll({
-      where: {
-        project_id: project_id,
+export const show = async function (data: MemberData) {
+  let project_id: number = Number(data.project_id);
+  let members: any = await Member.findAll({
+    where: {
+      project_id: project_id,
+    },
+    attributes: {
+      exclude: ['id'],
+    },
+    include: [
+      {
+        model: User,
       },
-      attributes: {
-        exclude: ['id'],
-      },
-      include: [
-        {
-          model: User,
-        },
-      ],
-    });
+    ],
+  });
 
-    return members;
+  return members;
 };

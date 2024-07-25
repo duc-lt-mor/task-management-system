@@ -3,15 +3,21 @@ import { Op } from 'sequelize';
 import { ColumData } from '../Interfaces/ColumInterface';
 import { sequelize } from '../Config/config';
 
-export const Create = async function (data: ColumData) {
+export const create = async function (data: ColumData) {
   const t = await sequelize.transaction();
+
+  let cols: number = await Colum.count({
+    where: {
+      project_id: data.project_id
+    }
+  })
 
   try {
     await Colum.create(
       {
         type: data.type,
         name: data.name,
-        index: data.index,
+        index: cols +1,
         project_id: data.project_id,
       },
       { transaction: t },
@@ -23,39 +29,39 @@ export const Create = async function (data: ColumData) {
   }
 };
 
-export const Edit = async function (id: number, data: ColumData) {
+export const edit = async function (id: number, data: ColumData) {
   const t = await sequelize.transaction();
 
-  let indexs: any = data.index;
+  let indexs = data.array_index;
   //lay ra cot can sua
   let colum: any = await Colum.findOne({
     where: {
       id: id,
     },
   });
-  
-  if (data.name == colum.name || !data.name) {
+
+  if (!data.name) {
     data.name = colum.name;
   }
 
-  if (!data.type || data.type == colum.type) {
+  if (!data.type) {
     data.type = colum.type;
   }
   try {
-    for (let x in indexs) {
-      await Colum.update(
-        { index: indexs[x].index },
-        { where: { id: indexs[x].id }, transaction: t },
-      );
-    }
+    await Promise.all([
+      await Promise.all(indexs.map(async (inde) =>
+        Colum.update({ index: inde.index }, { where: { id: inde.id } }),
+      )),
 
-    await Colum.update(
-      {
-        name: data.name,
-        type: data.type,
-      },
-      { where: { id: id }, transaction: t },
-    );
+      await Colum.update(
+        {
+          name: data.name,
+          type: data.type,
+        },
+        { where: { id: id }, transaction: t },
+      ),
+    ]);
+
     await t.commit();
   } catch (err) {
     await t.rollback();
@@ -63,7 +69,7 @@ export const Edit = async function (id: number, data: ColumData) {
   }
 };
 
-export const Delete = async function (id: number) {
+export const destroy = async function (id: number) {
   const t = await sequelize.transaction();
 
   let colum: any = await Colum.findOne({

@@ -5,7 +5,7 @@ import { ProjectData } from '../Interfaces/ProjectInterface';
 import { sequelize } from '../Config/config';
 
 // lay ra 1 project
-export const getProjectById = async (id: number) => {
+export const findProjectById = async (id: number) => {
   let project = await Project.findOne({
     where: {
       id: id,
@@ -15,14 +15,15 @@ export const getProjectById = async (id: number) => {
 };
 
 // tao 1 project
-export const Create = async function (data: ProjectData) {
+export const create = async function (data: ProjectData) {
   const t = await sequelize.transaction();
-
+  let trim_name: string = data.name.replace(/\s+/g, ' ').trim();
+  let trim_key = data.key.replace(/\s+/g, ' ').trim();
   try {
     let project: any = await Project.create(
       {
-        name: data.name,
-        key: data.key,
+        name: trim_name,
+        key: trim_key,
         decripstion: data.decriptstion,
         creator_id: data.creator_id,
         expected_end_date: data.expected_end_date,
@@ -62,18 +63,24 @@ export const Create = async function (data: ProjectData) {
 };
 
 // sua project
-export const Edit = async function (id: number, data: ProjectData) {
+export const edit = async function (id: number, data: ProjectData) {
   const t = await sequelize.transaction();
+  let project: any = await findProjectById(id);
 
+  if (!data.name) {
+    data.name = project.name;
+  }
+
+  let trim_name: string = data.name.replace(/\s+/g, ' ').trim();
+  
   try {
-    let project: any = await getProjectById(id);
-    await project.update(
+    await Project.update(
       {
-        name: data.name,
+        name: trim_name,
         decripstion: data.decriptstion,
         expected_end_date: data.expected_end_date,
       },
-      { transaction: t },
+      { where: { id: id }, transaction: t },
     );
 
     await t.commit();
@@ -83,23 +90,25 @@ export const Edit = async function (id: number, data: ProjectData) {
   }
 };
 // xoa project
-export const Delete = async (id: number) => {
+export const destroy = async (id: number) => {
   const t = await sequelize.transaction();
 
   try {
-    await Member.destroy({
-      where: {
-        project_id: id,
-      },
-      transaction: t,
-    });
+    await Promise.all([
+      await Member.destroy({
+        where: {
+          project_id: id,
+        },
+        transaction: t,
+      }),
 
-    await Colum.destroy({
-      where: {
-        project_id: id,
-      },
-      transaction: t,
-    });
+      await Colum.destroy({
+        where: {
+          project_id: id,
+        },
+        transaction: t,
+      }),
+    ]);
 
     await Project.destroy({
       where: {

@@ -4,7 +4,7 @@ import express from 'express';
 import { Op } from 'sequelize';
 
 
-export const Add = async function (
+export const add = async function (
   req: express.Request,
   res: express.Response,
 ) {
@@ -16,7 +16,7 @@ export const Add = async function (
     },
   });
   try {
-    await MemberServices.Add(user.id, req.body);
+    await MemberServices.add(user.id, req.body);
     return res.status(200).send('add member success');
   } catch (err) {
     return res.status(500).send('add member failed');
@@ -24,12 +24,12 @@ export const Add = async function (
 };
 
 
-export const Remove = async function (
+export const remove = async function (
   req: express.Request,
   res: express.Response,
 ) {
   try {
-    await MemberServices.Remove(Number(req.params.id));
+    await MemberServices.remove(Number(req.params.id));
     return res.status(200).send('delete member success');
   } catch (error) {
     return res.status(500).send('add member failed');
@@ -37,12 +37,12 @@ export const Remove = async function (
 };
 
 
-export const EditRole = async function (
+export const editRole = async function (
   req: express.Request,
   res: express.Response,
 ) {
   try {
-    await MemberServices.EditRole(Number(req.params.id), req.body);
+    await MemberServices.editRole(Number(req.params.id), req.body);
     res.status(201).send('edit member role success');
   } catch (error) {
     res.status(500).send('change role failed');
@@ -50,12 +50,12 @@ export const EditRole = async function (
 };
 
 
-export const Show = async function (
+export const show = async function (
   req: express.Request,
   res: express.Response,
 ) {
   try {
-    let members = await MemberServices.Show(req.body);
+    let members = await MemberServices.show(req.body);
     res.status(200).send(members);
   } catch (error) {
     res.status(500).send("can't get member list");

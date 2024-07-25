@@ -28,7 +28,7 @@ export const get = function () {
 
 export const setPhone = async function (email: string, phone: number) {
   const user: any = await find(email);
-  
+
   if (!user) {
     return { success: false };
   }

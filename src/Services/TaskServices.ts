@@ -12,7 +12,7 @@ export const get = async function () {
   return await Task.findAll();
 };
 
-export const update = async function (id: number, data: any) {
+export const update = async function (id: number, data: any, ) {
     const task: any = find(id)
     if (!task) {
         return {success: false}
@@ -25,7 +25,7 @@ export const update = async function (id: number, data: any) {
         task.assignee_id = data.assignee_id
     }
 
-    if (data.priority !== undefined) {
+    if (data.priority) {
         task.priority = data.priority
     }
 

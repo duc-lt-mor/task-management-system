@@ -19,7 +19,6 @@ export const create = async function (
   }
 };
 
-
 export const edit = async function (
   req: express.Request,
   res: express.Response,
@@ -37,15 +36,16 @@ export const edit = async function (
   }
 };
 
-
 export const destroy = async function (
   req: express.Request,
   res: express.Response,
 ) {
   try {
-    let project: any = await ProjectServices.findProjectById(Number(req.params.project_id));
+    let project: any = await ProjectServices.findProjectById(
+      Number(req.params.project_id),
+    );
 
-    if(!project){
+    if (!project) {
       return res.status(400).send('project already been delete');
     }
     await ProjectServices.destroy(Number(req.params.project_id));

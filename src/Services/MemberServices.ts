@@ -58,7 +58,7 @@ export const editRole = async function (id: number, data: MemberData) {
 //xem danh sach thanh vien cua project
 export const show = async function (data: MemberData) {
   let project_id: number = Number(data.project_id);
-  let members: any = await Member.findAll({
+  let members = await Member.findAll({
     where: {
       project_id: project_id,
     },

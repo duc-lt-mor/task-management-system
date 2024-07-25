@@ -29,7 +29,7 @@ export const getLogin = async function (
       return res.status(401).json('Invalid username or password');
     }
     const token: string = generateToken({
-      name: user.name,
+      id: user.id,
       email: user.email,
       role: user.role,
     });

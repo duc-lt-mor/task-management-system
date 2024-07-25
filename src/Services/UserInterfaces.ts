@@ -1,7 +1,7 @@
 export interface UserPayload {
-  name: string;
+  role: string;
   email: string;
-  role: number;
+  id: number;
 }
 
 export interface UserData {

@@ -1,108 +1,91 @@
-import { Task } from '../Models/task';
 import express from 'express';
+import * as services from '../Services/TaskServices';
 
 export const generateTask = async function (
   req: express.Request,
   res: express.Response,
 ) {
   try {
-    const name = req.body.name;
-    const description = req.body.name;
-    const creator_id = req.body.creator_id;
-    const assignee_id = req.body.assignee_id;
-    const priority = req.body.priority;
-    const expected_end_date = req.body.expected_end_date;
-    const real_end_date = req.body.real_end_date;
-    const colum_id = 1;
+    const taskData = {
+      name: req.body.name,
+      description: req.body.name,
+      creator_id: req.body.creator_id,
+      assignee_id: req.body.assignee_id,
+      priority: req.body.priority,
+      expected_end_date: req.body.expected_end_date,
+      real_end_date: req.body.real_end_date,
+      colum_id: 1,
+    };
 
-    const task = await Task.create({
-      name,
-      description,
-      creator_id,
-      assignee_id,
-      priority,
-      expected_end_date,
-      real_end_date,
-      colum_id,
-    });
+    const task = await services.generate({ taskData });
     return res
       .status(201)
       .json({ message: `Task generated successfully`, task });
   } catch (err) {
-    return res.status(500).send(`Internal error`);
+    return res.status(500).json(`Internal error`);
   }
 };
 
-export const getTask = async function (req: express.Request, res: express.Response) {
+export const getTask = async function (
+  req: express.Request,
+  res: express.Response,
+) {
   try {
-    const taskId = req.params.id;
+    const taskId = parseInt(req.params.id);
     if (!taskId) {
-      return res.status(404).send(`Task not found, try another ID`);
+      return res
+        .status(404)
+        .json({ message: `Task not found, try another ID` });
     }
-    const task = Task.findByPk(taskId);
+    const task = services.find(taskId);
     return res.status(201).json(task);
   } catch (err) {
-    return res.status(500).send(`Internal error`);
+    return res.status(500).json({ message: `Internal error` });
   }
 };
 
-export const getTasks = async function (req: express.Request, res: express.Response) {
+//get all tasks in a project
+export const getTasks = async function (
+  req: express.Request,
+  res: express.Response,
+) {
   try {
-    const tasks = await Task.findAll();
+    const tasks = services.get();
     return res.status(201).json(tasks);
   } catch (err) {
     return res.status(500).json(err);
   }
 };
 
-//find task by id and update task info
-export const updateTaskInfo = async function (
+export const update = async function (
   req: express.Request,
   res: express.Response,
 ) {
   try {
-    const creator_id = req.body.creator_id;
-    const assignee_id = req.body.assignee_id;
-    const end_date = req.body.end_date;
+    const taskId = parseInt(req.params.id);
 
-    const taskId = req.params.id;
-    if (!taskId) {
-      return res.status(404).send(`Task not found`);
+    if (isNaN(taskId)) {
+      return res.status(400).json({ message: 'Invalid task ID' });
     }
-    const task: any = await Task.findByPk(taskId);
-    if (!task) {
-      return res.status(404).json({ message: 'Task not found' });
-    }
-    task.assignee_id = assignee_id;
-    task.creator_id = creator_id;
-    task.end_date = end_date;
 
-    await task.save();
+    const updateData = {
+      status: req.body.status,
+      assignee_id: req.body.assignee_id,
+      creator_id: req.body.creator_id,
+      end_date: req.body.end_date,
+      real_end_date: req.body.real_end_date,
+    };
+
+    const result: any = await services.update(taskId, updateData);
+
+    if (!result.success) {
+      return res.status(404).json({ message: result.message });
+    }
+
+    return res.status(200).json(result.task);
   } catch (err) {
-    return res.status(500).send(`Internal error`);
-  }
-};
-
-//find task by id and update task status
-export const updateStatus = async function (
-  req: express.Request,
-  res: express.Response,
-) {
-  try {
-    const status = req.body.status;
-    const taskId = req.params.id;
-    if (!taskId) {
-      return res.status(404).send(`Task not found`);
-    }
-    const task: any = await Task.findByPk(taskId);
-    if (!task) {
-      return res.status(404).json({ message: 'Task not found' });
-    }
-    task.status = status;
-
-    await task.save();
-  } catch (err) {
-    return res.status(500).send(`Internal error`);
+    console.error('Error updating task:', err);
+    return res.status(500).json({ message: 'Internal server error' });
   }
 };
 
@@ -112,13 +95,17 @@ export const deleteTask = async function (
   res: express.Response,
 ) {
   try {
-    const taskId = req.params.id;
-    if (!taskId) {
-      return res.status(404).send(`Task not found, try another ID`);
+    const id = parseInt(req.params.id, 10);
+    if (!id) {
+      return res
+        .status(404)
+        .json({ message: `Task not found, try another ID` });
     }
-    const deleted = Task.destroy({ where: { taskId } });
-    return res.status(201).json({ message: `Task deleted`, deleted });
-  } catch {
-    return res.status(500).json(`Internal server error`);
+    const deleted = await services.deleteTask(id);
+    if (deleted) {
+      return res.status(201).json({ message: `Task deleted`, deleted });
+    }
+  } catch (err) {
+    return res.status(500).json({ message: `Internal server error`, err });
   }
 };

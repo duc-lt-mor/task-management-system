@@ -1,27 +1,39 @@
-import { Task } from "../Models/task";
+import { Task } from '../Models/task';
 
 export const generate = async function (data: any) {
-    const task = await Task.create(data)
-    return task
-}
+  return await Task.create(data);
+};
 
-export const find = async function (name: string) {
-    const task = await Task.findOne({where: {name}})
-    return task
-}
+export const find = async function (id: number) {
+  return await Task.findOne({ where: { id } });
+};
 
 export const get = async function () {
-    const tasks = await Task.findAll()
-    return tasks
-}
+  return await Task.findAll();
+};
 
-//find task and update status by id
-export const updateStatus = async function (id: number, status: number) {
-    const task: any = await Task.findByPk(id)
+export const update = async function (id: number, data: any) {
+    const task: any = find(id)
     if (!task) {
         return {success: false}
     }
-    task.status = status
-    await task.save()
-    return task
+    if (data.status !== undefined) {
+        task.status = data.status
+    }
+
+    if (data.assignee_id !== undefined) {
+        task.assignee_id = data.assignee_id
+    }
+
+    if (data.priority !== undefined) {
+        task.priority = data.priority
+    }
+
+    if (data.real_end_date !== undefined) {
+        task.real_end_date = data.real_end_date
+    }
 }
+
+export const deleteTask = async function (id: number) {
+  return await Task.destroy({ where: { id } });
+};

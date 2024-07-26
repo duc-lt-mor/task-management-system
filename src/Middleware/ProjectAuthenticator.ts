@@ -1,9 +1,8 @@
 import { CustomRequest } from '../Middleware/UserAuthenticator';
-import { Project } from '../Models/project';
+
 import { Member } from '../Models/member';
-import { Colum } from '../Models/colum';
+
 import express from 'express';
-import { User } from '../Models/user';
 
 export const authenticateProject = async function (
   req: CustomRequest,
@@ -16,31 +15,25 @@ export const authenticateProject = async function (
     }
 
     let member: any = await Member.findOne({
+      attributes: ['role_id'],
       where: {
         user_id: req.user.id,
-        project_id: Number(req.params.project_id),
+        project_id: Number(req.params.project_id || req.body.project_id),
       },
-      include: [
-        {
-          model: User,
-        },
-      ],
     });
 
-    if (!member) {
+    if (req.user.role == 'server_admin') {
+      next();
+      console.log(member);
+    }
+    if (member?.role_id != 1) {
       return res
         .status(403)
         .json({ message: 'You do not have permission to access.' });
     } else {
-      if (member.role_id == 1) {
-        next();
-      } else {
-        return res
-          .status(403)
-          .json({ message: 'You do not have permission to access.' });
-      }
+      next();
     }
   } catch (err) {
-    return res.status(500).json({ message: 'Internal error' });
+    return res.status(500).json({ message: 'Internal error '});
   }
 };

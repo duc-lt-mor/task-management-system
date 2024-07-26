@@ -3,9 +3,10 @@ export interface Roles {
   }
 
 export const ADMIN = 1
-export const PROJECT_MANAGER = 2
-export const TEAM_LEADER = 3
-export const USER = 4
+export const SYSTEM_USER =2
+export const PROJECT_MANAGER = 3
+export const TEAM_LEADER = 4
+export const USER = 5
 
 export const roles: Roles = {
   [ADMIN]: [
@@ -20,6 +21,9 @@ export const roles: Roles = {
     'create_task',
     'update_task',
     'delete_task',
+  ],
+  [SYSTEM_USER]: [
+    'create_project',
   ],
   [PROJECT_MANAGER]: [
     'update_user',

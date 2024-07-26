@@ -8,21 +8,15 @@ export const generateTask = async function (req: authenticator.CustomRequest, re
       return res.status(401).json({ message: 'User not authenticated' });
     }
 
-    const userRole: number = req.user.system_role_id;
-    // Check if the user has permission to create a task
-    // if (!authenticator.accessControl(userRole, 'create_task')) {
-    //   console.log(userRole)
-    //   return res.status(403).json({ message: 'Unauthorized access', userRole });
-    // }
-
     const project_id = req.body.project_id;
+    const creator_id = req.user?.id
     const key = await services.generateKey(project_id); // Ensure this is awaited
     const taskData = {
       project_id,
       key,
       name: req.body.name,
-      description: req.body.decription, // Use correct field for description
-      creator_id: req.user.id, // Set from authenticated user
+      description: req.body.description, // Use correct field for description
+      creator_id, // Set from authenticated user
       assignee_id: req.body.assignee_id,
       priority: req.body.priority,
       expected_end_date: req.body.expected_end_date,

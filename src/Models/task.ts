@@ -12,6 +12,10 @@ export const Task = sequelize.define(
       autoIncrement: true,
       primaryKey: true,
     },
+    key: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
     name: {
       type: DataTypes.STRING,
       allowNull: false,

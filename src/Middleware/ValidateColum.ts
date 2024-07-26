@@ -1,6 +1,5 @@
 import { Colum } from '../Models/colum';
 import { Task } from '../Models/task';
-import express from 'express';
 import { Op } from 'sequelize';
 import { body, param } from 'express-validator';
 

@@ -1,7 +1,5 @@
 import { Project } from '../Models/project';
-import * as ProjectServices from '../Services/ProjectServices';
 import { Op } from 'sequelize';
-import express from 'express';
 import { body } from 'express-validator';
 
 export const validateCreate = function () {

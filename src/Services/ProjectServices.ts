@@ -17,13 +17,12 @@ export const findProjectById = async (id: number) => {
 // tao 1 project
 export const create = async function (data: ProjectData) {
   const t = await sequelize.transaction();
-  let trim_name: string = data.name.replace(/\s+/g, ' ').trim();
-  let trim_key = data.key.replace(/\s+/g, ' ').trim();
+
   try {
     let project: any = await Project.create(
       {
-        name: trim_name,
-        key: trim_key,
+        name: data.name,
+        key: data.key,
         decripstion: data.decriptstion,
         creator_id: data.creator_id,
         expected_end_date: data.expected_end_date,
@@ -70,13 +69,11 @@ export const edit = async function (id: number, data: ProjectData) {
   if (!data.name) {
     data.name = project.name;
   }
-
-  let trim_name: string = data.name.replace(/\s+/g, ' ').trim();
   
   try {
     await Project.update(
       {
-        name: trim_name,
+        name: data.name,
         decripstion: data.decriptstion,
         expected_end_date: data.expected_end_date,
       },

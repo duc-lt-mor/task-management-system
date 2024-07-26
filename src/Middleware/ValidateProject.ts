@@ -57,10 +57,9 @@ export const validateCreate = function () {
 export const validateUpdate = function () {
   return [
     body('name').custom(async (name, { req }) => {
-      let trim_name: string = name.trim();
       let project_found = await Project.findOne({
         where: {
-          name: trim_name,
+          name: name,
           id: { [Op.ne]: req.params?.project_id },
         },
       });

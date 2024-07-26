@@ -1,6 +1,6 @@
 import { body } from 'express-validator';
 
-export const validator = function () {
+export const validateRegister = function () {
   return [
     body(`name`).notEmpty().withMessage(`Please enter your name`),
     body(`email`).notEmpty().withMessage(`Please enter your email`),
@@ -18,3 +18,10 @@ export const validator = function () {
       .withMessage('Please select a system role'),
   ];
 };
+
+export const validateLogin = function () {
+  return [
+    body(`email`).notEmpty().withMessage(`Please enter your email`),
+    body(`password`).notEmpty().withMessage(`Please enter your password`)
+  ]
+}

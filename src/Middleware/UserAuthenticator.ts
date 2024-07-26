@@ -1,6 +1,6 @@
 import jwt, { Secret, SignOptions } from 'jsonwebtoken';
 import express from 'express';
-import { UserPayload } from '../Services/UserInterfaces';
+import { UserPayload } from '../Interfaces/UserInterfaces';
 import dotenv from 'dotenv';
 import { roles } from '../Models/Roles';
 dotenv.config();
@@ -52,16 +52,3 @@ export const accessControl = function (
   return userPermission.includes(permission);
 };
 
-export const generateToken = function (user: UserPayload) {
-  const payload: UserPayload = {
-    role: user.role,
-    email: user.email,
-    id: user.id,
-  };
-
-  const options: SignOptions = {
-    expiresIn: process.env.expiresIn,
-  };
-
-  return jwt.sign(payload, JWT_SECRET_KEY, options);
-};

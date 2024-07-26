@@ -32,7 +32,8 @@ export const register = async function (data: UserData) {
     name: data.name,
     email: data.email,
     password: hashedPassword,
-    systemRoleID: data.systemRoleID,
+    phone_number: data.phone_number,
+    system_role_id: data.system_role_id,
   });
   if (user) {
     return user
@@ -43,7 +44,7 @@ export const register = async function (data: UserData) {
 };
 
 export const find = function (email: string) {
-  return User.findOne({ where: { email } });
+  return User.findOne({ where: { email: email } });
 };
 
 export const get = function () {

@@ -16,22 +16,14 @@ export const authenticateJWT = function (
   res: express.Response,
   next: express.NextFunction,
 ) {
-  const authHeader = req.header(`Authorization`);
+  const authHeader = req.headers.authorization
   if (authHeader) {
-    jwt.verify(
-      authHeader.split(' ')[1],
-      JWT_SECRET_KEY,
-      (err: any, user: any) => {
-        if (err) {
-          return res.status(403).send('Unauthorization');
-        }
-        req.user = user as UserPayload;
-        next();
-      },
-    );
+    const decoded = jwt.verify(authHeader.split(' ')[1], JWT_SECRET_KEY);
+    req.user = decoded as UserPayload
+    return next()
   }
 
-  return res.status(403).send('Unauthorization');
+  return res.status(403).json('Unauthorization');
 };
 
 export const verifyToken = async function (
@@ -52,10 +44,13 @@ export const verifyToken = async function (
   }
 };
 
-export const accessControl = function (userRole: string, permission: string): boolean {
-  const userPermission = roles[userRole] || []
-  return userPermission.includes(permission)
-}
+export const accessControl = function (
+  userRole: string,
+  permission: string,
+): boolean {
+  const userPermission = roles[userRole] || [];
+  return userPermission.includes(permission);
+};
 
 export const generateToken = function (user: UserPayload) {
   const payload: UserPayload = {

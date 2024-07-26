@@ -1,8 +1,18 @@
 import { Task } from '../Models/task';
+import { Project } from '../Models/project';
 
-export const generate = async function (data: any) {
+export const create = async function (data: any) {
   return await Task.create(data);
 };
+
+export const generateKey = async function (projectID: number) {
+  const project = await Project.findByPk(projectID)
+  if (!project) {
+    throw new Error(`Project not found`)
+  }
+  const count = await Task.count({where: {projectID: projectID}})
+  const newID = count + 1
+}
 
 export const find = async function (id: number) {
   return await Task.findOne({ where: { id } });

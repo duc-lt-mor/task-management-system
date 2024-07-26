@@ -59,4 +59,3 @@ User.hasMany(Task, {
 Task.belongsTo(User, {
   foreignKey: 'assignee_id',
 });
-sequelize.sync();

@@ -3,37 +3,41 @@ import * as services from '../Services/TaskServices';
 import { accessControl } from '../Middleware/UserAuthenticator';
 import { CustomRequest } from '../Middleware/UserAuthenticator';
 
-
-export const generateTask = async function (
-  req: CustomRequest,
-  res: express.Response,
-) {
+export const generateTask = async function (req: CustomRequest, res: express.Response) {
   try {
+    // Ensure user is authenticated
     if (!req.user) {
       return res.status(401).json({ message: 'User not authenticated' });
     }
-    const userRole: any  = req.user.role
 
+    const userRole: string = req.user.role;
+    // Check if the user has permission to create a task
     if (!accessControl(userRole, 'create_task')) {
-      return res.status(403).json({ message: 'Unauthorized access' });
+      return res.status(403).json({ message: 'Unauthorized access', userRole });
     }
+
+    const projectID = req.body.project_id;
+    const key = await services.generateKey(projectID); // Ensure this is awaited
     const taskData = {
+      projectID,
+      key,
       name: req.body.name,
-      description: req.body.name,
-      creator_id: req.body.creator_id,
+      description: req.body.description, // Use correct field for description
+      creator_id: req.user.id, // Set from authenticated user
       assignee_id: req.body.assignee_id,
       priority: req.body.priority,
       expected_end_date: req.body.expected_end_date,
       real_end_date: req.body.real_end_date,
       colum_id: 1,
     };
-    
-    const task = await services.generate({ taskData });
-    return res
-      .status(201)
-      .json({ message: `Task generated successfully`, task });
+
+    const task = await services.create(taskData);
+    return res.status(201).json({ message: 'Task generated successfully', task });
   } catch (err) {
-    return res.status(500).json(`Internal error`);
+    console.error(err); // Log error for debugging purposes
+    if (!res.headersSent) {
+      return res.status(500).json({ message: 'Internal server error', error: err });
+    }
   }
 };
 

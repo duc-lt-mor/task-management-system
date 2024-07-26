@@ -27,4 +27,3 @@ Project.hasMany(Colum, {
 Colum.belongsTo(Project, {
   foreignKey: 'project_id',
 });
-sequelize.sync();

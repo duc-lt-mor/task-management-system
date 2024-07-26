@@ -9,6 +9,7 @@ router.get('/login', user.getLogin)
 router.post('/register', ...validator(), user.postRegister)
 router.delete('/', user.deleteUser)
 
+router.post('/api/task', authenticator.authenticateJWT, task.generateTask)
 router.get('/task/:id', task.getTask)
 router.get('/task', task.getTasks)
 router.delete('/task/:id', task.deleteTask)

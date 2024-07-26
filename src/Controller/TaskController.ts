@@ -10,6 +10,7 @@ export const generateTask = async function (req: authenticator.CustomRequest, re
 
     const project_id = req.body.project_id;
     const creator_id = req.user?.id
+    const colum_id = 1
     const key = await services.generateKey(project_id); // Ensure this is awaited
     const taskData = {
       project_id,
@@ -21,7 +22,7 @@ export const generateTask = async function (req: authenticator.CustomRequest, re
       priority: req.body.priority,
       expected_end_date: req.body.expected_end_date,
       real_end_date: req.body.real_end_date,
-      colum_id: 1,
+      colum_id
     };
 
     const task = await services.create(taskData);

@@ -2,15 +2,32 @@ import { Member } from '../Models/member';
 import { User } from '../Models/user';
 import { MemberData } from '../Interfaces/MemberInterface';
 import { sequelize } from '../Config/config';
+import { validationResult } from 'express-validator';
+import express from 'express';
+import createHttpError from 'http-errors';
+import { Op } from 'sequelize';
 
 //them thanh vien vao project
-export const add = async function (id: number, data: MemberData) {
+export const add = async function (req: express.Request, data: MemberData) {
   const t = await sequelize.transaction();
+  let find_mem: string = req.body.find_mem;
 
+  let user: any = await User.findOne({
+    where: {
+      [Op.or]: [{ name: find_mem }, { email: find_mem }],
+    },
+  });
   try {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      const errorMessages = errors.array().map((e: any) => e.msg);
+      const error = createHttpError(400, JSON.stringify(errorMessages));
+      throw error;
+    }
     await Member.create(
       {
-        user_id: id,
+        user_id: user.id,
         project_id: data.project_id,
         role_id: data.role_id,
       },

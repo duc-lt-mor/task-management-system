@@ -5,15 +5,11 @@ import { body, param } from 'express-validator';
 
 export const validateCreate = function () {
   return [
-    body('name').custom(async (name, { req }) => {
-      // Check if 'name' is not empty before querying the database
-      if (!name) {
-        throw new Error('please enter column name'); // Add message for empty name
-      }
-
+    body('name').notEmpty().trim().custom(async (name, { req }) => {
+  
       let colum: any = await Colum.findOne({
         where: {
-          name: name.replace(/\s+/g, ' ').trim(),
+          name: name,
           project_id: Number(req.body.project_id),
         },
       });
@@ -36,7 +32,7 @@ export const validateUpdate = function () {
       // Check for column name uniqueness within the same project, excluding the current column ID
       const check_name = await Colum.findOne({
         where: {
-          name: req.body.name.replace(/\s+/g, ' ').trim(),
+          name: req.body.name,
           project_id: Number(project_id),
           id: { [Op.ne]: Number(req.params?.col_id) },
         },
@@ -55,14 +51,14 @@ export const validateDelete = function () {
       let id: number = Number(col_id);
 
       //dem so task hien co trong mot cot
-      let tasks: number = await Task.count({
+      let tasks: any =  Task.count({
         where: {
           colum_id: id,
         },
       });
 
       //lay ra thong tin cot can xoa
-      let colum: any = await Colum.findOne({
+      let colum: any = Colum.findOne({
         where: {
           id: id,
         },

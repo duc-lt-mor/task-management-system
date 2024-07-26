@@ -2,8 +2,11 @@ import { Colum } from '../Models/colum';
 import { Op } from 'sequelize';
 import { ColumData } from '../Interfaces/ColumInterface';
 import { sequelize } from '../Config/config';
+import { validationResult } from 'express-validator';
+import express from 'express';
+import createHttpError from 'http-errors';
 
-export const create = async function (data: ColumData) {
+export const create = async function (data: ColumData, req: express.Request ) {
   const t = await sequelize.transaction();
 
   let cols: number = await Colum.count({
@@ -13,6 +16,14 @@ export const create = async function (data: ColumData) {
   })
 
   try {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+
+      const errorMessages = errors.array().map((e: any) => e.msg);
+      const error = createHttpError(400, JSON.stringify(errorMessages));
+      throw error
+    }
     await Colum.create(
       {
         type: data.type,
@@ -29,7 +40,7 @@ export const create = async function (data: ColumData) {
   }
 };
 
-export const edit = async function (id: number, data: ColumData) {
+export const edit = async function (id: number, data: ColumData, req: express.Request) {
   const t = await sequelize.transaction();
 
   let indexs = data.array_index;
@@ -48,6 +59,14 @@ export const edit = async function (id: number, data: ColumData) {
     data.type = colum.type;
   }
   try {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+
+      const errorMessages = errors.array().map((e: any) => e.msg);
+      const error = createHttpError(400, JSON.stringify(errorMessages));
+      throw error
+    }
     await Promise.all([
       await Promise.all(indexs.map(async (inde) =>
         Colum.update({ index: inde.index }, { where: { id: inde.id } }),
@@ -69,7 +88,7 @@ export const edit = async function (id: number, data: ColumData) {
   }
 };
 
-export const destroy = async function (id: number) {
+export const destroy = async function (id: number, req: express.Request) {
   const t = await sequelize.transaction();
 
   let colum: any = await Colum.findOne({
@@ -85,6 +104,14 @@ export const destroy = async function (id: number) {
     },
   });
   try {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+
+      const errorMessages = errors.array().map((e: any) => e.msg);
+      const error = createHttpError(400, JSON.stringify(errorMessages));
+      throw error
+    }
     //giam gia tri index cua cac cot o cuoi den vi tri cua cot can xoa
     for (let i: number = last_index; i >= colum.index; i--) {
       let col: any = await Colum.findOne({

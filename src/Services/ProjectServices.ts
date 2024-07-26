@@ -3,7 +3,9 @@ import { Member } from '../Models/member';
 import { Colum } from '../Models/colum';
 import { ProjectData } from '../Interfaces/ProjectInterface';
 import { sequelize } from '../Config/config';
-
+import { validationResult } from 'express-validator';
+import express from 'express';
+import createHttpError from 'http-errors';
 // lay ra 1 project
 export const findProjectById = async (id: number) => {
   let project = await Project.findOne({
@@ -15,10 +17,16 @@ export const findProjectById = async (id: number) => {
 };
 
 // tao 1 project
-export const create = async function (data: ProjectData) {
+export const create = async function (req: express.Request, data: ProjectData) {
   const t = await sequelize.transaction();
 
   try {
+    const errors = validationResult(req);
+    if (errors) {
+      const errorMessages = errors.array().map((e: any) => e.msg);
+      const error = createHttpError(400, JSON.stringify(errorMessages,null, 2));
+      throw error;
+    }
     let project: any = await Project.create(
       {
         name: data.name,
@@ -62,15 +70,26 @@ export const create = async function (data: ProjectData) {
 };
 
 // sua project
-export const edit = async function (id: number, data: ProjectData) {
+export const edit = async function (
+  id: number,
+  req: express.Request,
+  data: ProjectData,
+) {
   const t = await sequelize.transaction();
   let project: any = await findProjectById(id);
 
   if (!data.name) {
     data.name = project.name;
   }
-  
+
   try {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      const errorMessages = errors.array().map((e: any) => e.msg);
+      const error = createHttpError(400, JSON.stringify(errorMessages,null, 2));
+      throw error;
+    }
     await Project.update(
       {
         name: data.name,
@@ -92,14 +111,14 @@ export const destroy = async (id: number) => {
 
   try {
     await Promise.all([
-      await Member.destroy({
+      Member.destroy({
         where: {
           project_id: id,
         },
         transaction: t,
       }),
 
-      await Colum.destroy({
+      Colum.destroy({
         where: {
           project_id: id,
         },

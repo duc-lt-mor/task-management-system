@@ -1,8 +1,7 @@
 import { CustomRequest } from '../Middleware/UserAuthenticator';
-
 import { Member } from '../Models/member';
-
 import express from 'express';
+import * as Roles from '../Constant/Constant'
 
 export const authenticateProject = async function (
   req: CustomRequest,
@@ -22,11 +21,10 @@ export const authenticateProject = async function (
       },
     });
 
-    if (req.user.role == 'server_admin') {
+    if (req.user.role == Roles.ADMIN) {
       next();
-      console.log(member);
     }
-    if (member?.role_id != 1) {
+    if (member?.role_id != Roles.PROJECT_MANAGER) {
       return res
         .status(403)
         .json({ message: 'You do not have permission to access.' });

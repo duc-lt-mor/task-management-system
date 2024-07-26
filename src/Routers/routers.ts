@@ -11,7 +11,7 @@ const router = express.Router();
 
 router.post(
   '/project',
-  ...ValidateProject.validateCreate(),
+  ValidateProject.validateCreate,
   ProjectController.create,
 );
 router.put(
@@ -32,14 +32,13 @@ router.post(
   '/member',
   authenticator.verifyToken,
   ProjectAut.authenticateProject,
-  ValidateMember.addUser,
+  ...ValidateMember.addUser(),
   MemberController.add,
 );
 router.delete(
   '/member/:id',
   authenticator.verifyToken,
   ProjectAut.authenticateProject,
-  ValidateMember.moveUser,
   MemberController.remove,
 );
 router.put(

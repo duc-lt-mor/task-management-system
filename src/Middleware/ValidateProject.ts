@@ -2,34 +2,26 @@ import { Project } from '../Models/project';
 import { Op } from 'sequelize';
 import { body } from 'express-validator';
 
-export const validateCreate = function () {
-  return [
-    body('name').custom(async (name) => {
-      if (!name) {
-        throw new Error('Please enter project name');
-      }
 
-      let trim_name: string = name.replace(/\s+/g, ' ').trim();
+export const validateCreate = [
+    body('name').notEmpty().withMessage("Please enter project name").trim().custom(async (name) => {
+
       let project_found = await Project.findOne({
         where: {
-          name: trim_name,
+          name: name,
         },
       });
 
       if (project_found) {
-        throw new Error('project name already been used');
+        throw new Error( 'project name already been used');
       }
     }),
 
-    body('key').custom(async (key) => {
-      if (!key) {
-        throw new Error('Please enter project key');
-      }
+    body('key').notEmpty().withMessage('Please enter project key').trim().custom(async (key) => {
 
-      let trim_key: string = key.trim();
       let project_found = await Project.findOne({
         where: {
-          key: trim_key,
+          key: key,
         },
       });
 
@@ -51,7 +43,7 @@ export const validateCreate = function () {
       }
     }),
   ];
-};
+
 
 //xac thuc du lieu dau vao cho sua project
 export const validateUpdate = function () {

@@ -2,10 +2,10 @@ export interface Roles {
     [role: string]: string[];
   }
 
-export const ADMIN = 'admin'
-export const PROJECT_MANAGER = 'project_manager'
-export const TEAM_LEADER = 'team_leader'
-export const USER = 'user'
+export const ADMIN = 1
+export const PROJECT_MANAGER = 2
+export const TEAM_LEADER = 3
+export const USER = 4
 
 export const roles: Roles = {
   [ADMIN]: [

@@ -16,7 +16,7 @@ export const Task = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    decription: {
+    description: {
       type: DataTypes.STRING,
       allowNull: true,
     },
@@ -24,7 +24,7 @@ export const Task = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    piority: {
+    priority: {
       type: DataTypes.STRING,
       allowNull: false,
     },

@@ -20,4 +20,3 @@ export const Role = sequelize.define('roles', {
     allowNull: true,
   },
 });
-sequelize.sync();

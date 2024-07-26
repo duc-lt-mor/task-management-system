@@ -38,4 +38,4 @@ Comment.belongsTo(Task, {
   foreignKey: 'task_id',
 });
 
-sequelize.sync();
+

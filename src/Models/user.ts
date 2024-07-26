@@ -31,4 +31,4 @@ System_role.hasMany(User, {
 User.belongsTo(System_role, {
   foreignKey: 'system_role_id',
 });
-sequelize.sync();
+

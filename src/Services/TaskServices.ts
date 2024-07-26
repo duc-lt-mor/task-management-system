@@ -6,12 +6,15 @@ export const create = async function (data: any) {
 };
 
 export const generateKey = async function (projectID: number) {
-  const project = await Project.findByPk(projectID)
+  const project: any = await Project.findByPk(projectID)
   if (!project) {
     throw new Error(`Project not found`)
   }
   const count = await Task.count({where: {projectID: projectID}})
   const newID = count + 1
+  const projectPrefix = project.prefix || `PROJ${projectID}`
+  const key = `${projectPrefix}-${newID.toString().padStart(4, '0')}`
+  return key
 }
 
 export const find = async function (id: number) {

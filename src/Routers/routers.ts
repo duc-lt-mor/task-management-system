@@ -9,11 +9,10 @@ router.get('/login', user.getLogin)
 router.post('/register', ...validator(), user.postRegister)
 router.delete('/', user.deleteUser)
 
-router.get('/task/:id', authenticator.verifyToken, task.getTask)
-router.get('/task', authenticator.verifyToken, task.getTasks)
-router.delete('/task/:id', authenticator.verifyToken, authenticator.authorizeRole([1]), task.deleteTask)
+router.get('/task/:id', task.getTask)
+router.get('/task', task.getTasks)
+router.delete('/task/:id', task.deleteTask)
 
-router.put('/task', authenticator.verifyToken, authenticator.authorizeRole([1, 2, 3]), task.updateTaskInfo)
-router.put('/status', authenticator.verifyToken, task.updateStatus)
+router.put('/task', task.update)
 
 export { router }

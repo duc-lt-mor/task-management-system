@@ -38,6 +38,6 @@ export const setPhone = async function (email: string, phone: number) {
   return user;
 };
 
-export const deleteUser = function (email: any) {
-  return User.destroy({ where: { email } });
+export const deleteUser = function (id: number) {
+  return User.destroy({ where: { id } });
 };

@@ -31,7 +31,7 @@ export const getLogin = async function (
     const token: string = generateToken({
       id: user.id,
       email: user.email,
-      role: user.role,
+      role: user.system_role_id,
     });
 
     return res.status(200).json({
@@ -83,9 +83,9 @@ export const deleteUser = async function (
   res: express.Response,
 ) {
   try {
-    const email = req.body.email;
-    const deleted = await services.deleteUser(email);
-    return res.status(200).json({ message: `Deleted user`, deleted });
+    const id = parseInt(req.params.id);
+    await services.deleteUser(id);
+    return res.status(200).json({ message: `Deleted user` });
   } catch (err) {
     return res.status(500).json(err);
   }

@@ -1,8 +1,8 @@
 import jwt, { Secret, SignOptions } from 'jsonwebtoken';
 import express from 'express';
-import { UserPayload } from '../Interfaces/UserInterfaces';
+import { UserPayload } from '../Interfaces/UserInterfaces'
 import dotenv from 'dotenv';
-import { roles } from '../Models/Roles';
+import { roles } from '../Interfaces/Roles';
 dotenv.config();
 
 const JWT_SECRET_KEY: Secret = process.env.JWT_SECRET as Secret;

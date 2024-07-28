@@ -1,9 +1,9 @@
-import swaggerAutogen from 'swagger-autogen';
+const swaggerAutogen = require('swagger-autogen');
 
 const doc = {
   info: {
     title: 'My API',
-    description: 'Description'
+    description: 'Description',
   },
   host: 'localhost:3000',
   schemes: ['http'],
@@ -12,6 +12,6 @@ const doc = {
 const outputFile = '../../swagger-output.json';
 const endpointsFiles = ['./src/app.ts'];
 
-swaggerAutogen()(outputFile,endpointsFiles, doc).then(() => {
+swaggerAutogen()(outputFile, endpointsFiles, doc).then(() => {
   console.log('Swagger documentation generated.');
 });

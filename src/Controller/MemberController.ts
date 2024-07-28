@@ -49,7 +49,7 @@ export const show = async function (
   next: express.NextFunction,
 ) {
   try {
-    let members = await MemberServices.show(req.body);
+    let members = await MemberServices.show(Number(req.params.project_id));
 
     res.status(200).send(members);
   } catch (err) {

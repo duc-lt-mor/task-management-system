@@ -28,6 +28,8 @@ router.delete(
   ProjectController.destroy,
 );
 
+router.get('/project/member/:project_id', MemberController.show);
+
 router.post(
   '/member',
   authenticator.verifyToken,
@@ -47,7 +49,6 @@ router.put(
   ProjectAut.authenticateProject,
   MemberController.editRole,
 );
-router.get('/member', MemberController.show);
 
 router.post(
   '/colum',

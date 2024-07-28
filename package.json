@@ -4,8 +4,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon",
-    "swagger": "node ./Swagger/swagger.js"
+    "start": "nodemon app.ts",
+    "swagger": "node src/Swagger/swagger.ts"
   },
   "keywords": [],
   "author": "",

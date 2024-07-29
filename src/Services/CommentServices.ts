@@ -2,11 +2,15 @@ import createHttpError from 'http-errors';
 import { Comment } from '../Models/comment';
 import { Task } from '../Models/task';
 
+export const generate = async function(data: any) {
+  return await Comment.create(data)
+}
+
 export const get = async () => {
   return await Comment.findAll();
 };
 
-export const generateKey = async (task_id: number) => {
+export const generateKey = async function (task_id: number) {
   const task: any = Task.findByPk(task_id);
   if (!task) {
     const error = createHttpError(404, `Task not found`);
@@ -20,16 +24,20 @@ export const generateKey = async (task_id: number) => {
   return key;
 };
 
-export const find = async (key: string) => {
-    return await Comment.findOne({where: {key: key}})
+export const find = function (key: string) {
+    return Task.findOne({where: {key: key}})
 };
 
-export const update = async (key: string, content: string) => {
-    const task: any = await Task.findOne({where: {key: key}})
+export const update = function (key: string, data: any) {
+    const task: any = Task.findOne({where: {key: key}})
     if(!task) {
         const error = createHttpError(404, `Task not found`)
         throw error
     }
-    task.content = content
+    task.content = data.content
     return task
+}
+
+export const destroy = function(key: string) {
+  return Task.destroy({where: {key: key}})
 }

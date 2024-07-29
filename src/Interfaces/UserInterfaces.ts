@@ -1,5 +1,5 @@
 export interface UserPayload {
-  role: string;
+  system_role_id: number;
   email: string;
   id: number;
 }

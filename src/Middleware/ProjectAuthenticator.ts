@@ -21,7 +21,7 @@ export const authenticateProject = async function (
       },
     });
 
-    if (req.user.role == Roles.ADMIN) {
+    if (req.user.system_role_id == Roles.ADMIN) {
       next();
     }
     if (member?.role_id != Roles.PROJECT_MANAGER) {

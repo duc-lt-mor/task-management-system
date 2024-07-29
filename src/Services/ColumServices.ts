@@ -26,9 +26,9 @@ export const create = async function (data: ColumData, req: express.Request ) {
     }
     await Colum.create(
       {
-        type: data.type,
+        col_type: data.type,
         name: data.name,
-        index: cols +1,
+        col_index: cols +1,
         project_id: data.project_id,
       },
       { transaction: t },
@@ -56,7 +56,7 @@ export const edit = async function (id: number, data: ColumData, req: express.Re
   }
 
   if (!data.type) {
-    data.type = colum.type;
+    data.type = colum.col_type;
   }
   try {
     const errors = validationResult(req);
@@ -69,7 +69,7 @@ export const edit = async function (id: number, data: ColumData, req: express.Re
     }
     await Promise.all([
       await Promise.all(indexs.map(async (inde) =>
-        Colum.update({ index: inde.index }, { where: { id: inde.id } }),
+        Colum.update({ col_index: inde.index }, { where: { id: inde.id }, transaction: t }),
       )),
 
       await Colum.update(

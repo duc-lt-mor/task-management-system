@@ -21,8 +21,20 @@
             "schema": {
               "type": "object",
               "properties": {
-                "project_id": {
-                  "example": "any"
+                "name": {
+                  "example": "project 1",
+                  "required":true
+                },
+                "key": {
+                  "example": "proj1",
+                  "required": true
+                },
+                "decripstion": {
+                  "example": "this is decripstion of project 1"
+                },
+                "expected_end_date": {
+                  "example": "2024-08-09",
+                  "required": true
                 }
               }
             }
@@ -31,6 +43,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }
@@ -78,8 +93,16 @@
             "schema": {
               "type": "object",
               "properties": {
-                "project_id": {
-                  "example": "any"
+                "name": {
+                  "example": "project 1",
+                  "required":true
+                },
+                "decripstion": {
+                  "example": "this is decripstion of project 1"
+                },
+                "expected_end_date": {
+                  "example": "2024-08-09",
+                  "required": true
                 }
               }
             }
@@ -115,18 +138,6 @@
             "name": "authorization",
             "in": "header",
             "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "project_id": {
-                  "example": "any"
-                }
-              }
-            }
           }
         ],
         "responses": {
@@ -163,7 +174,10 @@
               "type": "object",
               "properties": {
                 "project_id": {
-                  "example": "any"
+                  "example": "1"
+                },
+                "user name/ email": {
+                  "example":"jonathan"
                 }
               }
             }
@@ -252,8 +266,8 @@
             "schema": {
               "type": "object",
               "properties": {
-                "project_id": {
-                  "example": "any"
+                "role_id": {
+                  "example": "1"
                 }
               }
             }
@@ -292,6 +306,12 @@
             "schema": {
               "type": "object",
               "properties": {
+                "name": {
+                  "example": "colum 1"
+                },
+                "col_type": {
+                  "example": "todo/ in_progress/ done/ custom"
+                },
                 "project_id": {
                   "example": "any"
                 }
@@ -338,6 +358,20 @@
             "schema": {
               "type": "object",
               "properties": {
+                "name": {
+                  "example": "colum 1"
+                },
+                "col_type": {
+                  "example": "todo/ in_progress/ done/ custom"
+                },
+                "array_index": {
+                  "example":[
+                    {"id":9,"index":2},
+                    {"id":10,"index":4},
+                    {"id":11,"index":3},
+                    {"id":12,"index":1}
+                ]
+                },
                 "project_id": {
                   "example": "any"
                 }
@@ -406,4 +440,5 @@
       }
     }
   }
+  
 }

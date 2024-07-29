@@ -51,16 +51,5 @@ export const verifyToken = async function (
   }
 };
 
-export const generateToken = function (user: UserPayload) {
-  const payload: UserPayload = {
-    role: user.role,
-    email: user.email,
-    id: user.id,
-  };
-
-  const options: SignOptions = {
-    expiresIn: process.env.expiresIn,
-  };
-
-  return jwt.sign(payload, JWT_SECRET_KEY, options);
+export const accessControl = (requiredPermission: string) => {
 };

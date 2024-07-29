@@ -77,7 +77,7 @@ router.delete(
 
 
 
-router.get('/login', user.getLogin)
+router.post('/login', user.getLogin)
 router.post('/register', ...validator.validateRegister(), user.postRegister)
 router.delete('/user/:userId', user.deleteUser)
 

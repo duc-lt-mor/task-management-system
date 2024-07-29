@@ -3,7 +3,8 @@ import { Op } from 'sequelize';
 import { body } from 'express-validator';
 
 
-export const validateCreate = [
+export const validateCreate = function () {
+  return [
     body('name').notEmpty().withMessage("Please enter project name").trim().custom(async (name) => {
 
       let project_found = await Project.findOne({
@@ -43,9 +44,9 @@ export const validateCreate = [
       }
     }),
   ];
+}
 
 
-//xac thuc du lieu dau vao cho sua project
 export const validateUpdate = function () {
   return [
     body('name').custom(async (name, { req }) => {

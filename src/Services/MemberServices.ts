@@ -73,7 +73,7 @@ export const editRole = async function (id: number, data: MemberData) {
 };
 
 //xem danh sach thanh vien cua project
-export const show = async function (id: Number) {
+export const show = async function (id: number) {
   let members = await Member.findAll({
     where: {
       project_id: id,

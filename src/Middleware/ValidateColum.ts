@@ -24,12 +24,12 @@ export const validateCreate = function () {
 export const validateUpdate = function () {
   return [
     body('project_id').custom(async (project_id, { req }) => {
-      // Check if project_id is not a number
+      
       if (isNaN(req.body.project_id) || !req.body.project_id) {
         throw new Error('Project ID must be a number');
       }
 
-      // Check for column name uniqueness within the same project, excluding the current column ID
+      
       const check_name = await Colum.findOne({
         where: {
           name: req.body.name,

@@ -14,7 +14,7 @@ const router = express.Router();
 
 router.post(
   '/project',
-  ValidateProject.validateCreate,
+  ...ValidateProject.validateCreate(),
   ProjectController.create,
 );
 router.put(

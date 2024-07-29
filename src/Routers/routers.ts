@@ -8,7 +8,7 @@ import * as authenticator from '../Middleware/UserAuthenticator';
 import * as ProjectAut from '../Middleware/ProjectAuthenticator';
 import * as user from "../Controller/UserController"
 import * as validator from "../Middleware/UserValidator"
-import { exceptionHandler } from "../Middleware/ExceptionHandler"
+import * as Statistic from "../Controller/StatisticController";
 import express from 'express';
 const router = express.Router();
 
@@ -30,6 +30,10 @@ router.delete(
   ProjectAut.authenticateProject,
   ProjectController.destroy,
 );
+router.get('/project/statistis/:project_id', Statistic.showFinishOnDateTask);
+
+
+
 
 router.get('/project/member/:project_id', MemberController.show);
 

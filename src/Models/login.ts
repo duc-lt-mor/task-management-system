@@ -24,4 +24,3 @@ User.hasMany(Login, {
 Login.belongsTo(User, {
   foreignKey: 'user_id',
 });
-sequelize.sync();

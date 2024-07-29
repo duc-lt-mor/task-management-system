@@ -16,7 +16,7 @@ export const Task = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    decription: {
+    description: {
       type: DataTypes.STRING,
       allowNull: true,
     },
@@ -24,7 +24,7 @@ export const Task = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    piority: {
+    priority: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -59,4 +59,3 @@ User.hasMany(Task, {
 Task.belongsTo(User, {
   foreignKey: 'assignee_id',
 });
-sequelize.sync();

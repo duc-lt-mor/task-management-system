@@ -1,7 +1,7 @@
 import { CustomRequest } from '../Middleware/UserAuthenticator';
 import { Member } from '../Models/member';
 import express from 'express';
-import * as Roles from '../Constant/Constant'
+import * as Roles from '../Interfaces/Roles'
 
 export const authenticateProject = async function (
   req: CustomRequest,

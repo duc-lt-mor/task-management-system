@@ -27,10 +27,6 @@ export const postRegister = async function (
   next: express.NextFunction
 ) {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      next(!errors.isEmpty())
-    }
 
     const data = {
       name: req.body.name,
@@ -44,13 +40,14 @@ export const postRegister = async function (
     const existedUser = await services.find(data.email);
 
     if (existedUser) {
-      next(existedUser)
+      const error = createHttpError(400, `User existed`)
+      throw error
     }
 
     const result = await services.register(data);
 
     if (result) {
-      res.status(201).json({ message: 'User created', user: result });
+      return res.status(201).json({ message: 'User created', user: result });
     }
   } catch (err) {
     next(err)

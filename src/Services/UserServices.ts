@@ -17,6 +17,7 @@ export const login = async function (data: any) {
     const error = createHttpError(401, `Invalid username or password`);
     throw error;
   }
+ 
   const token: string = tokenService.generateToken({
     id: user.id,
     email: user.email,

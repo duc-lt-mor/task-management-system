@@ -75,7 +75,7 @@ export const edit = async function (id: number, data: ColumData, req: express.Re
       await Colum.update(
         {
           name: data.name,
-          type: data.type,
+          col_type: data.type,
         },
         { where: { id: id }, transaction: t },
       ),
@@ -113,16 +113,16 @@ export const destroy = async function (id: number, req: express.Request) {
       throw error
     }
     //giam gia tri index cua cac cot o cuoi den vi tri cua cot can xoa
-    for (let i: number = last_index; i >= colum.index; i--) {
+    for (let i: number = last_index; i >= colum.col_index; i--) {
       let col: any = await Colum.findOne({
         where: {
-          [Op.and]: [{ index: i }, { project_id: colum.project_id }],
+          [Op.and]: [{ col_index: i }, { project_id: colum.project_id }],
         },
       });
 
       await col.update(
         {
-          index: i - 1,
+          col_index: i - 1,
         },
         { transaction: t },
       );

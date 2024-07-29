@@ -7,7 +7,9 @@
   },
   "host": "localhost:3000",
   "basePath": "/",
-  "schemes": ["http"],
+  "schemes": [
+    "http"
+  ],
   "paths": {
     "/project": {
       "post": {
@@ -28,6 +30,9 @@
                 "key": {
                   "example": "proj1",
                   "required": true
+                },
+                "creator_id":{
+                  "example":"1"
                 },
                 "decripstion": {
                   "example": "this is decripstion of project 1"
@@ -85,7 +90,9 @@
           {
             "name": "authorization",
             "in": "header",
-            "type": "string"
+            "type": "string",
+            "scheme": "bearer",
+            "bearerFormat": "JWT" 
           },
           {
             "name": "body",
@@ -137,7 +144,9 @@
           {
             "name": "authorization",
             "in": "header",
-            "type": "string"
+            "type": "string",
+            "scheme": "bearer",
+            "bearerFormat": "JWT" 
           }
         ],
         "responses": {
@@ -165,7 +174,9 @@
           {
             "name": "authorization",
             "in": "header",
-            "type": "string"
+            "type": "string",
+            "scheme": "bearer",
+            "bearerFormat": "JWT" 
           },
           {
             "name": "body",
@@ -214,7 +225,9 @@
           {
             "name": "authorization",
             "in": "header",
-            "type": "string"
+            "type": "string",
+            "scheme": "bearer",
+            "bearerFormat": "JWT" 
           },
           {
             "name": "body",
@@ -258,7 +271,9 @@
           {
             "name": "authorization",
             "in": "header",
-            "type": "string"
+            "type": "string",
+            "scheme": "bearer",
+            "bearerFormat": "JWT" 
           },
           {
             "name": "body",
@@ -298,7 +313,9 @@
           {
             "name": "authorization",
             "in": "header",
-            "type": "string"
+            "type": "string",
+            "scheme": "bearer",
+            "bearerFormat": "JWT" 
           },
           {
             "name": "body",
@@ -350,7 +367,9 @@
           {
             "name": "authorization",
             "in": "header",
-            "type": "string"
+            "type": "string",
+            "scheme": "bearer",
+            "bearerFormat": "JWT" 
           },
           {
             "name": "body",
@@ -408,7 +427,9 @@
           {
             "name": "authorization",
             "in": "header",
-            "type": "string"
+            "type": "string",
+            "scheme": "bearer",
+            "bearerFormat": "JWT" 
           },
           {
             "name": "body",
@@ -438,7 +459,96 @@
           }
         }
       }
+    },
+    "/login": {
+      "post": {
+        "summary": "Login",
+        "tags": ["User"],
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "example": "any"
+                },
+                "password": {
+                  "example": "any"
+                }
+              }
+            }
+            }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/register": {
+      "post": {
+        "summary": "Register",
+        "tags": ["User"],
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "example": "any"
+                },
+                "email": {
+                  "example": "any"
+                },
+                "password": {
+                  "example": "any"
+                },
+                "passwordConfirm": {
+                  "example": "any"
+                },
+                "phone_number": {
+                  "example": "any"
+                },
+                "system_role_id": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      }
+    },
+    "/user/{userId}": {
+      "delete": {
+        "summary": "Delete a user",
+        "tags": ["User"],
+        "description": "",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
     }
   }
-  
 }

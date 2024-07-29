@@ -22,7 +22,7 @@ export const create = async function (req: express.Request, data: ProjectData) {
 
   try {
     const errors = validationResult(req);
-    if (errors) {
+    if (!errors.isEmpty()) {
       const errorMessages = errors.array().map((e: any) => e.msg);
       const error = createHttpError(400, JSON.stringify(errorMessages,null, 2));
       throw error;
@@ -41,21 +41,21 @@ export const create = async function (req: express.Request, data: ProjectData) {
     await Colum.bulkCreate(
       [
         {
-          type: 'todo',
+          col_type: 'todo',
           name: 'TO DO',
-          index: 1,
+          col_index: 1,
           project_id: project.id,
         },
         {
-          type: 'in_progress',
+          col_type: 'in_progress',
           name: 'IN PROGRESS',
-          index: 2,
+          col_index: 2,
           project_id: project.id,
         },
         {
-          type: 'done',
+          col_type: 'done',
           name: 'DONE',
-          index: 3,
+          col_index: 3,
           project_id: project.id,
         },
       ],

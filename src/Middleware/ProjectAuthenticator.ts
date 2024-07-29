@@ -24,13 +24,17 @@ export const authenticateProject = async function (
     if (req.user.system_role_id == Roles.ADMIN) {
       next();
     }
-    if (member?.role_id != Roles.PROJECT_MANAGER) {
-      return res
-        .status(403)
-        .json({ message: 'You do not have permission to access.' });
-    } else {
-      next();
+
+    else {
+      if (member?.role_id != Roles.PROJECT_MANAGER) {
+        return res
+          .status(403)
+          .json({ message: 'You do not have permission to access.' });
+      } else {
+        next();
+      }
     }
+    
   } catch (err) {
     return res.status(500).json({ message: 'Internal error '});
   }

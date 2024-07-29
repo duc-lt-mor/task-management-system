@@ -29,4 +29,3 @@ Project.hasMany(Member, {
 Member.belongsTo(Project, {
   foreignKey: 'project_id',
 });
-sequelize.sync();

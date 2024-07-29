@@ -44,11 +44,34 @@ export const verifyToken = async function (
   }
 };
 
-export const accessControl = function (
-  userRole: string,
-  permission: string,
-): boolean {
-  const userPermission = roles[userRole] || [];
-  return userPermission.includes(permission);
-};
+export const accessControl = (requiredPermission: string) => {
+  return (req: CustomRequest, res: express.Response, next: express.NextFunction) => {
+    // Extract token from headers
+    const token = req.header('Authorization')?.replace('Bearer ', '');
 
+    if (!token) {
+      return res.status(401).json({ message: 'User not authenticated' });
+    }
+
+    // Verify JWT
+    jwt.verify(token, process.env.JWT_SECRET as string, (err, user) => {
+      if (err) {
+        return res.status(403).json({ message: 'Forbidden: Invalid token' });
+      }
+
+      // Attach user to request object
+      req.user = user as UserPayload;
+
+      // Check access control
+      const userRole: number = req.user.system_role_id;
+      const userPermissions = roles[userRole] || [];
+
+      if (!userPermissions.includes(requiredPermission)) {
+        return res.status(403).json({ message: 'Forbidden: You do not have access to this resource' });
+      }
+
+      // Proceed to the next middleware or route handler
+      next();
+    });
+  };
+};

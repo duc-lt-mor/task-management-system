@@ -1,6 +1,5 @@
 import express from 'express';
 import * as services from '../Services/UserServices';
-import { validationResult } from 'express-validator';
 import createHttpError from 'http-errors';
 
 

@@ -7,7 +7,8 @@ export const exceptionHandler = (err: unknown, req: express.Request, res: expres
             message: customError.message
         })
     }
+
     res.status(500).json({
-        message: 'Interval Server Error',
+        message: 'Internal Server Error',
     })
 }

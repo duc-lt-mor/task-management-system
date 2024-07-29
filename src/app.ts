@@ -20,6 +20,11 @@ app.use(exceptionHandler)
 const swaggerDocument = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../swagger-output.json'), 'utf8'));
 
 app.use('/api-doc', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use(`/api`, router);
+app.use(exceptionHandler);
 
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);

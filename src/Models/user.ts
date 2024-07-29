@@ -31,4 +31,7 @@ System_role.hasMany(User, {
 User.belongsTo(System_role, {
   foreignKey: 'system_role_id',
 });
+<<<<<<< HEAD
 
+=======
+>>>>>>> c0b8671428223097b8f91ad331e50627daa9e5d8

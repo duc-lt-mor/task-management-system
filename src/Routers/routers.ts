@@ -6,6 +6,9 @@ import * as ValidateMember from '../Middleware/ValidateMember';
 import * as MemberController from '../Controller/MemberController';
 import * as authenticator from '../Middleware/UserAuthenticator';
 import * as ProjectAut from '../Middleware/ProjectAuthenticator';
+import * as user from "../Controller/UserController"
+import * as validator from "../Middleware/UserValidator"
+import { exceptionHandler } from "../Middleware/ExceptionHandler"
 import express from 'express';
 const router = express.Router();
 
@@ -71,5 +74,11 @@ router.delete(
   ...ValidateColum.validateDelete(),
   ColumController.destroy,
 );
+
+
+
+router.get('/login', user.getLogin)
+router.post('/register', ...validator.validateRegister(), user.postRegister)
+router.delete('/user/:userId', user.deleteUser)
 
 export default router;

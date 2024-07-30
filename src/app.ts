@@ -1,7 +1,5 @@
 import express from 'express';
 import { config } from 'dotenv';
-import fs from 'fs';
-import path from 'path';
 import router  from './Routers/routers';
 import * as swaggerUi from 'swagger-ui-express'
 import { exceptionHandler } from './Middleware/ExceptionHandler';
@@ -12,12 +10,11 @@ const app = express();
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));
 const port = process.env.PORT;
-
 app.use('/', router)
 app.use(exceptionHandler)
 
 // // Load the Swagger JSON file
-const swaggerDocument = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../swagger-output.json'), 'utf8'));
+const swaggerDocument = require('./Swagger/swagger-output.json');
 
 app.use('/api-doc', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(express.json());

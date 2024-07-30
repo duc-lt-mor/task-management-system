@@ -33,7 +33,7 @@ export const register = async function (data: UserData) {
     name: data.name,
     email: data.email,
     password: hashedPassword,
-    systemRoleID: data.systemRoleID,
+    system_role_id: data.systemRoleID,
   });
   if (user) {
     return user

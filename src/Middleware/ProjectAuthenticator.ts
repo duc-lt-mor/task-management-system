@@ -1,36 +1,53 @@
 import { CustomRequest } from '../Middleware/UserAuthenticator';
 import { Member } from '../Models/member';
 import express from 'express';
-import * as Roles from '../Interfaces/Roles';
+import * as Permission from '../Constant/Permissions';
+import * as Role from '../Constant/Roles';
+import { System_role } from '../Models/system_role';
+import { Project_role } from '../Models/project_role';
+export const authenticateProject = function (permission: number) {
+  return async (
+    req: CustomRequest,
+    res: express.Response,
+    next: express.NextFunction,
+  ) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ message: 'User not authenticated' });
+      }
 
-export const authenticateProject = async function (
-  req: CustomRequest,
-  res: express.Response,
-  next: express.NextFunction,
-) {
-  try {
-    if (!req.user) {
-      return res.status(401).json({ message: 'User not authenticated' });
+      let member: any = await Member.findOne({
+        where: {
+          user_id: req.user.id,
+          project_id: Number(req.params.project_id) || Number(req.body.project_id),
+        },
+        include: [
+          {
+            model: Project_role,
+          },
+        ],
+      });
+
+      let system_role: any = await System_role.findOne({
+        where: {
+          id: req.user.system_role_id,
+        },
+      });
+
+      if (system_role.key == Role.ADMIN) {
+        next();
+      } else if (
+        member?.project_role.key != Role.PM ||
+        !member?.project_role.permission_keys.permissions.includes(permission)
+      ) {
+        return res
+          .status(403)
+          .json({ message: 'You do not have permission to access.' });
+      } else {
+        next();
+      }
+    } catch (err) {
+      return res.status(500).json({ message: 'Internal error ' });
     }
-
-    let member: any = await Member.findOne({
-      attributes: ['role_id'],
-      where: {
-        user_id: req.user.id,
-        project_id: Number(req.params.project_id || req.body.project_id),
-      },
-    });
-
-    if (req.user.system_role_id == Roles.ADMIN) {
-      next();
-    } else if (member?.role_id != Roles.PROJECT_MANAGER) {
-      return res
-        .status(403)
-        .json({ message: 'You do not have permission to access.' });
-    } else {
-      next();
-    }
-  } catch (err) {
-    return res.status(500).json({ message: 'Internal error ' });
-  }
+  };
 };

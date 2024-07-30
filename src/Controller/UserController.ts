@@ -4,14 +4,13 @@ import { validationResult } from 'express-validator';
 import createHttpError from 'http-errors';
 
 
-export const getLogin = async function (
+export const login = async function (
   req: express.Request,
   res: express.Response,
   next: express.NextFunction,
 ) {
   try {
     const token = await services.login(req.body);
-
     return res.status(200).json({
       message: 'Login successful',
       token,
@@ -21,17 +20,12 @@ export const getLogin = async function (
   }
 };
 
-export const postRegister = async function (
+export const register = async function (
   req: express.Request,
   res: express.Response,
   next: express.NextFunction
 ) {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      next(!errors.isEmpty())
-    }
-
     const data = {
       name: req.body.name,
       email: req.body.email,
@@ -56,6 +50,23 @@ export const postRegister = async function (
     next(err)
   }
 };
+
+export const find = async function (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) {
+  try {
+    const email = req.body.email
+    const user = await services.find(email)
+    if (!user) {
+      throw createHttpError(404, `User not found`)
+    }
+    return res.status(200).json({message: `User ${email}: `, user})
+  } catch(err) {
+    next(err)
+  }
+} 
 
 export const deleteUser = async function (
   req: express.Request,

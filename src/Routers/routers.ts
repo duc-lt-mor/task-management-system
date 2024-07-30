@@ -5,8 +5,8 @@ const router = express.Router()
 import * as authenticator from "../Middleware/UserAuthenticator"
 import { exceptionHandler } from "../Middleware/ExceptionHandler"
 
-router.get('/login', user.getLogin)
-router.post('/register', ...validator.validateRegister(), user.postRegister)
+router.get('/login', user.login)
+router.post('/register', ...validator.validateRegister(), user.register)
 router.delete('/user/:userId', user.deleteUser)
 
 export { router }

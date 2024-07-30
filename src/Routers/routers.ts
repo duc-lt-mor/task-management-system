@@ -1,10 +1,10 @@
 import express from "express"
 import * as user from "../Controller/UserController"
 import * as task from "../Controller/TaskController"
-import * as userValidator from "../Middleware/UserValidator"
 import * as authenticator from "../Middleware/UserAuthenticator"
 import { exceptionHandler } from "../Middleware/ExceptionHandler"
 import { validateTask }   from "../Middleware/TaskValidator"
+import * as userValidator from "../Middleware/UserValidator"
 
 const router = express.Router()
 

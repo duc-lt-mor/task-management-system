@@ -15,6 +15,6 @@ router.post('/task', authenticator.authenticateJWT, authenticator.accessControl(
 router.get('/task/:id', authenticator.authenticateJWT, authenticator.accessControl('get_task'), task.getTask)
 router.get('/task', authenticator.authenticateJWT, authenticator.accessControl('get_tasks'), task.getTasks)
 router.delete('/task/:id', authenticator.authenticateJWT, authenticator.accessControl('delete_task'), task.deleteTask)
-router.put('/task', task.update)
+router.put('/task', authenticator.authenticateJWT, authenticator.accessControl('update_task'), task.update)
 
 export { router }

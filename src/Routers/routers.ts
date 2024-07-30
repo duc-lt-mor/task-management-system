@@ -9,6 +9,7 @@ import * as authenticator from '../Middleware/UserAuthenticator';
 import * as ProjectAut from '../Middleware/ProjectAuthenticator';
 import * as user from '../Controller/UserController';
 import * as validator from '../Middleware/UserValidator';
+import * as validateRole from '../Middleware/ValidateRole';
 import express from 'express';
 const router = express.Router();
 
@@ -20,14 +21,14 @@ router.post(
 router.put(
   '/project/:project_id',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject(3),
+  ProjectAut.authenticateProject(2),
   ...ValidateProject.validateUpdate(),
   ProjectController.edit,
 );
 router.delete(
   '/project/:project_id',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject(4),
+  ProjectAut.authenticateProject(3),
   ProjectController.destroy,
 );
 
@@ -49,7 +50,7 @@ router.delete(
 router.put(
   '/member/:id',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject(3),
+  ProjectAut.authenticateProject(2),
   MemberController.editRole,
 );
 
@@ -57,34 +58,44 @@ router.post(
   '/project/role',
   authenticator.verifyToken,
   ProjectAut.authenticateProject(1),
+  ...validateRole.validateRole(),
   RoleController.create,
 );
 
 router.put(
   '/project/role/:role_id',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject(3),
+  ProjectAut.authenticateProject(2),
+  ...validateRole.validateRole(),
   RoleController.edit,
+);
+
+router.delete(
+  '/project/role/:role_id',
+  authenticator.verifyToken,
+  ProjectAut.authenticateProject(3),
+  ...validateRole.validateDelete(),
+  RoleController.destroy,
 );
 
 router.post(
   '/colum',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject,
+  ProjectAut.authenticateProject(1),
   ...ValidateColum.validateCreate(),
   ColumController.create,
 );
 router.put(
   '/colum/:col_id',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject,
+  ProjectAut.authenticateProject(2),
   ...ValidateColum.validateUpdate(),
   ColumController.edit,
 );
 router.delete(
   '/colum/:col_id',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject,
+  ProjectAut.authenticateProject(3),
   ...ValidateColum.validateDelete(),
   ColumController.destroy,
 );

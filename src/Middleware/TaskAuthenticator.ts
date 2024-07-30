@@ -38,7 +38,7 @@ export const authenticateProject = function (permission: number) {
       if (system_role.key == Role.ADMIN) {
         next();
       } else if (
-        member?.project_role.key != Role.PM ||
+        member?.project_role.key == Role.USER ||
         !member?.project_role.permission_keys.permissions.includes(permission)
       ) {
         return res

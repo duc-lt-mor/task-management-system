@@ -2,7 +2,6 @@ import express from 'express';
 import * as services from '../Services/UserServices';
 import createHttpError from 'http-errors';
 
-
 export const getLogin = async function (
   req: express.Request,
   res: express.Response,
@@ -23,10 +22,9 @@ export const getLogin = async function (
 export const postRegister = async function (
   req: express.Request,
   res: express.Response,
-  next: express.NextFunction
+  next: express.NextFunction,
 ) {
   try {
-
     const data = {
       name: req.body.name,
       email: req.body.email,
@@ -39,8 +37,8 @@ export const postRegister = async function (
     const existedUser = await services.find(data.email);
 
     if (existedUser) {
-      const error = createHttpError(400, `User existed`)
-      throw error
+      const error = createHttpError(400, `User existed`);
+      throw error;
     }
 
     const result = await services.register(data);
@@ -49,20 +47,20 @@ export const postRegister = async function (
       return res.status(201).json({ message: 'User created', user: result });
     }
   } catch (err) {
-    next(err)
+    next(err);
   }
 };
 
 export const deleteUser = async function (
   req: express.Request,
   res: express.Response,
-  next: express.NextFunction
+  next: express.NextFunction,
 ) {
   try {
     const id = parseInt(req.params.id);
     await services.deleteUser(id);
     return res.status(200).json({ message: `Deleted user` });
   } catch (err) {
-    next(err)
+    next(err);
   }
 };

@@ -21,11 +21,6 @@ export const Comment = sequelize.define(
       allowNull: false
     },
 
-    key: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
-
     content: {
       type: DataTypes.STRING,
       allowNull: true,

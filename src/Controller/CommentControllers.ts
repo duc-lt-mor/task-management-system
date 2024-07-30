@@ -10,10 +10,8 @@ export const generate = async function (
 ) {
   try {
     const task_id = req.body.task_id;
-    const key = await services.generateKey(task_id);
     const comment: any = await services.generate({
       task_id,
-      key,
       user_id: req.body.user_id,
       content: req.body.content,
       createdAt: new Date(),
@@ -47,13 +45,11 @@ export const reply = async function (
       throw createHttpError(404, 'Parent comment not found');
     }
 
-    const key = await services.generateKey(taskId);
     // Create the reply comment
     try {
       const replyComment = await services.reply({
         content,
         taskId,
-        key,
         parentId: parentComment.id, // Set the parentId to link this as a reply
       });
 
@@ -88,8 +84,8 @@ export const find = async function (
   next: express.NextFunction,
 ) {
   try {
-    const key = req.params.key;
-    const comment = await services.find(key);
+    const id = parseInt(req.params.id);
+    const comment = await services.find(id);
     if (!comment) {
       const error = createHttpError(400, `Could not find comment`);
       throw error;
@@ -106,16 +102,16 @@ export const update = async function (
   next: express.NextFunction,
 ) {
   try {
-    const key = req.params.key;
+    const id = parseInt(req.params.id);
     const content = req.body.content;
-    const comment: any = await services.find(key);
+    const comment: any = await services.find(id);
 
     if (!comment) {
       const error = createHttpError(404, `Comment not found`);
       throw error;
     }
 
-    await services.update(key, { content, createdAt: new Date() });
+    await services.update(id, { content, createdAt: new Date() });
     await comment.save();
 
     return res.status(200).json(comment);
@@ -130,8 +126,8 @@ export const destroy = async function (
   next: express.NextFunction,
 ) {
   try {
-    const key = req.params.key;
-    const comment: any = await services.find(key);
+    const id = parseInt(req.params.id);
+    const comment: any = await services.find(id);
     if (!comment) {
       throw createHttpError(404, `Comment not found`);
     }
@@ -142,7 +138,7 @@ export const destroy = async function (
         `You are not authorized to deleted this comment`,
       );
     } else {
-      const deleted = services.destroy(key);
+      const deleted = services.destroy(id);
       return res.status(200).json({ message: `Deleted`, deleted });
     }
   } catch (err) {

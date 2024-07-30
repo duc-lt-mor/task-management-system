@@ -59,7 +59,7 @@ export const getTasks = async function (
   res: express.Response,
 ) {
   try {
-    const tasks = services.get();
+    const tasks = await services.get();
     return res.status(201).json(tasks);
   } catch (err) {
     return res.status(500).json(err);

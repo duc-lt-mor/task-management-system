@@ -14,6 +14,7 @@ import * as validateRole from '../Middleware/ValidateRole';
 import * as task from '../Controller/TaskController';
 import { validateTask } from '../Middleware/TaskValidator';
 import * as userValidator from '../Middleware/UserValidator';
+import * as comment from '../Controller/CommentControllers';
 import express from 'express';
 const router = express.Router();
 
@@ -146,6 +147,31 @@ router.put(
   authenticator.authenticateJWT,
   TaskAut.authenticateUpdateTask(9),
   task.update,
+);
+
+router.post(
+  '/comment',
+  authenticator.authenticateJWT,
+  CommentAut.authenticateCreateComment(12),
+  comment.generate,
+);
+router.put(
+  '/comment',
+  authenticator.authenticateJWT,
+  CommentAut.authenticateUpdateComment,
+  comment.update,
+);
+router.post(
+  '/reply',
+  authenticator.authenticateJWT,
+  CommentAut.authenticateCreateComment(12),
+  comment.reply,
+);
+router.delete(
+  '/comment/:key',
+  authenticator.authenticateJWT,
+  CommentAut.authenticateDeleteComment,
+  comment.destroy,
 );
 
 export default router;

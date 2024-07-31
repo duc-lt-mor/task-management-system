@@ -15,6 +15,12 @@ export const Comment = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: true,
     },
+
+    task_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+
     content: {
       type: DataTypes.STRING,
       allowNull: true,

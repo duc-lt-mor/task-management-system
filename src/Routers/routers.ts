@@ -1,20 +1,48 @@
-import * as user from "../Controller/UserController"
-import * as task from "../Controller/TaskController"
-import * as validator from "../Middleware/UserValidator"
-import express from "express"
-const router = express.Router()
-import * as authenticator from "../Middleware/UserAuthenticator"
-import { exceptionHandler } from "../Middleware/ExceptionHandler"
+import express from 'express';
+import * as user from '../Controller/UserController';
+import * as task from '../Controller/TaskController';
+import * as authenticator from '../Middleware/UserAuthenticator';
+import { validateTask } from '../Middleware/TaskValidator';
+import * as userValidator from '../Middleware/UserValidator';
 
-router.get('/login', user.getLogin)
-router.post('/register', ...validator.validateRegister(), exceptionHandler, user.postRegister)
-router.delete('/user/:userId', user.deleteUser)
+const router = express.Router();
 
-router.post('/task', authenticator.authenticateJWT, authenticator.accessControl('create_task'), task.generateTask)
-router.get('/task/:id', task.getTask)
-router.get('/task', task.getTasks)
-router.delete('/task/:id', task.deleteTask)
+router.get('/login', user.getLogin);
+router.post(
+  '/register',
+  ...userValidator.validateRegister(),
+  user.postRegister,
+);
+router.delete('/user/:userId', user.deleteUser);
 
-router.put('/task', task.update)
+router.post(
+  '/task',
+  authenticator.authenticateJWT,
+  authenticator.accessControl('create_task'),
+  validateTask,
+  task.generateTask,
+);
+router.get(
+  '/task/:id',
+  authenticator.authenticateJWT,
+  authenticator.accessControl('get_task'),
+  task.getTask,
+);
+router.get(
+  '/task',
+  task.getTasks,
+);
+router.delete(
+  '/task/:id',
+  authenticator.authenticateJWT,
+  authenticator.accessControl('delete_task'),
+  task.deleteTask,
+);
+router.put(
+  '/task',
+  authenticator.authenticateJWT,
+  authenticator.accessControl('update_task'),
+  task.update,
+);
 
-export { router }
+export { router };

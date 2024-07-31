@@ -1,19 +1,23 @@
 import express from 'express';
 import * as services from '../Services/TaskServices';
-import * as authenticator from '../Middleware/UserAuthenticator'
+import * as authenticator from '../Middleware/UserAuthenticator';
 import createHttpError from 'http-errors';
+import { Task } from '../Models/task';
 
-export const generateTask = async function (req: authenticator.CustomRequest, res: express.Response) {
+export const generateTask = async function (
+  req: authenticator.CustomRequest,
+  res: express.Response,
+  next: express.NextFunction,
+) {
   try {
     // Ensure user is authenticated
     if (!req.user) {
-      const error = createHttpError(401, 'User not authenticated')
-      throw error
+      return res.status(401).json({ message: 'User not authenticated' });
     }
 
     const project_id = req.body.project_id;
-    const creator_id = req.user?.id
-    const colum_id = 1
+    const creator_id = req.user?.id;
+    const colum_id = 1;
     const key = await services.generateKey(project_id); // Ensure this is awaited
     const taskData = {
       project_id,
@@ -25,34 +29,38 @@ export const generateTask = async function (req: authenticator.CustomRequest, re
       priority: req.body.priority,
       expected_end_date: req.body.expected_end_date,
       real_end_date: req.body.real_end_date,
-      colum_id
+      colum_id,
     };
 
     const task = await services.create(taskData);
-    return res.status(201).json({ message: 'Task generated successfully', task });
-  } catch (err) {
-    console.error(err); // Log error for debugging purposes
-    if (!res.headersSent) {
-      return res.status(500).json({ message: 'Internal server error', error: err });
+    if (!task) {
+      throw createHttpError(400, `Could not create task. Please try again`);
     }
+    return res
+      .status(201)
+      .json({ message: 'Task generated successfully', task });
+  } catch (err) {
+    next(err);
   }
 };
 
 export const getTask = async function (
   req: express.Request,
   res: express.Response,
+  next: express.NextFunction,
 ) {
   try {
-    const key = req.params.key;
-    if (!key) {
-      return res
-        .status(404)
-        .json({ message: `Task not found, try another ID` });
+    const taskId = parseInt(req.params.id);
+    if (!taskId) {
+      throw createHttpError(404, `Task id not found`);
     }
-    const task = services.find(key);
+    const task = services.find(taskId);
+    if (!task) {
+      throw createHttpError(404, `No task available with this ID`);
+    }
     return res.status(201).json(task);
   } catch (err) {
-    return res.status(500).json({ message: `Internal error` });
+    return next(err);
   }
 };
 
@@ -60,25 +68,33 @@ export const getTask = async function (
 export const getTasks = async function (
   req: express.Request,
   res: express.Response,
+  next: express.NextFunction,
 ) {
   try {
-    const tasks = services.get();
+    const tasks: any = await Task.findAll();
+    for (const task in tasks) {
+      console.log(tasks[task].name)
+
+    }
+    if (!tasks) {
+      throw createHttpError(404, `No tasks found`);
+    }
     return res.status(201).json(tasks);
   } catch (err) {
-    return res.status(500).json(err);
+    return next(err);
   }
 };
 
-export const update = async function (
+export const update = function (
   req: express.Request,
   res: express.Response,
-  next: express.NextFunction
+  next: express.NextFunction,
 ) {
   try {
-    const key = req.params.key;
+    const taskId = parseInt(req.params.id);
 
-    if (!key) {
-      return res.status(400).json({ message: 'Invalid task key' });
+    if (isNaN(taskId)) {
+      return res.status(400).json({ message: 'Invalid task ID' });
     }
 
     const updateData = {
@@ -89,34 +105,36 @@ export const update = async function (
       real_end_date: req.body.real_end_date,
     };
 
-    const result: any = await services.update(key, updateData);
+    const result: any = services.update(taskId, updateData);
 
-    if (!result.success) {
-      return res.status(404).json({ message: result.message });
+    if (!result) {
+      throw createHttpError(400, `Couldn't update task data`);
     }
 
     return res.status(200).json(result.task);
   } catch (err) {
-    next(err)
+    return next(err);
   }
 };
 
-//find task by key and delete task
+//find task by id and delete task
 export const deleteTask = async function (
   req: express.Request,
   res: express.Response,
-  next: express.NextFunction
+  next: express.NextFunction,
 ) {
   try {
-    const key = req.params.key;
-    if (!key) {
-      const error = createHttpError(401, 'Task not found')
+    const id = parseInt(req.params.id, 10);
+    if (!id) {
+      return res
+        .status(404)
+        .json({ message: `Task not found, try another ID` });
     }
-    const deleted = await services.deleteTask(key);
+    const deleted = await services.deleteTask(id);
     if (deleted) {
-      return res.status(201).json({ message: `Task deleted` });
+      return res.status(201).json({ message: `Task deleted`, deleted });
     }
   } catch (err) {
-    next(err)
+    return next(err);
   }
 };

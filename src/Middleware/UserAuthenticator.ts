@@ -78,4 +78,3 @@ export const accessControl = (requiredPermission: string) => {
     });
   };
 };
-

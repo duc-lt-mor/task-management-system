@@ -4,12 +4,7 @@ import { Member } from '../Models/member';
 export const validateRole = function () {
   return [
     body('name').notEmpty().withMessage('Please enter project name'),
-    body('key')
-      .notEmpty()
-      .withMessage(
-        'Please enter project key from one of those key [pm,leader,user]',
-      ),
-    body('permission_keys')
+    body('permissions')
       .notEmpty()
       .withMessage('please enter at least one permission'),
   ];

@@ -14,7 +14,6 @@ export const authenticateCreateComment = function (permission: number) {
     next: express.NextFunction,
   ) => {
     try {
-
       if (!req.user) {
         return res.status(401).json({ message: 'User not authenticated' });
       }
@@ -43,21 +42,21 @@ export const authenticateCreateComment = function (permission: number) {
         },
       });
 
-     let [member, system_role, task] = await Promise.all([member_found, system_role_found, task_found]);
+      let [member, system_role, task] = await Promise.all([
+        member_found,
+        system_role_found,
+        task_found,
+      ]);
 
-      if (system_role?.key == Role.ADMIN) {
+      if (
+        system_role?.key == Role.ADMIN ||
+        member?.project_role.permissions.includes(permission) ||
+        member?.project_role.permissions.includes(0)
+      ) {
         next();
-      } 
-      
-      else if (member?.project_role.key != Role.USER) {
+      } else if (task?.assignee_id == req.user.id) {
         next();
-      } 
-      
-      else if (task?.assignee_id == req.user.id) {
-        next();
-      } 
-      
-      else {
+      } else {
         return res
           .status(403)
           .json({ message: 'You do not have permission to access.' });
@@ -75,7 +74,6 @@ export const authenticateUpdateComment = function (permission: number) {
     next: express.NextFunction,
   ) => {
     try {
-
       if (!req.user) {
         return res.status(401).json({ message: 'User not authenticated' });
       }
@@ -88,9 +86,7 @@ export const authenticateUpdateComment = function (permission: number) {
 
       if (comment?.user_id == req.user.id) {
         next();
-      } 
-      
-      else {
+      } else {
         return res
           .status(403)
           .json({ message: 'You do not have permission to access.' });
@@ -124,17 +120,16 @@ export const authenticateDeleteComment = function (permission: number) {
         },
       });
 
-     let [system_role, comment] = await Promise.all([system_role_found, comment_found]);
+      let [system_role, comment] = await Promise.all([
+        system_role_found,
+        comment_found,
+      ]);
 
       if (system_role?.key == Role.ADMIN) {
         next();
-      } 
-      
-      else if (comment.user_id == req.user.id) {
+      } else if (comment.user_id == req.user.id) {
         next();
-      } 
-      
-      else {
+      } else {
         return res
           .status(403)
           .json({ message: 'You do not have permission to access.' });

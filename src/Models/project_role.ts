@@ -7,8 +7,8 @@ export const Project_role = sequelize.define('project_roles', {
     autoIncrement: true,
     primaryKey: true,
   },
-  key: {
-    type: DataTypes.STRING,
+  is_pm: {
+    type: DataTypes.BOOLEAN,
     allowNull: false,
   },
   name: {
@@ -22,7 +22,7 @@ export const Project_role = sequelize.define('project_roles', {
   project_id: {
     type: DataTypes.INTEGER
   },
-  permission_keys: {
+  permissions: {
     type: DataTypes.JSON,
     allowNull: false
   }

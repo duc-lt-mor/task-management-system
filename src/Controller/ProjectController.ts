@@ -1,8 +1,9 @@
 import * as ProjectServices from '../Services/ProjectServices';
+import { CustomRequest } from '../Middleware/UserAuthenticator';
 import express from 'express';
 
 export const create = async function (
-  req: express.Request,
+  req: CustomRequest,
   res: express.Response,
   next: express.NextFunction,
 ) {

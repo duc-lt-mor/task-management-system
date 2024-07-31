@@ -18,6 +18,13 @@
         "description": "",
         "parameters": [
           {
+            "name": "authorization",
+            "in": "header",
+            "type": "string",
+            "scheme": "bearer",
+            "bearerFormat": "JWT" 
+          },
+          {
             "name": "body",
             "in": "body",
             "schema": {
@@ -30,9 +37,6 @@
                 "key": {
                   "example": "proj1",
                   "required": true
-                },
-                "creator_id":{
-                  "example":"1"
                 },
                 "decripstion": {
                   "example": "this is decripstion of project 1"
@@ -168,14 +172,10 @@
                   "example": "project 1",
                   "required":true
                 },
-                "key": {
-                  "example": "pm/ leader/ user",
-                  "required": true
-                },
                 "project_id":{
                   "example":"1"
                 },
-                "permission_keys": {
+                "permissions": {
                   "example": "{'permissions': [1,2,3,4]}",
                   "required": true
                 }
@@ -228,11 +228,7 @@
                   "example": "project 1",
                   "required":true
                 },
-                "key": {
-                  "example": "pm/ leader/ user",
-                  "required": true
-                },
-                "permission_keys": {
+                "permissions": {
                   "example": "{'permissions': [1,2,3,4]}",
                   "required": true
                 }
@@ -363,14 +359,14 @@
         }
       }
     },
-    "/member/{id}": {
+    "/member/{member_id}": {
       "delete": {
         "summary": "Remove a user from a project",
         "tags": ["Member"],
         "description": "",
         "parameters": [
           {
-            "name": "id",
+            "name": "member_id",
             "in": "path",
             "required": true,
             "type": "string"
@@ -416,7 +412,7 @@
         "description": "",
         "parameters": [
           {
-            "name": "id",
+            "name": "member_id",
             "in": "path",
             "required": true,
             "type": "string"

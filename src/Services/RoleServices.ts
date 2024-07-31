@@ -31,9 +31,9 @@ export const create = async function (req: express.Request, data: RoleData) {
     await Project_role.create(
       {
         name: data.name,
-        key: data.key,
+        is_pm: 0,
         project_id: data.project_id,
-        permission_keys: data.permission_keys,
+        permissions: data.permissions,
       },
       { transaction: t },
     );
@@ -70,8 +70,7 @@ export const edit = async function (
     await Project_role.update(
       {
         name: data.name,
-        key: data.key,
-        permissions: data.permission_keys,
+        permissions: data.permissions,
       },
       { where: { id: id }, transaction: t },
     );

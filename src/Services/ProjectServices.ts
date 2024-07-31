@@ -6,6 +6,8 @@ import { sequelize } from '../Config/config';
 import { validationResult } from 'express-validator';
 import express from 'express';
 import createHttpError from 'http-errors';
+import { CustomRequest } from '../Middleware/UserAuthenticator';
+import { Project_role } from '../Models/project_role';
 // lay ra 1 project
 export const findProjectById = async (id: number) => {
   let project = await Project.findOne({
@@ -17,27 +19,32 @@ export const findProjectById = async (id: number) => {
 };
 
 // tao 1 project
-export const create = async function (req: express.Request, data: ProjectData) {
+export const create = async function (req: CustomRequest, data: ProjectData) {
   const t = await sequelize.transaction();
 
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       const errorMessages = errors.array().map((e: any) => e.msg);
-      const error = createHttpError(400, JSON.stringify(errorMessages,null, 2));
+      const error = createHttpError(
+        400,
+        JSON.stringify(errorMessages, null, 2),
+      );
       throw error;
     }
+    console.log(data, req.user?.id);
     let project: any = await Project.create(
       {
         name: data.name,
         key: data.key,
         decripstion: data.decriptstion,
-        creator_id: data.creator_id,
+        creator_id: req.user?.id,
         expected_end_date: data.expected_end_date,
       },
       { transaction: t },
     );
-    // khoi tao 3 cot mac dinh (todo, inprogress, done)
+
+    // khoi tao 3 cot mac dinh
     await Colum.bulkCreate(
       [
         {
@@ -59,6 +66,39 @@ export const create = async function (req: express.Request, data: ProjectData) {
           project_id: project.id,
         },
       ],
+      { transaction: t },
+    );
+    // khoi tao 3 role mac dinh
+    let project_role: any = await Project_role.bulkCreate(
+      [
+        {
+          is_pm: 1,
+          name: 'Project Manager',
+          permissions: [0],
+          project_id: project.id,
+        },
+        {
+          is_pm: 0,
+          name: 'Leader',
+          permissions: [8,9,10,11,12],
+          project_id: project.id,
+        },
+        {
+          is_pm: 0,
+          name: 'User',
+          permissions: [],
+          project_id: project.id,
+        },
+      ],
+      { transaction: t },
+    );
+
+    await Member.create(
+      {
+        user_id: req.user?.id,
+        project_id: project.id,
+        project_role_id: project_role[0].id,
+      },
       { transaction: t },
     );
 
@@ -87,7 +127,10 @@ export const edit = async function (
 
     if (!errors.isEmpty()) {
       const errorMessages = errors.array().map((e: any) => e.msg);
-      const error = createHttpError(400, JSON.stringify(errorMessages,null, 2));
+      const error = createHttpError(
+        400,
+        JSON.stringify(errorMessages, null, 2),
+      );
       throw error;
     }
     await Project.update(

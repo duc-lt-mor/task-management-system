@@ -21,7 +21,7 @@ export const remove = async function (
   next: express.NextFunction,
 ) {
   try {
-    await MemberServices.remove(Number(req.params.id));
+    await MemberServices.remove(Number(req.params.member_id));
 
     return res.status(200).send('delete member success');
   } catch (err) {
@@ -35,7 +35,7 @@ export const editRole = async function (
   next: express.NextFunction,
 ) {
   try {
-    await MemberServices.editRole(Number(req.params.id), req.body);
+    await MemberServices.editRole(Number(req.params.member_id), req.body);
 
     res.status(201).send('edit member role success');
   } catch (err) {

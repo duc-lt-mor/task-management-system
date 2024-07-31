@@ -17,7 +17,7 @@ export const authenticateCDTask = function (permission: number) {
         return res.status(401).json({ message: 'User not authenticated' });
       }
 
-      let member_found: any =  Member.findOne({
+      let member_found: any = Member.findOne({
         where: {
           user_id: req.user.id,
           project_id: Number(req.body.project_id),
@@ -29,25 +29,27 @@ export const authenticateCDTask = function (permission: number) {
         ],
       });
 
-      let system_role_found: any =  System_role.findOne({
+      let system_role_found: any = System_role.findOne({
         where: {
           id: req.user.system_role_id,
         },
       });
 
-    let [member, system_role] =  await Promise.all([member_found,system_role_found]);
+      let [member, system_role] = await Promise.all([
+        member_found,
+        system_role_found,
+      ]);
 
-      if (system_role?.key == Role.ADMIN) {
-        next();
-      } else if (
-        member?.project_role.key == Role.USER ||
-        !member?.project_role.permission_keys.permissions.includes(permission)
+      if (
+        system_role?.key == Role.ADMIN ||
+        member?.project_role.permissions.includes(permission) ||
+        member?.project_role.permissions.includes(0)
       ) {
+        next();
+      } else {
         return res
           .status(403)
           .json({ message: 'You do not have permission to access.' });
-      } else {
-        next();
       }
     } catch (err) {
       return res.status(500).json({ message: 'Internal error ' });
@@ -90,24 +92,21 @@ export const authenticateUpdateTask = function (permission: number) {
         },
       });
 
-     let [member, system_role, task] = await Promise.all([member_found,system_role_found,task_found]);
+      let [member, system_role, task] = await Promise.all([
+        member_found,
+        system_role_found,
+        task_found,
+      ]);
 
-      if (system_role?.key == Role.ADMIN) {
-        next();
-      } 
-
-      else if (
-        member?.project_role.key != Role.USER &&
-        member?.project_role.permission_keys.permissions.includes(permission)
+      if (
+        system_role?.key == Role.ADMIN ||
+        member?.project_role.permissions.includes(permission) ||
+        member?.project_role.permissions.includes(0)
       ) {
         next();
-      } 
-
-      else if (task?.assignee_id == req.user.id) {
+      } else if (task?.assignee_id == req.user.id) {
         next();
-      } 
-
-      else {
+      } else {
         return res
           .status(403)
           .json({ message: 'You do not have permission to access.' });

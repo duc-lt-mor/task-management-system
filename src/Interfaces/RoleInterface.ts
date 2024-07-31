@@ -1,7 +1,7 @@
 export interface RoleData {
   id: number;
   name: string;
-  key: string;
+  is_pm: number;
   project_id: number;
-  permission_keys: JSON;
+  permissions: JSON;
 }

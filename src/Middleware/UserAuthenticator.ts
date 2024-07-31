@@ -3,6 +3,7 @@ import express from 'express';
 import { UserPayload } from '../Interfaces/UserInterfaces'
 import dotenv from 'dotenv';
 import { roles } from '../Interfaces/Roles';
+import createHttpError from 'http-errors';
 dotenv.config();
 
 const JWT_SECRET_KEY: Secret = process.env.JWT_SECRET as Secret;
@@ -40,7 +41,7 @@ export const verifyToken = async function (
     req.user = decoded as UserPayload;
     next();
   } catch (err) {
-    res.status(401).json({ message: 'Token verification failed' });
+    return next(err)
   }
 };
 
@@ -56,7 +57,8 @@ export const accessControl = (requiredPermission: string) => {
     // Verify JWT
     jwt.verify(token, process.env.JWT_SECRET as string, (err, user) => {
       if (err) {
-        return res.status(403).json({ message: 'Forbidden: Invalid token' });
+        const error = createHttpError(403, 'Token is forbidded')
+        throw error
       }
 
       // Attach user to request object
@@ -67,11 +69,12 @@ export const accessControl = (requiredPermission: string) => {
       const userPermissions = roles[userRole] || [];
 
       if (!userPermissions.includes(requiredPermission)) {
-        return res.status(403).json({ message: 'Forbidden: You do not have access to this resource' });
+        const error = createHttpError(403, 'Access denied')
+        throw error
       }
 
       // Proceed to the next middleware or route handler
-      next();
+      return next();
     });
   };
 };

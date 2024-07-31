@@ -1,11 +1,14 @@
 import express from 'express';
 import * as services from '../Services/TaskServices';
 import * as authenticator from '../Middleware/UserAuthenticator'
+import createHttpError from 'http-errors';
+
 export const generateTask = async function (req: authenticator.CustomRequest, res: express.Response) {
   try {
     // Ensure user is authenticated
     if (!req.user) {
-      return res.status(401).json({ message: 'User not authenticated' });
+      const error = createHttpError(401, 'User not authenticated')
+      throw error
     }
 
     const project_id = req.body.project_id;
@@ -40,13 +43,13 @@ export const getTask = async function (
   res: express.Response,
 ) {
   try {
-    const taskId = parseInt(req.params.id);
-    if (!taskId) {
+    const key = req.params.key;
+    if (!key) {
       return res
         .status(404)
         .json({ message: `Task not found, try another ID` });
     }
-    const task = services.find(taskId);
+    const task = services.find(key);
     return res.status(201).json(task);
   } catch (err) {
     return res.status(500).json({ message: `Internal error` });
@@ -69,12 +72,13 @@ export const getTasks = async function (
 export const update = async function (
   req: express.Request,
   res: express.Response,
+  next: express.NextFunction
 ) {
   try {
-    const taskId = parseInt(req.params.id);
+    const key = req.params.key;
 
-    if (isNaN(taskId)) {
-      return res.status(400).json({ message: 'Invalid task ID' });
+    if (!key) {
+      return res.status(400).json({ message: 'Invalid task key' });
     }
 
     const updateData = {
@@ -85,7 +89,7 @@ export const update = async function (
       real_end_date: req.body.real_end_date,
     };
 
-    const result: any = await services.update(taskId, updateData);
+    const result: any = await services.update(key, updateData);
 
     if (!result.success) {
       return res.status(404).json({ message: result.message });
@@ -93,28 +97,26 @@ export const update = async function (
 
     return res.status(200).json(result.task);
   } catch (err) {
-    console.error('Error updating task:', err);
-    return res.status(500).json({ message: 'Internal server error' });
+    next(err)
   }
 };
 
-//find task by id and delete task
+//find task by key and delete task
 export const deleteTask = async function (
   req: express.Request,
   res: express.Response,
+  next: express.NextFunction
 ) {
   try {
-    const id = parseInt(req.params.id, 10);
-    if (!id) {
-      return res
-        .status(404)
-        .json({ message: `Task not found, try another ID` });
+    const key = req.params.key;
+    if (!key) {
+      const error = createHttpError(401, 'Task not found')
     }
-    const deleted = await services.deleteTask(id);
+    const deleted = await services.deleteTask(key);
     if (deleted) {
-      return res.status(201).json({ message: `Task deleted`, deleted });
+      return res.status(201).json({ message: `Task deleted` });
     }
   } catch (err) {
-    return res.status(500).json({ message: `Internal server error`, err });
+    next(err)
   }
 };

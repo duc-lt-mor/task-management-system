@@ -17,16 +17,16 @@ export const generateKey = async function (project_id: number) {
   return key
 }
 
-export const find = async function (id: number) {
-  return await Task.findOne({ where: { id } });
+export const find = async function (key: string) {
+  return await Task.findOne({ where: { key: key } });
 };
 
 export const get = async function () {
   return await Task.findAll();
 };
 
-export const update = async function (id: number, data: any, ) {
-    const task: any = find(id)
+export const update = async function (key: string, data: any, ) {
+    const task: any = Task.findByPk(key)
     if (!task) {
         return {success: false}
     }
@@ -47,6 +47,6 @@ export const update = async function (id: number, data: any, ) {
     }
 }
 
-export const deleteTask = async function (id: number) {
-  return await Task.destroy({ where: { id } });
+export const deleteTask = async function (key: string) {
+  return await Task.destroy({ where: { key: key } });
 };

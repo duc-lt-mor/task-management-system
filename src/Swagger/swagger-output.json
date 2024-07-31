@@ -337,8 +337,11 @@
                 "project_id": {
                   "example": "1"
                 },
-                "user name/ email": {
-                  "example":"jonathan"
+                "project_role_id": {
+                  "example": "1"
+                },
+                "find_mem": {
+                  "example":"user name/ email"
                 }
               }
             }

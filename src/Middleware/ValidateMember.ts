@@ -11,17 +11,16 @@ export const addUser = function () {
       .withMessage('please enter user name/ user email')
       .custom(async (find_mem, { req }) => {
         let project_id: number = Number(req.body.project_id);
-        let err: Array<string> = [];
 
-        let user: any = User.findOne({
+        let user_found: any = User.findOne({
           where: {
             [Op.or]: [{ name: find_mem }, { email: find_mem }],
           },
         });
+  
+        let project_found: any = ProjectServices.findProjectById(project_id);
 
-        let project: any = ProjectServices.findProjectById(project_id);
-
-        await Promise.all([user, project]);
+        let [user, project] = await Promise.all([user_found, project_found]);
 
         let member: any = await Member.findOne({
           where: {
@@ -45,7 +44,7 @@ export const addUser = function () {
           throw new Error('user already been added');
         }
       }),
-    body('project_id').isEmpty().withMessage('please enter project id'),
+    body('project_id').notEmpty().withMessage('please enter project id'),
   ];
 };
 

@@ -51,22 +51,22 @@ export const validateDelete = function () {
       let id: number = Number(col_id);
 
       //dem so task hien co trong mot cot
-      let tasks: any =  Task.count({
+      let tasks_count: any =  Task.count({
         where: {
           colum_id: id,
         },
       });
 
       //lay ra thong tin cot can xoa
-      let colum: any = Colum.findOne({
+      let colum_found: any = Colum.findOne({
         where: {
           id: id,
         },
       });
 
-      await Promise.all([tasks, colum]);
+     let [tasks, colum] = await Promise.all([tasks_count, colum_found]);
 
-      if (colum.col_type != 'custom') {
+      if (colum?.col_type != 'custom') {
         //kiem tra xem cot can xoa co phai cot default khong
         throw new Error("you can't delete default colum");
       }

@@ -70,6 +70,7 @@ export const edit = async function (
     await Project_role.update(
       {
         name: data.name,
+        key: data.key,
         permissions: data.permission_keys,
       },
       { where: { id: id }, transaction: t },

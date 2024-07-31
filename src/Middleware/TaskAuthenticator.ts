@@ -17,7 +17,7 @@ export const authenticateCDTask = function (permission: number) {
         return res.status(401).json({ message: 'User not authenticated' });
       }
 
-      let member: any =  Member.findOne({
+      let member_found: any =  Member.findOne({
         where: {
           user_id: req.user.id,
           project_id: Number(req.body.project_id),
@@ -29,15 +29,15 @@ export const authenticateCDTask = function (permission: number) {
         ],
       });
 
-      let system_role: any =  System_role.findOne({
+      let system_role_found: any =  System_role.findOne({
         where: {
           id: req.user.system_role_id,
         },
       });
 
-      await Promise.all([member,system_role]);
+    let [member, system_role] =  await Promise.all([member_found,system_role_found]);
 
-      if (system_role.key == Role.ADMIN) {
+      if (system_role?.key == Role.ADMIN) {
         next();
       } else if (
         member?.project_role.key == Role.USER ||
@@ -66,7 +66,7 @@ export const authenticateUpdateTask = function (permission: number) {
         return res.status(401).json({ message: 'User not authenticated' });
       }
 
-      let member: any = Member.findOne({
+      let member_found: any = Member.findOne({
         where: {
           user_id: req.user.id,
           project_id: Number(req.body.project_id),
@@ -78,21 +78,21 @@ export const authenticateUpdateTask = function (permission: number) {
         ],
       });
 
-      let system_role: any = System_role.findOne({
+      let system_role_found: any = System_role.findOne({
         where: {
           id: req.user.system_role_id,
         },
       });
 
-      let task: any = Task.findOne({
+      let task_found: any = Task.findOne({
         where: {
           id: req.params.task_id,
         },
       });
 
-      await Promise.all([member,system_role,task]);
+     let [member, system_role, task] = await Promise.all([member_found,system_role_found,task_found]);
 
-      if (system_role.key == Role.ADMIN) {
+      if (system_role?.key == Role.ADMIN) {
         next();
       } 
 
@@ -103,7 +103,7 @@ export const authenticateUpdateTask = function (permission: number) {
         next();
       } 
 
-      else if (task.assignee_id == req.user.id) {
+      else if (task?.assignee_id == req.user.id) {
         next();
       } 
 

@@ -19,7 +19,7 @@ export const authenticateCreateComment = function (permission: number) {
         return res.status(401).json({ message: 'User not authenticated' });
       }
 
-      let member: any = Member.findOne({
+      let member_found: any = Member.findOne({
         where: {
           user_id: req.user.id,
           project_id: Number(req.body.project_id),
@@ -31,21 +31,21 @@ export const authenticateCreateComment = function (permission: number) {
         ],
       });
 
-      let system_role: any = System_role.findOne({
+      let system_role_found: any = System_role.findOne({
         where: {
           id: req.user.system_role_id,
         },
       });
 
-      let task: any = Task.findOne({
+      let task_found: any = Task.findOne({
         where: {
           id: req.body.task_id,
         },
       });
 
-      await Promise.all([member, system_role, task]);
+     let [member, system_role, task] = await Promise.all([member_found, system_role_found, task_found]);
 
-      if (system_role.key == Role.ADMIN) {
+      if (system_role?.key == Role.ADMIN) {
         next();
       } 
       
@@ -53,7 +53,7 @@ export const authenticateCreateComment = function (permission: number) {
         next();
       } 
       
-      else if (task.assignee_id == req.user.id) {
+      else if (task?.assignee_id == req.user.id) {
         next();
       } 
       
@@ -86,7 +86,7 @@ export const authenticateUpdateComment = function (permission: number) {
         },
       });
 
-      if (comment.user_id == req.user.id) {
+      if (comment?.user_id == req.user.id) {
         next();
       } 
       
@@ -112,21 +112,21 @@ export const authenticateDeleteComment = function (permission: number) {
         return res.status(401).json({ message: 'User not authenticated' });
       }
 
-      let system_role: any = System_role.findOne({
+      let system_role_found: any = System_role.findOne({
         where: {
           id: req.user.system_role_id,
         },
       });
 
-      let comment: any = Comment.findOne({
+      let comment_found: any = Comment.findOne({
         where: {
           id: req.body.task_id,
         },
       });
 
-      await Promise.all([system_role, comment]);
+     let [system_role, comment] = await Promise.all([system_role_found, comment_found]);
 
-      if (system_role.key == Role.ADMIN) {
+      if (system_role?.key == Role.ADMIN) {
         next();
       } 
       

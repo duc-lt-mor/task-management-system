@@ -16,7 +16,7 @@ export const authenticateProject = function (permission: number) {
         return res.status(401).json({ message: 'User not authenticated' });
       }
 
-      let member: any =  Member.findOne({
+      let member_found: any =  Member.findOne({
         where: {
           user_id: req.user.id,
           project_id:
@@ -29,15 +29,15 @@ export const authenticateProject = function (permission: number) {
         ],
       });
 
-      let system_role: any =  System_role.findOne({
+      let system_role_found: any =  System_role.findOne({
         where: {
           id: req.user.system_role_id,
         },
       });
 
-      await Promise.all([member,system_role]);
+     let [member, system_role] = await Promise.all([member_found,system_role_found]);
 
-      if (system_role.key == Role.ADMIN) {
+      if (system_role?.key == Role.ADMIN) {
         next();
       } else if (
         member?.project_role.key != Role.PM ||
@@ -50,7 +50,7 @@ export const authenticateProject = function (permission: number) {
         next();
       }
     } catch (err) {
-      return res.status(500).json({ message: 'Internal error ' });
+      return res.status(500).json({ message: 'Internal error '});
     }
   };
 };

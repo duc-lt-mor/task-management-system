@@ -14,7 +14,7 @@ app.use('/', router)
 app.use(exceptionHandler)
 
 // // Load the Swagger JSON file
-const swaggerDocument = require('./Swagger/swagger-output.json');
+const swaggerDocument = require('.swagger-output.json');
 
 app.use('/api-doc', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(express.json());

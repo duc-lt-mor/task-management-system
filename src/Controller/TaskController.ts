@@ -2,6 +2,7 @@ import express from 'express';
 import * as services from '../Services/TaskServices';
 import * as authenticator from '../Middleware/UserAuthenticator';
 import createHttpError from 'http-errors';
+import { Task } from '../Models/task';
 
 export const generateTask = async function (
   req: authenticator.CustomRequest,
@@ -33,7 +34,7 @@ export const generateTask = async function (
 
     const task = await services.create(taskData);
     if (!task) {
-      throw createHttpError(400, `Could not create task. Please try again`)
+      throw createHttpError(400, `Could not create task. Please try again`);
     }
     return res
       .status(201)
@@ -70,7 +71,11 @@ export const getTasks = async function (
   next: express.NextFunction,
 ) {
   try {
-    const tasks = await services.get();
+    const tasks: any = await Task.findAll();
+    for (const task in tasks) {
+      console.log(tasks[task].name)
+
+    }
     if (!tasks) {
       throw createHttpError(404, `No tasks found`);
     }
@@ -131,21 +136,5 @@ export const deleteTask = async function (
     }
   } catch (err) {
     return next(err);
-  }
-};
-
-export const search = async function (
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction,
-) {
-  try {
-    const searchValue = req.params.search || req.query.search;
-
-    if (!searchValue) {
-      throw createHttpError(400, `Search value is required`);
-    }
-  } catch (err) {
-    next(err);
   }
 };

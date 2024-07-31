@@ -9,7 +9,7 @@ import * as swaggerUi from 'swagger-ui-express'
 config();
 const app = express();
 const port = process.env.PORT;
-const swaggerDocument = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../swagger-output.json'), 'utf8'));
+const swaggerDocument = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../Swagger/swagger-output.json'), 'utf8'));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

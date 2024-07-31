@@ -25,8 +25,6 @@ export const postRegister = async function (
   next: express.NextFunction,
 ) {
   try {
-<<<<<<< HEAD
-=======
     // Validate the incoming request
     // const errors = validationResult(req);
     // if (!errors.isEmpty()) {
@@ -34,7 +32,6 @@ export const postRegister = async function (
     //   return next(createHttpError(400, 'Validation errors', { errors: errors.array() }));
     // }
 
->>>>>>> 10effc5a8075e1d8ba4262a250228c93045a32d0
     const data = {
       name: req.body.name,
       email: req.body.email,
@@ -44,17 +41,9 @@ export const postRegister = async function (
       system_role_id: req.body.system_role_id,
     };
 
-<<<<<<< HEAD
-    const existedUser = await services.find(data.email);
-
-    if (existedUser) {
-      const error = createHttpError(400, `User existed`);
-      throw error;
-=======
     // Check if email is provided and valid
     if (!data.email) {
       return next(createHttpError(400, 'Email is required'));
->>>>>>> 10effc5a8075e1d8ba4262a250228c93045a32d0
     }
 
     // Check if the user already exists
@@ -72,14 +61,12 @@ export const postRegister = async function (
     }
 
     // Handle unexpected situations
-    return next(createHttpError(500, 'User registration failed for unknown reasons'));
+    return next(
+      createHttpError(500, 'User registration failed for unknown reasons'),
+    );
   } catch (err) {
-<<<<<<< HEAD
-    next(err);
-=======
     // Handle any other errors
     return next(err);
->>>>>>> 10effc5a8075e1d8ba4262a250228c93045a32d0
   }
 };
 

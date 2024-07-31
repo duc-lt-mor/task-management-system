@@ -3,6 +3,7 @@ import * as services from '../Services/TaskServices';
 import * as authenticator from '../Middleware/UserAuthenticator';
 import createHttpError from 'http-errors';
 import { Task } from '../Models/task';
+import { Colum } from '../Models/colum';
 
 export const generateTask = async function (
   req: authenticator.CustomRequest,
@@ -15,9 +16,15 @@ export const generateTask = async function (
       return res.status(401).json({ message: 'User not authenticated' });
     }
 
-    const project_id = req.body.project_id;
-    const creator_id = req.user?.id;
-    const colum_id = 1;
+    const project_id: number = Number(req.body.project_id);
+    const creator_id: number = req.user?.id;
+    let colum: any = await Colum.findOne({
+      where: {
+        project_id: project_id,
+        col_type: 'todo',
+      },
+    });
+    const colum_id: number = colum.id;
     const key = await services.generateKey(project_id); // Ensure this is awaited
     const taskData = {
       project_id,
@@ -73,8 +80,7 @@ export const getTasks = async function (
   try {
     const tasks: any = await Task.findAll();
     for (const task in tasks) {
-      console.log(tasks[task].name)
-
+      console.log(tasks[task].name);
     }
     if (!tasks) {
       throw createHttpError(404, `No tasks found`);

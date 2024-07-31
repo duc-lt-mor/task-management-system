@@ -114,7 +114,7 @@ router.delete(
   ColumController.destroy,
 );
 
-router.get('/login', user.getLogin);
+router.post('/login', user.getLogin);
 router.post(
   '/register',
   ...userValidator.validateRegister(),
@@ -124,52 +124,52 @@ router.delete('/user/:userId', user.deleteUser);
 
 router.post(
   '/task',
-  authenticator.authenticateJWT,
+  authenticator.verifyToken,
   TaskAut.authenticateCDTask(8),
-  validateTask,
+  ...validateTask(),
   task.generateTask,
 );
 router.get(
   '/task/:id',
-  authenticator.authenticateJWT,
+  authenticator.verifyToken,
   ProjectAut.authenticateProject(11),
   task.getTask,
 );
 router.get('/task', task.getTasks);
 router.delete(
   '/task/:id',
-  authenticator.authenticateJWT,
+  authenticator.verifyToken,
   TaskAut.authenticateCDTask(10),
   task.deleteTask,
 );
 router.put(
   '/task',
-  authenticator.authenticateJWT,
+  authenticator.verifyToken,
   TaskAut.authenticateUpdateTask(9),
   task.update,
 );
 
 router.post(
   '/comment',
-  authenticator.authenticateJWT,
+  authenticator.verifyToken,
   CommentAut.authenticateCreateComment(12),
   comment.generate,
 );
 router.put(
   '/comment',
-  authenticator.authenticateJWT,
+  authenticator.verifyToken,
   CommentAut.authenticateUpdateComment,
   comment.update,
 );
 router.post(
   '/reply',
-  authenticator.authenticateJWT,
+  authenticator.verifyToken,
   CommentAut.authenticateCreateComment(12),
   comment.reply,
 );
 router.delete(
   '/comment/:key',
-  authenticator.authenticateJWT,
+  authenticator.verifyToken,
   CommentAut.authenticateDeleteComment,
   comment.destroy,
 );

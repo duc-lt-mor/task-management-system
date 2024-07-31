@@ -102,13 +102,14 @@ export const destroy = async function (id: number, req: express.Request) {
         project_role_id: id,
       },
       transaction: t,
-    }),
-      await Project_role.destroy({
-        where: {
-          id: id,
-        },
-        transaction: t,
-      });
+    });
+
+    await Project_role.destroy({
+      where: {
+        id: id,
+      },
+      transaction: t,
+    });
 
     await t.commit();
   } catch (error) {

@@ -16,7 +16,7 @@ export const authenticateProject = function (permission: number) {
         return res.status(401).json({ message: 'User not authenticated' });
       }
 
-      let member: any = await Member.findOne({
+      let member: any =  Member.findOne({
         where: {
           user_id: req.user.id,
           project_id:
@@ -29,11 +29,13 @@ export const authenticateProject = function (permission: number) {
         ],
       });
 
-      let system_role: any = await System_role.findOne({
+      let system_role: any =  System_role.findOne({
         where: {
           id: req.user.system_role_id,
         },
       });
+
+      await Promise.all([member,system_role]);
 
       if (system_role.key == Role.ADMIN) {
         next();

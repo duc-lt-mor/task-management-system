@@ -7,9 +7,13 @@ import * as MemberController from '../Controller/MemberController';
 import * as RoleController from '../Controller/RoleController';
 import * as authenticator from '../Middleware/UserAuthenticator';
 import * as ProjectAut from '../Middleware/ProjectAuthenticator';
+import * as TaskAut from '../Middleware/TaskAuthenticator';
+import * as CommentAut from '../Middleware/CommentAuthenticator';
 import * as user from '../Controller/UserController';
-import * as validator from '../Middleware/UserValidator';
 import * as validateRole from '../Middleware/ValidateRole';
+import * as task from '../Controller/TaskController';
+import { validateTask } from '../Middleware/TaskValidator';
+import * as userValidator from '../Middleware/UserValidator';
 import express from 'express';
 const router = express.Router();
 
@@ -109,8 +113,39 @@ router.delete(
   ColumController.destroy,
 );
 
-router.post('/login', user.getLogin);
-router.post('/register', ...validator.validateRegister(), user.postRegister);
+router.get('/login', user.getLogin);
+router.post(
+  '/register',
+  ...userValidator.validateRegister(),
+  user.postRegister,
+);
 router.delete('/user/:userId', user.deleteUser);
+
+router.post(
+  '/task',
+  authenticator.authenticateJWT,
+  TaskAut.authenticateCDTask(8),
+  validateTask,
+  task.generateTask,
+);
+router.get(
+  '/task/:id',
+  authenticator.authenticateJWT,
+  ProjectAut.authenticateProject(11),
+  task.getTask,
+);
+router.get('/task', task.getTasks);
+router.delete(
+  '/task/:id',
+  authenticator.authenticateJWT,
+  TaskAut.authenticateCDTask(10),
+  task.deleteTask,
+);
+router.put(
+  '/task',
+  authenticator.authenticateJWT,
+  TaskAut.authenticateUpdateTask(9),
+  task.update,
+);
 
 export default router;

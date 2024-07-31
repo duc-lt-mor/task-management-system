@@ -14,7 +14,7 @@ export const authenticateCreateComment = function (permission: number) {
     next: express.NextFunction,
   ) => {
     try {
-        
+
       if (!req.user) {
         return res.status(401).json({ message: 'User not authenticated' });
       }
@@ -22,8 +22,7 @@ export const authenticateCreateComment = function (permission: number) {
       let member: any = Member.findOne({
         where: {
           user_id: req.user.id,
-          project_id:
-            Number(req.params.project_id) || Number(req.body.project_id),
+          project_id: Number(req.body.project_id),
         },
         include: [
           {

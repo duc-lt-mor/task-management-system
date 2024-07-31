@@ -17,11 +17,10 @@ export const authenticateCDTask = function (permission: number) {
         return res.status(401).json({ message: 'User not authenticated' });
       }
 
-      let member: any = await Member.findOne({
+      let member: any =  Member.findOne({
         where: {
           user_id: req.user.id,
-          project_id:
-            Number(req.params.project_id) || Number(req.body.project_id),
+          project_id: Number(req.body.project_id),
         },
         include: [
           {
@@ -30,11 +29,13 @@ export const authenticateCDTask = function (permission: number) {
         ],
       });
 
-      let system_role: any = await System_role.findOne({
+      let system_role: any =  System_role.findOne({
         where: {
           id: req.user.system_role_id,
         },
       });
+
+      await Promise.all([member,system_role]);
 
       if (system_role.key == Role.ADMIN) {
         next();
@@ -68,8 +69,7 @@ export const authenticateUpdateTask = function (permission: number) {
       let member: any = Member.findOne({
         where: {
           user_id: req.user.id,
-          project_id:
-            Number(req.params.project_id) || Number(req.body.project_id),
+          project_id: Number(req.body.project_id),
         },
         include: [
           {

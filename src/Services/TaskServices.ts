@@ -1,8 +1,9 @@
 import { Task } from '../Models/task';
 import { Project } from '../Models/project';
+import { Op } from 'sequelize';
 
-export const create = async function (data: any) {
-  return await Task.create(data);
+export const create = function (data: any) {
+  return Task.create(data);
 };
 
 export const generateKey = async function (project_id: number) {
@@ -17,15 +18,15 @@ export const generateKey = async function (project_id: number) {
   return key
 }
 
-export const find = async function (id: number) {
-  return await Task.findOne({ where: { id } });
+export const find = function (id: number) {
+  return Task.findOne({ where: { id } });
 };
 
-export const get = async function () {
-  return await Task.findAll();
+export const get =  function () {
+  return Task.findAll();
 };
 
-export const update = async function (id: number, data: any, ) {
+export const update = function (id: number, data: any, ) {
     const task: any = find(id)
     if (!task) {
         return {success: false}
@@ -47,6 +48,28 @@ export const update = async function (id: number, data: any, ) {
     }
 }
 
-export const deleteTask = async function (id: number) {
-  return await Task.destroy({ where: { id } });
+export const deleteTask =  function (id: number) {
+  return Task.destroy({ where: { id } });
 };
+
+export const search = async function (value: any) {
+  const isNumeric = !isNaN(Number(value))
+
+  const conditions = [
+    {name: {[Op.like]: `%${value}%`}},
+    {key: {[Op.like]: `%${value}%`}},
+    ...(isNumeric ? [
+      { creator_id: value },
+      { project_id: value },
+      { assignee_id: value },
+      { priority: value }
+    ]: [])
+  ]
+  const tasks = await Task.findAll({
+    where: {
+      [Op.or]: conditions
+    }
+  });
+
+  return tasks;
+}

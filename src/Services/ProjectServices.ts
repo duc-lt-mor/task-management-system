@@ -32,7 +32,7 @@ export const create = async function (req: CustomRequest, data: ProjectData) {
       );
       throw error;
     }
-    console.log(data, req.user?.id);
+
     let project: any = await Project.create(
       {
         name: data.name,
@@ -72,19 +72,19 @@ export const create = async function (req: CustomRequest, data: ProjectData) {
     let project_role: any = await Project_role.bulkCreate(
       [
         {
-          is_pm: 1,
+          is_pm: true,
           name: 'Project Manager',
           permissions: [0],
           project_id: project.id,
         },
         {
-          is_pm: 0,
+          is_pm: false,
           name: 'Leader',
-          permissions: [8,9,10,11,12],
+          permissions: [8, 9, 10, 11, 12],
           project_id: project.id,
         },
         {
-          is_pm: 0,
+          is_pm: false,
           name: 'User',
           permissions: [],
           project_id: project.id,
@@ -153,6 +153,12 @@ export const destroy = async (id: number) => {
   const t = await sequelize.transaction();
 
   try {
+    await Project_role.destroy({
+      where: {
+        project_id: id,
+      },
+      transaction: t,
+    });
     await Promise.all([
       Member.destroy({
         where: {

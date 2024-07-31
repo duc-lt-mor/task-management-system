@@ -30,3 +30,23 @@ export const validateDelete = function () {
     }),
   ];
 };
+
+export const validateChangeOwnerProject = function () {
+  return [
+    body('project_id').notEmpty().withMessage('Please enter project id'),
+    body('new_owner_id')
+      .notEmpty()
+      .withMessage('please enter new owner id')
+      .custom(async (new_owner_id, { req }) => {
+        let member: any = await Member.findOne({
+          where: {
+            project_id: Number(req.body.project_id),
+            user_id: Number(new_owner_id),
+          },
+        });
+        if (!member) {
+          throw new Error('user not found');
+        }
+      }),
+  ];
+};

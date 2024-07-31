@@ -47,12 +47,10 @@ export const authenticateProject = function (permission: number) {
       ) {
         next();
       } else {
-        return res
-          .status(403)
-          .json({
-            message: 'You do not have permission to access.',
-            a: member?.project_role.permissions.includes(0),
-          });
+        return res.status(403).json({
+          message: 'You do not have permission to access.',
+          a: member?.project_role.permissions.includes(0),
+        });
       }
     } catch (err) {
       return res.status(500).json({ message: 'Internal error ' });

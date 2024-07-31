@@ -64,6 +64,14 @@ router.post(
 );
 
 router.put(
+  '/change_owner',
+  authenticator.verifyToken,
+  ProjectAut.authenticateProject(0),
+  ...validateRole.validateChangeOwnerProject(),
+  RoleController.changeProjectOwner,
+);
+
+router.put(
   '/project/role/:role_id',
   authenticator.verifyToken,
   ProjectAut.authenticateProject(6),

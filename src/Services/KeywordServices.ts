@@ -4,7 +4,7 @@ import { Task } from '../Models/task';
 import { TaskKeyword } from '../Models/task_keyword';
 
 
-export const addKeyword = function (tasks: string[], transaction: Transaction) {
+export const addKeyword = function (tasks: string[], transaction: Transaction)  {
   const keywords: string[] = [];
   for (const task in tasks) {
     const words = tasks[task].split(' ');
@@ -13,7 +13,7 @@ export const addKeyword = function (tasks: string[], transaction: Transaction) {
     }
   }
   for (const keyword of keywords) {
-    const word = Keyword.findOne({where: {keyword: keyword}})
+    const word = Keyword.findOne({where: {keyword: keyword}, transaction})
     if(!word) {
       Keyword.create({ keyword }, { transaction });
     }

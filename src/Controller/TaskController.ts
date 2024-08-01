@@ -2,14 +2,11 @@ import express from 'express';
 import * as services from '../Services/TaskServices';
 import * as authenticator from '../Middleware/UserAuthenticator';
 import createHttpError from 'http-errors';
-<<<<<<< HEAD
+import { Task } from '../Models/task';
+import { Colum } from '../Models/colum';
 import { addKeyword } from '../Services/KeywordServices';
 import { Keyword } from '../Models/keyword';
 import { TaskKeyword } from '../Models/task_keyword';
-=======
-import { Task } from '../Models/task';
-import { Colum } from '../Models/colum';
->>>>>>> f6f62765efcbe95921bc372229aab2a1d3fdf502
 
 export const generateTask = async function (
   req: authenticator.CustomRequest,
@@ -102,14 +99,10 @@ export const getTasks = async function (
   next: express.NextFunction,
 ) {
   try {
-<<<<<<< HEAD
-    const tasks = await services.get();
-=======
     const tasks: any = await Task.findAll();
     for (const task in tasks) {
       console.log(tasks[task].name);
     }
->>>>>>> f6f62765efcbe95921bc372229aab2a1d3fdf502
     if (!tasks) {
       throw createHttpError(404, `No tasks found`);
     }
@@ -142,9 +135,9 @@ export const update = async function (
       throw createHttpError(400, `Couldn't update task data`);
     }
 
-    return res.status(200).json("update task success");
+    return res.status(200).json('update task success');
   } catch (err) {
-    console.log(err)
+    console.log(err);
     return next(err);
   }
 };

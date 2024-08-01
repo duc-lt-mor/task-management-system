@@ -137,6 +137,7 @@ router.get(
   task.getTask,
 );
 router.get('/task', task.getTasks);
+router.get('/task/search/:searchValue', search.search)
 router.delete(
   '/task/:id',
   authenticator.verifyToken,

@@ -5,15 +5,18 @@ import { TaskKeyword } from '../Models/task_keyword';
 
 
 export const addKeyword = function (tasks: string[], transaction: Transaction) {
-  let keywords: string[] = [];
+  const keywords: string[] = [];
   for (const task in tasks) {
-    let words = tasks[task].split(' ');
+    const words = tasks[task].split(' ');
     for (const i in words) {
       keywords.push(words[i]);
     }
   }
   for (const keyword of keywords) {
-    Keyword.create({ keyword }, { transaction });
+    const word = Keyword.findOne({where: {keyword: keyword}})
+    if(!word) {
+      Keyword.create({ keyword }, { transaction });
+    }
   }
 };
 
@@ -21,12 +24,11 @@ export const search = async function (value: string | number) {
   const keywords: any = await Keyword.findAll({
     where: {
       keyword: {
-        [Op.eq]: `${value}%`,
+        [Op.like]: `${value}%`,
       },
     },
     attributes: ['id'],
   });
-
   const keywordIDs = await keywords.map((keyword: { id: any }) => keyword.id);
 
   const taskKeywords: any = await TaskKeyword.findAll({

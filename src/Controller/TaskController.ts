@@ -6,6 +6,8 @@ import { Task } from '../Models/task';
 import { Colum } from '../Models/colum';
 import { Keyword } from '../Models/keyword';
 import { TaskKeyword } from '../Models/task_keyword';
+import { sequelize } from '../Config/config';
+import { addKeyword } from '../Services/KeywordServices';
 
 export const generateTask = async function (
   req: authenticator.CustomRequest,
@@ -13,6 +15,8 @@ export const generateTask = async function (
   next: express.NextFunction,
 ) {
   try {
+    const transaction = await sequelize.transaction();
+
     // Ensure user is authenticated
     if (!req.user) {
       return res.status(401).json({ message: 'User not authenticated' });
@@ -41,25 +45,10 @@ export const generateTask = async function (
       colum_id,
     };
 
-    const task: any = await services.create(taskData);
-    const taskName = task.name;
-    const keywords = taskName.split(/[\s,]+/); // Split by spaces and commas
+    const task: any = await services.create(taskData, transaction);
+    const taskName = [task.name];
+    const records: any = addKeyword(taskName, transaction);
 
-    for (const keyword of keywords) {
-      // Check if keyword exists
-      let record: any = await Keyword.findOne({ where: { keyword: keyword } });
-
-      // If not, create it
-      if (!record) {
-        record = await Keyword.create({ keyword });
-      }
-
-      // Associate keyword with task
-      await TaskKeyword.create({
-        task_id: task.id,
-        keyword_id: record.id,
-      });
-    }
     if (!task) {
       throw createHttpError(400, `Could not create task. Please try again`);
     }

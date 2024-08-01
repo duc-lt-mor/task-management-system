@@ -8,8 +8,10 @@ export const create = async function (
   next: express.NextFunction,
 ) {
   try {
-    await ProjectServices.create(req, req.body);
-    return res.status(200).send('create project success');
+    let project: any = await ProjectServices.create(req, req.body);
+    return res
+      .status(200)
+      .json({ message: 'create project success', 'new project': project });
   } catch (err) {
     next(err);
   }
@@ -21,8 +23,10 @@ export const edit = async function (
   next: express.NextFunction,
 ) {
   try {
-    await ProjectServices.edit(Number(req.params.project_id), req, req.body);
-    return res.status(200).send('update project success');
+    let project: any = await ProjectServices.edit(Number(req.params.project_id), req, req.body);
+    return res
+      .status(200)
+      .json({ message: 'update project success', 'updated project': project });
   } catch (err) {
     next(err);
   }

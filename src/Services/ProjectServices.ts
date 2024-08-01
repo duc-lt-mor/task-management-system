@@ -103,6 +103,7 @@ export const create = async function (req: CustomRequest, data: ProjectData) {
     );
 
     await t.commit();
+    return project;
   } catch (err) {
     await t.rollback();
     throw err;
@@ -143,6 +144,7 @@ export const edit = async function (
     );
 
     await t.commit();
+    return project;
   } catch (err) {
     await t.rollback();
     throw err;

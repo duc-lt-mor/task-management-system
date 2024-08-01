@@ -1,17 +1,17 @@
 export const options = {
-	definition: {
-		openapi: "3.0.0",
-		info: {
-			title: "Library API",
-			version: "1.0.0",
-			description: "A simple Express Library API",
-		},
-		servers: [
-			{
-				url: "http://localhost:3000",
-			},
-		],
-	},
-	apis: ['./Routers/*.ts'],
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'My API',
+      version: '1.0.0',
+      description: 'A simple API documentation',
+    },
+    servers: [
+      {
+        url: 'http://localhost:3000',
+        description: 'Local server',
+      },
+    ],
+  },
+  apis: ['src/Routers/routers.ts'],
 };
-

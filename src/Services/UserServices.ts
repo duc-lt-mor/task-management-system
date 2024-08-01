@@ -49,7 +49,11 @@ export const find = function (email: string) {
 };
 
 export const get = function () {
-  return User.findAll();
+  return User.findAll({
+    where:{
+      system_role_id: 2
+    }
+  });
 };
 
 export const setPhone = async function (email: string, phone: number) {

@@ -1,6 +1,6 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../Config/config';
-import { Role } from './role';
+import { Project_role } from './project_role';
 import { User } from './user';
 import { Project } from './project';
 export const Member = sequelize.define('members', {
@@ -11,11 +11,11 @@ export const Member = sequelize.define('members', {
     primaryKey: true,
   },
 });
-Role.hasMany(Member, {
-  foreignKey: 'role_id',
+Project_role.hasMany(Member, {
+  foreignKey: 'project_role_id',
 });
-Member.belongsTo(Role, {
-  foreignKey: 'role_id',
+Member.belongsTo(Project_role, {
+  foreignKey: 'project_role_id',
 });
 User.hasMany(Member, {
   foreignKey: 'user_id',

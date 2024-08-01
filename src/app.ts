@@ -1,24 +1,26 @@
 import express from 'express';
 import { config } from 'dotenv';
-import { router } from './Routers/routers';
+import router from './Routers/routers';
+import * as swaggerUi from 'swagger-ui-express';
 import { exceptionHandler } from './Middleware/ExceptionHandler';
-import fs from 'fs';
-import path from 'path';
-import * as swaggerUi from 'swagger-ui-express'
 
 config();
-const app = express();
-const port = process.env.PORT;
-const swaggerDocument = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../Swagger/swagger-output.json'), 'utf8'));
 
+const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+const port = process.env.PORT;
+app.use('/', router);
+app.use(exceptionHandler);
+
+// // Load the Swagger JSON file
+const swaggerDocument = require('./Swagger/swagger-output.json');
+
+app.use('/api-doc', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/api-doc', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-app.use(`/api`, router);
-app.use(exceptionHandler);
-
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
 });
-

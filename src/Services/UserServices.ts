@@ -17,6 +17,7 @@ export const login = async function (data: any) {
     const error = createHttpError(401, `Invalid username or password`);
     throw error;
   }
+
   const token: string = tokenService.generateToken({
     id: user.id,
     email: user.email,
@@ -36,10 +37,10 @@ export const register = async function (data: UserData) {
     system_role_id: data.system_role_id,
   });
   if (user) {
-    return user
-  } else{ 
+    return user;
+  } else {
     const error = createHttpError(401, `Can't create user`);
-    throw error
+    throw error;
   }
 };
 
@@ -56,7 +57,7 @@ export const setPhone = async function (email: string, phone: number) {
 
   if (!user) {
     const error = createHttpError(404, `User not found`);
-    throw error
+    throw error;
   }
 
   Object.assign(user, phone);

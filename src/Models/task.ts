@@ -43,7 +43,7 @@ export const Task = sequelize.define(
     },
     real_end_date: {
       type: DataTypes.DATE,
-      allowNull: false,
+      allowNull: true,
     },
   },
   {

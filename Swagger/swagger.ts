@@ -7,7 +7,7 @@ const doc = {
     host: 'localhost:3000',
     schemes: ['http'],
   };
-  const outputFile = './swagger-output.json';
+  const outputFile = './Swagger/swagger-output.json';
   const endpointsFiles = ['./src/app.ts'];
   swaggerAutogen()(outputFile, endpointsFiles, doc).then(() => {
     console.log('Swagger documentation generated.');

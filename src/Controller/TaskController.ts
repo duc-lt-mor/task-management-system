@@ -2,9 +2,14 @@ import express from 'express';
 import * as services from '../Services/TaskServices';
 import * as authenticator from '../Middleware/UserAuthenticator';
 import createHttpError from 'http-errors';
+<<<<<<< HEAD
 import { addKeyword } from '../Services/KeywordServices';
 import { Keyword } from '../Models/keyword';
 import { TaskKeyword } from '../Models/task_keyword';
+=======
+import { Task } from '../Models/task';
+import { Colum } from '../Models/colum';
+>>>>>>> f6f62765efcbe95921bc372229aab2a1d3fdf502
 
 export const generateTask = async function (
   req: authenticator.CustomRequest,
@@ -17,9 +22,15 @@ export const generateTask = async function (
       return res.status(401).json({ message: 'User not authenticated' });
     }
 
-    const project_id = req.body.project_id;
-    const creator_id = req.user?.id;
-    const colum_id = 1;
+    const project_id: number = Number(req.body.project_id);
+    const creator_id: number = req.user?.id;
+    let colum: any = await Colum.findOne({
+      where: {
+        project_id: project_id,
+        col_type: 'todo',
+      },
+    });
+    const colum_id: number = colum.id;
     const key = await services.generateKey(project_id); // Ensure this is awaited
     const taskData = {
       project_id,
@@ -74,7 +85,7 @@ export const getTask = async function (
     if (!taskId) {
       throw createHttpError(404, `Task id not found`);
     }
-    const task = services.find(taskId);
+    const task: any = await services.find(taskId);
     if (!task) {
       throw createHttpError(404, `No task available with this ID`);
     }
@@ -91,7 +102,14 @@ export const getTasks = async function (
   next: express.NextFunction,
 ) {
   try {
+<<<<<<< HEAD
     const tasks = await services.get();
+=======
+    const tasks: any = await Task.findAll();
+    for (const task in tasks) {
+      console.log(tasks[task].name);
+    }
+>>>>>>> f6f62765efcbe95921bc372229aab2a1d3fdf502
     if (!tasks) {
       throw createHttpError(404, `No tasks found`);
     }
@@ -101,7 +119,7 @@ export const getTasks = async function (
   }
 };
 
-export const update = function (
+export const update = async function (
   req: express.Request,
   res: express.Response,
   next: express.NextFunction,
@@ -114,21 +132,19 @@ export const update = function (
     }
 
     const updateData = {
-      status: req.body.status,
       assignee_id: req.body.assignee_id,
       creator_id: req.body.creator_id,
-      end_date: req.body.end_date,
       real_end_date: req.body.real_end_date,
     };
 
-    const result: any = services.update(taskId, updateData);
-
+    let result: any = await services.update(taskId, updateData);
     if (!result) {
       throw createHttpError(400, `Couldn't update task data`);
     }
 
-    return res.status(200).json(result.task);
+    return res.status(200).json("update task success");
   } catch (err) {
+    console.log(err)
     return next(err);
   }
 };
@@ -148,7 +164,7 @@ export const deleteTask = async function (
     }
     const deleted = await services.deleteTask(id);
     if (deleted) {
-      return res.status(201).json({ message: `Task deleted`, deleted });
+      return res.status(201).json({ message: `Task deleted` });
     }
   } catch (err) {
     return next(err);

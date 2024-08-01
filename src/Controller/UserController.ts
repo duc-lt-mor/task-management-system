@@ -1,8 +1,6 @@
 import express from 'express';
 import * as services from '../Services/UserServices';
-import { validationResult } from 'express-validator';
 import createHttpError from 'http-errors';
-
 
 export const getLogin = async function (
   req: express.Request,
@@ -24,7 +22,7 @@ export const getLogin = async function (
 export const postRegister = async function (
   req: express.Request,
   res: express.Response,
-  next: express.NextFunction
+  next: express.NextFunction,
 ) {
   try {
     // Validate the incoming request
@@ -63,7 +61,9 @@ export const postRegister = async function (
     }
 
     // Handle unexpected situations
-    return next(createHttpError(500, 'User registration failed for unknown reasons'));
+    return next(
+      createHttpError(500, 'User registration failed for unknown reasons'),
+    );
   } catch (err) {
     // Handle any other errors
     return next(err);
@@ -73,13 +73,13 @@ export const postRegister = async function (
 export const deleteUser = async function (
   req: express.Request,
   res: express.Response,
-  next: express.NextFunction
+  next: express.NextFunction,
 ) {
   try {
     const id = parseInt(req.params.id);
     await services.deleteUser(id);
     return res.status(200).json({ message: `Deleted user` });
   } catch (err) {
-    next(err)
+    next(err);
   }
 };

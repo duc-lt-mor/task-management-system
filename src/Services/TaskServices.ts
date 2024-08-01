@@ -27,26 +27,27 @@ export const get = function () {
   return Task.findAll();
 };
 
-export const update = function (id: number, data: any) {
-  const task: any = find(id);
+export const update = async function (id: number, data: any) {
+  const task: any = await find(id);
   if (!task) {
     return { success: false };
   }
-  if (data.status !== undefined) {
-    task.status = data.status;
-  }
 
-  if (data.assignee_id !== undefined) {
-    task.assignee_id = data.assignee_id;
-  }
-
-  if (data.priority) {
-    task.priority = data.priority;
-  }
-
-  if (data.real_end_date !== undefined) {
-    task.real_end_date = data.real_end_date;
-  }
+ try {
+ let tas: any =  await Task.update({
+    assignee_id: data.assignee_id,
+    priority: data.priority,
+    real_end_date: data.real_end_date
+  },{
+    where: {
+      id: id
+    }
+  })
+  return tas
+ } catch (error) {
+  console.log(error)
+  throw error
+ }
 };
 
 export const deleteTask = function (id: number) {

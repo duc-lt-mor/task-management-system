@@ -1,10 +1,9 @@
 import { Task } from '../Models/task';
 import { Project } from '../Models/project';
-import { Op } from 'sequelize';
-import { Keyword } from '../Models/keyword';
+import { Transaction } from 'sequelize';
 
-export const create = function (data: any) {
-  return Task.create(data);
+export const create = function (data: any, transaction: Transaction) {
+  return Task.create(data, { transaction });
 };
 
 export const generateKey = async function (project_id: number) {

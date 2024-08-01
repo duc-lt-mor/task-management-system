@@ -1,9 +1,10 @@
-import { Op } from 'sequelize';
+import { Op, Transaction } from 'sequelize';
 import { Keyword } from '../Models/keyword';
 import { Task } from '../Models/task';
 import { TaskKeyword } from '../Models/task_keyword';
 
-export const addKeyword = function (tasks: string[]) {
+
+export const addKeyword = function (tasks: string[], transaction: Transaction) {
   let keywords: string[] = [];
   for (const task in tasks) {
     let words = tasks[task].split(' ');
@@ -12,7 +13,7 @@ export const addKeyword = function (tasks: string[]) {
     }
   }
   for (const keyword of keywords) {
-    Keyword.create({ keyword });
+    Keyword.create({ keyword }, { transaction });
   }
 };
 

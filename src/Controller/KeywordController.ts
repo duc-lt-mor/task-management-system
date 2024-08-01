@@ -2,6 +2,7 @@ import express from 'express';
 import createHttpError from 'http-errors';
 import * as services from '../Services/KeywordServices';
 import { Task } from '../Models/task';
+import { sequelize } from '../Config/config';
 
 export const addKeyword = async function (
   req: express.Request,
@@ -9,9 +10,11 @@ export const addKeyword = async function (
   next: express.NextFunction,
 ) {
   try {
+    const transaction = await sequelize.transaction()
+
     const tasks: any = await Task.findAll();
     const taskNames: string[] = tasks.map((task: { name: any }) => task.name);
-    const keywords: any = services.addKeyword(taskNames);
+    const keywords: any = services.addKeyword(taskNames, transaction);
 
     return res.status(200).json(keywords);
   } catch (err) {

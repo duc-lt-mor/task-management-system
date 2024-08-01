@@ -4,7 +4,6 @@ import * as authenticator from '../Middleware/UserAuthenticator';
 import createHttpError from 'http-errors';
 import { Task } from '../Models/task';
 import { Colum } from '../Models/colum';
-import { addKeyword } from '../Services/KeywordServices';
 import { Keyword } from '../Models/keyword';
 import { TaskKeyword } from '../Models/task_keyword';
 
@@ -33,8 +32,8 @@ export const generateTask = async function (
       project_id,
       key,
       name: req.body.name,
-      description: req.body.description, // Use correct field for description
-      creator_id, // Set from authenticated user
+      description: req.body.description,
+      creator_id,
       assignee_id: req.body.assignee_id,
       priority: req.body.priority,
       expected_end_date: req.body.expected_end_date,
@@ -48,7 +47,7 @@ export const generateTask = async function (
 
     for (const keyword of keywords) {
       // Check if keyword exists
-      let record: any = await Keyword.findOne({ where: { keyword } });
+      let record: any = await Keyword.findOne({ where: { keyword: keyword } });
 
       // If not, create it
       if (!record) {
@@ -60,18 +59,19 @@ export const generateTask = async function (
         task_id: task.id,
         keyword_id: record.id,
       });
-      if (!task) {
-        throw createHttpError(400, `Could not create task. Please try again`);
-      }
-      return res
-        .status(201)
-        .json({ message: 'Task generated successfully', task });
     }
+    if (!task) {
+      throw createHttpError(400, `Could not create task. Please try again`);
+    }
+    return res
+      .status(201)
+      .json({ message: 'Task generated successfully', task });
   } catch (err) {
     next(err);
   }
 };
 
+//get 1 task by ID
 export const getTask = async function (
   req: express.Request,
   res: express.Response,
@@ -125,8 +125,7 @@ export const update = async function (
     }
 
     const updateData = {
-      assignee_id: req.body.assignee_id,
-      creator_id: req.body.creator_id,
+      colum: req.body.colum_id,
       real_end_date: req.body.real_end_date,
     };
 

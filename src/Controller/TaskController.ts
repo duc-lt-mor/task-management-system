@@ -61,7 +61,7 @@ export const getTask = async function (
     if (!taskId) {
       throw createHttpError(404, `Task id not found`);
     }
-    const task = services.find(taskId);
+    const task: any = await services.find(taskId);
     if (!task) {
       throw createHttpError(404, `No task available with this ID`);
     }
@@ -91,7 +91,7 @@ export const getTasks = async function (
   }
 };
 
-export const update = function (
+export const update = async function (
   req: express.Request,
   res: express.Response,
   next: express.NextFunction,
@@ -104,21 +104,19 @@ export const update = function (
     }
 
     const updateData = {
-      status: req.body.status,
       assignee_id: req.body.assignee_id,
       creator_id: req.body.creator_id,
-      end_date: req.body.end_date,
       real_end_date: req.body.real_end_date,
     };
 
-    const result: any = services.update(taskId, updateData);
-
+    let result: any = await services.update(taskId, updateData);
     if (!result) {
       throw createHttpError(400, `Couldn't update task data`);
     }
 
-    return res.status(200).json(result.task);
+    return res.status(200).json("update task success");
   } catch (err) {
+    console.log(err)
     return next(err);
   }
 };
@@ -138,7 +136,7 @@ export const deleteTask = async function (
     }
     const deleted = await services.deleteTask(id);
     if (deleted) {
-      return res.status(201).json({ message: `Task deleted`, deleted });
+      return res.status(201).json({ message: `Task deleted` });
     }
   } catch (err) {
     return next(err);

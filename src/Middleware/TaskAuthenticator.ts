@@ -52,7 +52,8 @@ export const authenticateCDTask = function (permission: number) {
           .json({ message: 'You do not have permission to access.' });
       }
     } catch (err) {
-      return res.status(500).json({ message: 'Internal error ' });
+      
+      return res.status(500).json({ message: 'Internal error '});
     }
   };
 };
@@ -88,7 +89,7 @@ export const authenticateUpdateTask = function (permission: number) {
 
       let task_found: any = Task.findOne({
         where: {
-          id: req.params.task_id,
+          id: req.params.id,
         },
       });
 
@@ -112,7 +113,8 @@ export const authenticateUpdateTask = function (permission: number) {
           .json({ message: 'You do not have permission to access.' });
       }
     } catch (err) {
-      return res.status(500).json({ message: 'Internal error ' });
+      console.log(req.user?.id)
+      return res.status(500).json({ message: 'Internal error ' + err});
     }
   };
 };

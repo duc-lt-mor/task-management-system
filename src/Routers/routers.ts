@@ -143,7 +143,7 @@ router.delete(
   task.deleteTask,
 );
 router.put(
-  '/task',
+  '/task/:id',
   authenticator.verifyToken,
   TaskAut.authenticateUpdateTask(9),
   task.update,

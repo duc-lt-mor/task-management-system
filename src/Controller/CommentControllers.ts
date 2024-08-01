@@ -12,12 +12,11 @@ export const generate = async function (
     const task_id = req.body.task_id;
     const comment: any = await services.generate({
       task_id,
-      user_id: req.body.user_id,
+      user_id: req.user?.id,
       content: req.body.content,
       createdAt: new Date(),
       updatedAt: new Date()
     });
-    console.log(comment)
     if (!comment) {
       throw createHttpError(400, `Could not generate comment`)
     }
@@ -29,18 +28,18 @@ export const generate = async function (
 };
 
 export const reply = async function (
-  req: express.Request,
+  req: authenticator.CustomRequest,
   res: express.Response,
   next: express.NextFunction,
 ) {
   try {
-    const { taskId, content, parentKey } = req.body;
+    const { task_id, content, parent_id } = req.body;
     if (!content) {
       throw createHttpError(400, 'Content is required');
     }
 
     // Find the parent comment using the comment key
-    const parentComment: any = await services.find(parentKey);
+    const parentComment: any = await services.find(parent_id);
     if (!parentComment) {
       throw createHttpError(404, 'Parent comment not found');
     }
@@ -49,8 +48,8 @@ export const reply = async function (
     try {
       const replyComment = await services.reply({
         content,
-        taskId,
-        parentId: parentComment.id, // Set the parentId to link this as a reply
+        task_id,
+        parent_id: parentComment.id, // Set the parentId to link this as a reply
       });
 
       return res.status(200).json(replyComment);

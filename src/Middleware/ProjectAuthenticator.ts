@@ -48,8 +48,7 @@ export const authenticateProject = function (permission: number) {
         next();
       } else {
         return res.status(403).json({
-          message: 'You do not have permission to access.',
-          a: member?.project_role.permissions.includes(0),
+          message: 'You do not have permission to access.'
         });
       }
     } catch (err) {

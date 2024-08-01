@@ -18,7 +18,6 @@ import * as comment from '../Controller/CommentControllers';
 import express from 'express';
 const router = express.Router();
 
-
 /**
  * @swagger
  * /project:
@@ -175,7 +174,11 @@ router.delete(
  *         '500':
  *           description: Internal Server Error
  */
-router.get('/project/member/:project_id', MemberController.show);
+router.get(
+  '/project/member/:project_id',
+  ProjectAut.authenticateProject(5),
+  MemberController.show,
+);
 
 /**
  * @swagger
@@ -199,7 +202,11 @@ router.get('/project/member/:project_id', MemberController.show);
  *         '500':
  *           description: Internal Server Error
  */
-router.get('/showrole/:project_id', RoleController.showRole)
+router.get(
+  '/showrole/:project_id',
+  ProjectAut.authenticateProject(1),
+  RoleController.showRole,
+);
 
 /**
  * @swagger
@@ -648,7 +655,6 @@ router.delete(
   ColumController.destroy,
 );
 
-
 /**
  * @swagger
  * /login:
@@ -721,7 +727,11 @@ router.post('/login', user.getLogin);
  *         '500':
  *           description: Internal Server Error
  */
-router.post('/register', ...userValidator.validateRegister(), user.postRegister);
+router.post(
+  '/register',
+  ...userValidator.validateRegister(),
+  user.postRegister,
+);
 
 /**
  * @swagger
@@ -750,8 +760,76 @@ router.post('/register', ...userValidator.validateRegister(), user.postRegister)
  *         '500':
  *           description: Internal Server Error
  */
-router.delete('/user/:userId', user.deleteUser);
+router.delete('/user/:userId', authenticator.isServerAdmin, user.deleteUser);
 
+/**
+ * @swagger
+ * /user/projects:
+ *    get:
+ *       summary: Return a list of projects in which user is a member
+ *       tags:
+ *         - User
+ *       parameters:
+ *         - name: authorization
+ *           in: header
+ *           type: string
+ *           format: bearer
+ *           description: Bearer token for authentication
+ *       responses:
+ *         '200':
+ *           description: OK
+ *         '401':
+ *           description: Unauthorized
+ *         '403':
+ *           description: Forbiden
+ *         '500':
+ *           description: Internal Server Error
+ */
+router.get('/user/projects', authenticator.verifyToken, user.showProject);
+
+/**
+ * @swagger
+ * /task:
+ *    post:
+ *       summary: Create a task in a project
+ *       tags:
+ *         - Task
+ *       parameters:
+ *         - name: authorization
+ *           in: header
+ *           type: string
+ *           format: bearer
+ *           description: Bearer token for authentication
+ *         - name: body
+ *           in: body
+ *           schema:
+ *             type: object
+ *             properties:
+ *               project_id:
+ *                 type: string
+ *                 example: 1
+ *               name:
+ *                 type: string
+ *                 example: fix bug
+ *               description:
+ *                 type: string
+ *                 example: this is description
+ *               priority:
+ *                 type: string
+ *                 example: high
+ *               expected_end_date:
+ *                 type: string
+ *                 example: 2024-08-19
+ *       responses:
+ *         '200':
+ *           description: OK
+ *         '401':
+ *           description: Unauthorized
+ *         '403':
+ *           description: Forbiden
+ *         '500':
+ *           description: Internal Server Error
+ */
 router.post(
   '/task',
   authenticator.verifyToken,
@@ -759,19 +837,139 @@ router.post(
   ...validateTask(),
   task.generateTask,
 );
+
+/**
+ * @swagger
+ * /task/{id}:
+ *    get:
+ *       summary: get a task in a project
+ *       tags:
+ *         - Task
+ *       parameters:
+ *         - name: id
+ *           in: path
+ *           type: string
+ *           required: true
+ *         - name: authorization
+ *           in: header
+ *           type: string
+ *           format: bearer
+ *           description: Bearer token for authentication
+ *       responses:
+ *         '200':
+ *           description: OK
+ *         '401':
+ *           description: Unauthorized
+ *         '403':
+ *           description: Forbiden
+ *         '500':
+ *           description: Internal Server Error
+ */
 router.get(
   '/task/:id',
   authenticator.verifyToken,
   ProjectAut.authenticateProject(11),
   task.getTask,
 );
-router.get('/task', task.getTasks);
+
+/**
+ * @swagger
+ * /project/tasks/{project_id}:
+ *    get:
+ *       summary: Get all tasks in a project
+ *       tags:
+ *         - Project
+ *       parameters:
+ *         - name: project_id
+ *           in: path
+ *           type: string
+ *           required: true
+ *         - name: authorization
+ *           in: header
+ *           type: string
+ *           format: bearer
+ *           description: Bearer token for authentication
+ *       responses:
+ *         '200':
+ *           description: OK
+ *         '401':
+ *           description: Unauthorized
+ *         '403':
+ *           description: Forbiden
+ *         '500':
+ *           description: Internal Server Error
+ */
+router.get('/task/', ProjectAut.authenticateProject(11), task.getTasks);
+
+/**
+ * @swagger
+ * /task/{id}:
+ *    delete:
+ *       summary: Delete a task in a project
+ *       tags:
+ *         - Colum
+ *       parameters:
+ *         - name: id
+ *           in: path
+ *           type: string
+ *           required: true
+ *         - name: authorization
+ *           in: header
+ *           type: string
+ *           format: bearer
+ *           description: Bearer token for authentication
+ *       responses:
+ *         '200':
+ *           description: OK
+ *         '401':
+ *           description: Unauthorized
+ *         '403':
+ *           description: Forbiden
+ *         '500':
+ *           description: Internal Server Error
+ */
 router.delete(
   '/task/:id',
   authenticator.verifyToken,
   TaskAut.authenticateCDTask(10),
   task.deleteTask,
 );
+
+/**
+ * @swagger
+ * /task/{id}:
+ *    put:
+ *       summary: Delete a colum in a project
+ *       tags:
+ *         - Task
+ *       parameters:
+ *         - name: col_id
+ *           in: path
+ *           type: string
+ *           required: true
+ *         - name: authorization
+ *           in: header
+ *           type: string
+ *           format: bearer
+ *           description: Bearer token for authentication
+ *         - name: body
+ *           in: body
+ *           schema:
+ *             type: object
+ *             properties:
+ *               project_id:
+ *                 type: string
+ *                 example: 1
+ *       responses:
+ *         '200':
+ *           description: OK
+ *         '401':
+ *           description: Unauthorized
+ *         '403':
+ *           description: Forbiden
+ *         '500':
+ *           description: Internal Server Error
+ */
 router.put(
   '/task/:id',
   authenticator.verifyToken,
@@ -779,28 +977,164 @@ router.put(
   task.update,
 );
 
+/**
+ * @swagger
+ * /comment:
+ *    post:
+ *       summary: Create a comment in a project
+ *       tags:
+ *         - Comment
+ *       parameters:
+ *         - name: authorization
+ *           in: header
+ *           type: string
+ *           format: bearer
+ *           description: Bearer token for authentication
+ *         - name: body
+ *           in: body
+ *           schema:
+ *             type: object
+ *             properties:
+ *               task_id:
+ *                 type: string
+ *                 example: 1
+ *               content:
+ *                 type: string
+ *                 example: example comment
+ *       responses:
+ *         '200':
+ *           description: OK
+ *         '401':
+ *           description: Unauthorized
+ *         '403':
+ *           description: Forbiden
+ *         '500':
+ *           description: Internal Server Error
+ */
 router.post(
   '/comment',
   authenticator.verifyToken,
   CommentAut.authenticateCreateComment(12),
   comment.generate,
 );
+
+/**
+ * @swagger
+ * /comment/{id}:
+ *    put:
+ *       summary: Edit a comment in a project
+ *       tags:
+ *         - Comment
+ *       parameters:
+ *         - name: id
+ *           in: path
+ *           type: string
+ *           required: true
+ *         - name: authorization
+ *           in: header
+ *           type: string
+ *           format: bearer
+ *           description: Bearer token for authentication
+ *         - name: body
+ *           in: body
+ *           schema:
+ *             type: object
+ *             properties:
+ *               content:
+ *                 type: string
+ *                 example: example comment
+ *       responses:
+ *         '200':
+ *           description: OK
+ *         '401':
+ *           description: Unauthorized
+ *         '403':
+ *           description: Forbiden
+ *         '500':
+ *           description: Internal Server Error
+ */
 router.put(
-  '/comment',
+  '/comment/:id',
   authenticator.verifyToken,
-  CommentAut.authenticateUpdateComment,
+  CommentAut.authenticateUDComment,
   comment.update,
 );
+
+/**
+ * @swagger
+ * /reply:
+ *    post:
+ *       summary: Reply a comment in a project
+ *       tags:
+ *         - Comment
+ *       parameters:
+ *         - name: authorization
+ *           in: header
+ *           type: string
+ *           format: bearer
+ *           description: Bearer token for authentication
+ *         - name: body
+ *           in: body
+ *           schema:
+ *             type: object
+ *             properties:
+ *               content:
+ *                 type: string
+ *                 example: example comment
+ *               task_id:
+ *                 type: string
+ *                 example: 1
+ *               parent_id:
+ *                 type: string
+ *                 example: 2
+ *       responses:
+ *         '200':
+ *           description: OK
+ *         '401':
+ *           description: Unauthorized
+ *         '403':
+ *           description: Forbiden
+ *         '500':
+ *           description: Internal Server Error
+ */
 router.post(
   '/reply',
   authenticator.verifyToken,
   CommentAut.authenticateCreateComment(12),
   comment.reply,
 );
+
+/**
+ * @swagger
+ * /comment/{id}:
+ *    delete:
+ *       summary: Delete a comment in a project
+ *       tags:
+ *         - Comment
+ *       parameters:
+ *         - name: id
+ *           in: path
+ *           type: string
+ *           required: true
+ *         - name: authorization
+ *           in: header
+ *           type: string
+ *           format: bearer
+ *           description: Bearer token for authentication
+ *       responses:
+ *         '200':
+ *           description: OK
+ *         '401':
+ *           description: Unauthorized
+ *         '403':
+ *           description: Forbiden
+ *         '500':
+ *           description: Internal Server Error
+ */
 router.delete(
-  '/comment/:key',
+  '/comment/:id',
   authenticator.verifyToken,
-  CommentAut.authenticateDeleteComment,
+  CommentAut.authenticateUDComment,
   comment.destroy,
 );
 

@@ -1,11 +1,12 @@
 import express from 'express';
 import { config } from 'dotenv';
-import router  from './Routers/routers';
+import router from './Routers/routers';
 import * as swaggerUi from 'swagger-ui-express';
 import swaggerJsDoc from 'swagger-jsdoc';
-import  {options} from './Swagger/swagger'
+import { options } from './Swagger/swagger';
+import session from 'express-session';
 import { exceptionHandler } from './Middleware/ExceptionHandler';
-
+import { sessionConfig } from './Config/config';
 config();
 
 const app = express();
@@ -14,6 +15,7 @@ app.use(express.urlencoded({ extended: true }));
 const port = process.env.PORT;
 app.use('/', router);
 app.use(exceptionHandler);
+app.use(session(sessionConfig));
 
 // // Load the Swagger JSON file
 const specs = swaggerJsDoc(options);

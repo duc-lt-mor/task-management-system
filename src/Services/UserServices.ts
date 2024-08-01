@@ -3,9 +3,12 @@ import { User } from '../Models/user';
 import { UserData } from '../Interfaces/UserInterfaces';
 import createHttpError from 'http-errors';
 import * as tokenService from './TokenService';
+import { Member } from '../Models/member';
+import { Project } from '../Models/project';
 
 export const login = async function (data: any) {
   const { email, password } = data;
+  console.log(data);
   const user: any = await User.findOne({ where: { email } });
   if (!user) {
     const error = createHttpError(401, `Invalid username or password`);
@@ -50,9 +53,9 @@ export const find = function (email: string) {
 
 export const get = function () {
   return User.findAll({
-    where:{
-      system_role_id: 2
-    }
+    where: {
+      system_role_id: 2,
+    },
   });
 };
 
@@ -71,4 +74,23 @@ export const setPhone = async function (email: string, phone: number) {
 
 export const deleteUser = function (id: number) {
   return User.destroy({ where: { id } });
+};
+
+export const showProject = async (id: number) => {
+  let projects = await Member.findAll({
+    where: {
+      user_id: id,
+    },
+    include: [
+      {
+        model: Project,
+      },
+    ],
+  });
+
+  if (!projects) {
+    throw new Error('you do not in any project');
+  } else {
+    return projects;
+  }
 };

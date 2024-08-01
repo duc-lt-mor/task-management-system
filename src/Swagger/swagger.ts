@@ -1,6 +1,6 @@
 export const options = {
   definition: {
-    openapi: '3.0.0',
+    swagger: '2.0',
     info: {
       title: 'My API',
       version: '1.0.0',

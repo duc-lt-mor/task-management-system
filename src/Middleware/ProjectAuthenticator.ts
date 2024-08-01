@@ -2,7 +2,6 @@ import { CustomRequest } from '../Middleware/UserAuthenticator';
 import { Member } from '../Models/member';
 import express from 'express';
 import * as Role from '../Constant/Roles';
-import { System_role } from '../Models/system_role';
 import { Project_role } from '../Models/project_role';
 
 export const authenticateProject = function (permission: number) {
@@ -16,7 +15,7 @@ export const authenticateProject = function (permission: number) {
         return res.status(401).json({ message: 'User not authenticated' });
       }
 
-      let member_found: any = Member.findOne({
+      let member: any = await Member.findOne({
         where: {
           user_id: req.user.id,
           project_id:
@@ -29,26 +28,15 @@ export const authenticateProject = function (permission: number) {
         ],
       });
 
-      let system_role_found: any = System_role.findOne({
-        where: {
-          id: req.user.system_role_id,
-        },
-      });
-
-      let [member, system_role] = await Promise.all([
-        member_found,
-        system_role_found,
-      ]);
-
       if (
-        system_role?.key == Role.ADMIN ||
+        req.user?.system_role_id == Role.ADMIN ||
         member?.project_role.permissions.includes(permission) ||
         member?.project_role.permissions.includes(0)
       ) {
         next();
       } else {
         return res.status(403).json({
-          message: 'You do not have permission to access.'
+          message: 'You do not have permission to access.',
         });
       }
     } catch (err) {

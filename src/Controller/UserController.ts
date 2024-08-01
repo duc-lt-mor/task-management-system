@@ -1,6 +1,7 @@
 import express from 'express';
 import * as services from '../Services/UserServices';
 import createHttpError from 'http-errors';
+import { CustomRequest } from '../Middleware/UserAuthenticator';
 
 export const getLogin = async function (
   req: express.Request,
@@ -9,7 +10,7 @@ export const getLogin = async function (
 ) {
   try {
     const token = await services.login(req.body);
-
+    req.cookies = token;
     return res.status(200).json({
       message: 'Login successful',
       token,
@@ -79,6 +80,19 @@ export const deleteUser = async function (
     const id = parseInt(req.params.id);
     await services.deleteUser(id);
     return res.status(200).json({ message: `Deleted user` });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const showProject = async function (
+  req: CustomRequest,
+  res: express.Response,
+  next: express.NextFunction,
+) {
+  try {
+    let projects: any = await services.showProject(Number(req.user?.id));
+    return res.status(200).json({ message: projects });
   } catch (err) {
     next(err);
   }

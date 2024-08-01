@@ -2,7 +2,7 @@ import jwt, { Secret, SignOptions } from 'jsonwebtoken';
 import express from 'express';
 import { UserPayload } from '../Interfaces/UserInterfaces';
 import dotenv from 'dotenv';
-
+import * as Role from '../Constant/Roles';
 dotenv.config();
 
 const JWT_SECRET_KEY: Secret = process.env.JWT_SECRET as Secret;
@@ -49,5 +49,17 @@ export const verifyToken = async function (
     next();
   } catch (err) {
     return next(err);
+  }
+};
+
+export const isServerAdmin = (
+  req: CustomRequest,
+  res: express.Response,
+  next: express.NextFunction,
+) => {
+  if (req.user?.system_role_id == Role.ADMIN) {
+    next();
+  } else {
+    return res.status(403).send('You do not have permission');
   }
 };

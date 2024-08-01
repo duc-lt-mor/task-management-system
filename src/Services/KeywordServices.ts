@@ -1,6 +1,7 @@
 import { Op } from 'sequelize';
 import { Keyword } from '../Models/keyword';
 import { Task } from '../Models/task';
+import { TaskKeyword } from '../Models/task_keyword';
 
 export const addKeyword = function (tasks: string[]) {
   let keywords: string[] = [];
@@ -11,41 +12,45 @@ export const addKeyword = function (tasks: string[]) {
     }
   }
   for (const keyword of keywords) {
-     Keyword.create({keyword}) ;
+    Keyword.create({ keyword });
   }
 };
 
 export const search = async function (value: string | number) {
-  const isNumeric = !isNaN(Number(value));
-  const conditions: any[] = [
-    { name: { [Op.like]: `%${value}` } },
-    { key: { [Op.like]: `%${value}` } },
-    ...(isNumeric
-      ? [
-          { creator_id: value },
-          { project_id: value },
-          { assignee_id: value },
-          { priority: value },
-        ]
-      : []),
-  ];
-
-  const tasks = await Task.findAll({
-    include: [
-      {
-        model: Keyword,
-        where: {
-          keyword: {
-            [Op.like]: `%${value}`,
-          },
-        },
-        through: {
-          attributes: [],
-        },
-      },
-    ],
+  const keywords: any = await Keyword.findAll({
     where: {
-      [Op.or]: conditions,
+      keyword: {
+        [Op.eq]: `${value}%`,
+      },
+    },
+    attributes: ['id'],
+  });
+
+  const keywordIDs = await keywords.map((keyword: { id: any }) => keyword.id);
+
+  const taskKeywords: any = await TaskKeyword.findAll({
+    where: {
+      keyword_id: {
+        [Op.in]: keywordIDs,
+      },
+    },
+    attributes: ['task_id'], // Only select the taskId
+  });
+  const taskIds = await taskKeywords.map(
+    (taskKeyword: { task_id: any }) => taskKeyword.task_id,
+  );
+
+  if (taskIds.length === 0) {
+    // If no task keywords found, return an empty result
+    return [];
+  }
+
+  // 5. Retrieve Tasks
+  const tasks = await Task.findAll({
+    where: {
+      id: {
+        [Op.in]: taskIds,
+      },
     },
   });
 

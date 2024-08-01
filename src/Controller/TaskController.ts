@@ -2,7 +2,9 @@ import express from 'express';
 import * as services from '../Services/TaskServices';
 import * as authenticator from '../Middleware/UserAuthenticator';
 import createHttpError from 'http-errors';
-import { Task } from '../Models/task';
+import { addKeyword } from '../Services/KeywordServices';
+import { Keyword } from '../Models/keyword';
+import { TaskKeyword } from '../Models/task_keyword';
 
 export const generateTask = async function (
   req: authenticator.CustomRequest,
@@ -32,13 +34,31 @@ export const generateTask = async function (
       colum_id,
     };
 
-    const task = await services.create(taskData);
-    if (!task) {
-      throw createHttpError(400, `Could not create task. Please try again`);
+    const task: any = await services.create(taskData);
+    const taskName = task.name;
+    const keywords = taskName.split(/[\s,]+/); // Split by spaces and commas
+
+    for (const keyword of keywords) {
+      // Check if keyword exists
+      let record: any = await Keyword.findOne({ where: { keyword } });
+
+      // If not, create it
+      if (!record) {
+        record = await Keyword.create({ keyword });
+      }
+
+      // Associate keyword with task
+      await TaskKeyword.create({
+        task_id: task.id,
+        keyword_id: record.id,
+      });
+      if (!task) {
+        throw createHttpError(400, `Could not create task. Please try again`);
+      }
+      return res
+        .status(201)
+        .json({ message: 'Task generated successfully', task });
     }
-    return res
-      .status(201)
-      .json({ message: 'Task generated successfully', task });
   } catch (err) {
     next(err);
   }
@@ -71,7 +91,7 @@ export const getTasks = async function (
   next: express.NextFunction,
 ) {
   try {
-    const tasks = await services.get()
+    const tasks = await services.get();
     if (!tasks) {
       throw createHttpError(404, `No tasks found`);
     }

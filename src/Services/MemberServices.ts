@@ -10,11 +10,11 @@ import { Op } from 'sequelize';
 //them thanh vien vao project
 export const add = async function (req: express.Request, data: MemberData) {
   const t = await sequelize.transaction();
-  let find_mem: string = req.body.find_mem;
+  let add_mem: string = req.body.add_mem;
 
   let user: any = await User.findOne({
     where: {
-      [Op.or]: [{ name: find_mem }, { email: find_mem }],
+      [Op.or]: [{ name: add_mem }, { email: add_mem }],
     },
   });
   try {
@@ -25,7 +25,7 @@ export const add = async function (req: express.Request, data: MemberData) {
       const error = createHttpError(400, JSON.stringify(errorMessages));
       throw error;
     }
-    await Member.create(
+    let member: any = await Member.create(
       {
         user_id: user.id,
         project_id: data.project_id,
@@ -34,6 +34,7 @@ export const add = async function (req: express.Request, data: MemberData) {
       { transaction: t },
     );
     await t.commit();
+    return member;
   } catch (err) {
     await t.rollback();
     throw err;
@@ -61,11 +62,12 @@ export const editRole = async function (id: number, data: MemberData) {
   const t = await sequelize.transaction();
 
   try {
-    await Member.update(
+   let member: any = await Member.update(
       { project_role_id: Number(data.project_role_id) },
       { where: { id: id }, transaction: t },
     );
     await t.commit();
+    return member;
   } catch (err) {
     await t.rollback();
     throw err;

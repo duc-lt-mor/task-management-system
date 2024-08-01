@@ -24,7 +24,7 @@ export const create = async function (data: ColumData, req: express.Request ) {
       const error = createHttpError(400, JSON.stringify(errorMessages));
       throw error
     }
-    await Colum.create(
+   let colum: any =  await Colum.create(
       {
         col_type: data.type,
         name: data.name,
@@ -34,6 +34,7 @@ export const create = async function (data: ColumData, req: express.Request ) {
       { transaction: t },
     );
     await t.commit();
+    return colum;
   } catch (err) {
     await t.rollback();
     throw err;
@@ -82,6 +83,7 @@ export const edit = async function (id: number, data: ColumData, req: express.Re
     ]);
 
     await t.commit();
+    return colum;
   } catch (err) {
     await t.rollback();
     throw err;

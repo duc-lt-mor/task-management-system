@@ -29,7 +29,7 @@ export const create = async function (req: express.Request, data: RoleData) {
       );
       throw error;
     }
-    await Project_role.create(
+    let role: any = await Project_role.create(
       {
         name: data.name,
         is_pm: 0,
@@ -39,6 +39,7 @@ export const create = async function (req: express.Request, data: RoleData) {
       { transaction: t },
     );
     await t.commit();
+    return role;
   } catch (err) {
     await t.rollback();
     throw err;
@@ -68,7 +69,7 @@ export const edit = async function (
       );
       throw error;
     }
-    await Project_role.update(
+    let role_updated: any = await Project_role.update(
       {
         name: data.name,
         permissions: data.permissions,
@@ -77,6 +78,7 @@ export const edit = async function (
     );
 
     await t.commit();
+    return role_updated;
   } catch (err) {
     await t.rollback();
     throw err;
@@ -132,28 +134,20 @@ export const changeProjectOwner = async function (req: CustomRequest) {
       );
       throw error;
     }
-    let old_owner_found: any = Member.findOne({
-      where: {
-        project_id: req.body.project_id,
-        user_id: req.user?.id,
-      },
-    });
-    let new_owner_found: any = Member.findOne({
+    
+
+    let new_owner: any = await Member.findOne({
       where: {
         project_id: req.body.project_id,
         user_id: req.body.new_owner_id,
       },
     });
-    let [old_owner, new_owner] = await Promise.all([
-      old_owner_found,
-      new_owner_found,
-    ]);
 
     await Promise.all([
       //update role new owner to pm
       await Member.update(
         {
-          project_role_id: old_owner.project_role_id,
+          project_role_id: req.body.new_project_role_id,
         },
         {
           where: {
@@ -163,7 +157,7 @@ export const changeProjectOwner = async function (req: CustomRequest) {
           transaction: t,
         },
       ),
-      //update role old owner to user
+      //update role old owner to other roles
       await Member.update(
         {
           project_role_id: new_owner.project_role_id,
@@ -179,8 +173,22 @@ export const changeProjectOwner = async function (req: CustomRequest) {
     ]);
 
     await t.commit();
+    return new_owner;
   } catch (error) {
     await t.rollback();
+    throw error;
+  }
+};
+
+export const showRole = async function (id: number) {
+  try {
+    let roles = await Project_role.findAll({
+      where: {
+        project_id: id,
+      },
+    });
+    return roles;
+  } catch (error) {
     throw error;
   }
 };

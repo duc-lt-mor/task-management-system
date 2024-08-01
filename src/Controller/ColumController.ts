@@ -7,9 +7,9 @@ export const create = async function (
   next: express.NextFunction,
 ) {
   try {
-    await ColumServices.create(req.body, req);
+    let comlum: any = await ColumServices.create(req.body, req);
 
-    res.status(201).send({ message: 'create success' });
+    res.status(201).send({ message: 'create success', 'new colum': comlum });
   } catch (error) {
     next(error);
   }
@@ -21,9 +21,13 @@ export const edit = async function (
   next: express.NextFunction,
 ) {
   try {
-    await ColumServices.edit(Number(req.params.col_id), req.body, req);
+    let colum: any = await ColumServices.edit(
+      Number(req.params.col_id),
+      req.body,
+      req,
+    );
 
-    res.status(200).send('edit success');
+    res.status(201).send({ message: 'edit success', 'edited colum': colum });
   } catch (error) {
     next(error);
   }

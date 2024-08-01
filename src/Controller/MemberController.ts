@@ -7,9 +7,11 @@ export const add = async function (
   next: express.NextFunction,
 ) {
   try {
-    await MemberServices.add(req, req.body);
+    let member: any = await MemberServices.add(req, req.body);
 
-    return res.status(200).send('add member success');
+    return res
+      .status(200)
+      .send({ message: 'add member success', 'added member': member });
   } catch (err) {
     next(err);
   }
@@ -35,9 +37,11 @@ export const editRole = async function (
   next: express.NextFunction,
 ) {
   try {
-    await MemberServices.editRole(Number(req.params.member_id), req.body);
+    let member: any = await MemberServices.editRole(Number(req.params.member_id), req.body);
 
-    res.status(201).send('edit member role success');
+    return res
+    .status(200)
+    .send({ message: 'edit member role success', 'member ': member });
   } catch (err) {
     next(err);
   }

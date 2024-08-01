@@ -71,11 +71,7 @@ export const getTasks = async function (
   next: express.NextFunction,
 ) {
   try {
-    const tasks: any = await Task.findAll();
-    for (const task in tasks) {
-      console.log(tasks[task].name)
-
-    }
+    const tasks = await services.get()
     if (!tasks) {
       throw createHttpError(404, `No tasks found`);
     }

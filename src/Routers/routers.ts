@@ -2,6 +2,7 @@ import express from 'express';
 import * as user from '../Controller/UserController';
 import * as task from '../Controller/TaskController';
 import * as authenticator from '../Middleware/UserAuthenticator';
+import * as search from '../Controller/KeywordController'
 import { validateTask } from '../Middleware/TaskValidator';
 import * as userValidator from '../Middleware/UserValidator';
 
@@ -44,5 +45,8 @@ router.put(
   authenticator.accessControl('update_task'),
   task.update,
 );
+
+router.post('/search', search.addKeyword)
+router.get('/search/:searchValue', search.search)
 
 export { router };

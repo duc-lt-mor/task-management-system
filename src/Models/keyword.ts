@@ -1,7 +1,6 @@
 import { sequelize } from "../Config/config";
 import { DataTypes } from "sequelize";
 import { Task } from "./task";
-import { TaskKeyword } from "./task_keyword";
 
 export const Keyword = sequelize.define(
     'keywords',
@@ -16,6 +15,13 @@ export const Keyword = sequelize.define(
             type: DataTypes.STRING,
             allowNull: false,
             unique: true
-        }
+        }, task_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: {
+                model: Task,
+                key: 'id',
+            },
+        },
     }
 )

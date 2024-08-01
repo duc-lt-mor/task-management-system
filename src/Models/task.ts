@@ -3,6 +3,7 @@ import { sequelize } from '../Config/config';
 import { Project } from './project';
 import { Colum } from './colum';
 import { User } from './user';
+import { Keyword } from './keyword';
 export const Task = sequelize.define(
   'tasks',
   {
@@ -32,6 +33,10 @@ export const Task = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    start_date: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
     expected_end_date: {
       type: DataTypes.DATE,
       allowNull: false,
@@ -42,7 +47,7 @@ export const Task = sequelize.define(
     },
   },
   {
-    timestamps: true,
+    timestamps: false,
   },
 );
 Project.hasMany(Task, {

@@ -6,15 +6,15 @@ import { body } from 'express-validator';
 
 export const addUser = function () {
   return [
-    body('find_mem')
+    body('add_mem')
       .notEmpty()
       .withMessage('please enter user name/ user email')
-      .custom(async (find_mem, { req }) => {
+      .custom(async (add_mem, { req }) => {
         let project_id: number = Number(req.body.project_id);
 
         let user_found: any = User.findOne({
           where: {
-            [Op.or]: [{ name: find_mem }, { email: find_mem }],
+            [Op.or]: [{ name: add_mem }, { email: add_mem }],
           },
         });
   

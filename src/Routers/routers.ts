@@ -8,11 +8,10 @@ import * as RoleController from '../Controller/RoleController';
 import * as authenticator from '../Middleware/UserAuthenticator';
 import * as ProjectAut from '../Middleware/ProjectAuthenticator';
 import * as user from '../Controller/UserController';
-import * as validator from '../Middleware/UserValidator';
 import * as validateRole from '../Middleware/ValidateRole';
+import * as userValidator from '../Middleware/UserValidator';
 import express from 'express';
 const router = express.Router();
-
 
 /**
  * @swagger
@@ -170,7 +169,11 @@ router.delete(
  *         '500':
  *           description: Internal Server Error
  */
-router.get('/project/member/:project_id', MemberController.show);
+router.get(
+  '/project/member/:project_id',
+  ProjectAut.authenticateProject(5),
+  MemberController.show,
+);
 
 /**
  * @swagger
@@ -194,7 +197,11 @@ router.get('/project/member/:project_id', MemberController.show);
  *         '500':
  *           description: Internal Server Error
  */
-router.get('/showrole/:project_id', RoleController.showRole)
+router.get(
+  '/showrole/:project_id',
+  ProjectAut.authenticateProject(1),
+  RoleController.showRole,
+);
 
 /**
  * @swagger
@@ -643,7 +650,6 @@ router.delete(
   ColumController.destroy,
 );
 
-
 /**
  * @swagger
  * /login:
@@ -716,35 +722,11 @@ router.post('/login', user.getLogin);
  *         '500':
  *           description: Internal Server Error
  */
-router.post('/register', ...validator.validateRegister(), user.postRegister);
+router.post(
+  '/register',
+  ...userValidator.validateRegister(),
+  user.postRegister,
+);
 
-/**
- * @swagger
- * /user/{userId}:
- *    put:
- *       summary: Delete a user
- *       tags:
- *         - User
- *       parameters:
- *         - name: UserId
- *           in: path
- *           type: string
- *           required: true
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
- *       responses:
- *         '200':
- *           description: OK
- *         '401':
- *           description: Unauthorized
- *         '403':
- *           description: Forbiden
- *         '500':
- *           description: Internal Server Error
- */
-router.delete('/user/:userId', user.deleteUser);
 
 export default router;

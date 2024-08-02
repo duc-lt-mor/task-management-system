@@ -1,7 +1,7 @@
 import { body, param } from 'express-validator';
 import { Member } from '../Models/member';
 
-import { PERMISSIONS } from '../Constant/Permissions';
+import { PERMISSIONS, PM_PERMISSIONS } from '../Constant/Permissions';
 import { Project_role } from '../Models/project_role';
 
 export const validateRole = function () {
@@ -10,13 +10,12 @@ export const validateRole = function () {
     body('permissions')
       .notEmpty()
       .withMessage('please enter at least one permission').custom((permissions) => {
-        let pm_permissions = [0];
         let err = []
         for (let p of permissions){
           if (!PERMISSIONS.includes(p)) {
             err.push( p+" is not exit in permissions")
           }
-          if (pm_permissions.includes(p)){
+          if (permissions.includes(PM_PERMISSIONS)){
             err.push("you can have pm permission")
           }
         }

@@ -12,12 +12,19 @@ export const addKeyword = function (tasks: string[], transaction: Transaction)  
       keywords.push(words[i]);
     }
   }
-  for (const keyword of keywords) {
-    const word = Keyword.findOne({where: {keyword: keyword}, transaction})
+
+  const uniques = Array.from(new Set(keywords))
+  const records: {keyword: string, id: number}[] = []
+
+  for (const keyword of uniques) {
+    let word: any = Keyword.findOne({where: {keyword: keyword}, transaction})
     if(!word) {
-      Keyword.create({ keyword }, { transaction });
+      word = Keyword.create({ keyword }, { transaction });
     }
+    records.push({keyword, id: word.id})
   }
+
+  return records
 };
 
 export const search = async function (value: string | number) {

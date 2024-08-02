@@ -46,12 +46,20 @@ export const generateTask = async function (
     };
 
     const task: any = await services.create(taskData, transaction);
-    const taskName = [task.name];
-    const records: any = addKeyword(taskName, transaction);
-
     if (!task) {
       throw createHttpError(400, `Could not create task. Please try again`);
     }
+    const taskName = [task.name];
+    const records = addKeyword(taskName, transaction);
+    for (const {id: keyword_id} of records) {
+      await TaskKeyword.create({
+        task_id: task.id,
+        keyword_id
+      }, {transaction})
+    }
+
+    await transaction.commit()
+    
     return res
       .status(201)
       .json({ message: 'Task generated successfully', task });

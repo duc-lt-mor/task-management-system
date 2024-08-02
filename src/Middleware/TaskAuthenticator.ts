@@ -52,7 +52,7 @@ export const authenticateCDTask = function (permission: number) {
           .json({ message: 'You do not have permission to access.' });
       }
     } catch (err) {
-      
+      console.log(err)
       return res.status(500).json({ message: 'Internal error '});
     }
   };

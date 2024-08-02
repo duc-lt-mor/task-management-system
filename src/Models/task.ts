@@ -47,7 +47,7 @@ export const Task = sequelize.define(
     },
   },
   {
-    timestamps: false,
+    timestamps: true,
   },
 );
 Project.hasMany(Task, {

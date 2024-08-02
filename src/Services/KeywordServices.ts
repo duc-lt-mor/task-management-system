@@ -4,7 +4,7 @@ import { Task } from '../Models/task';
 import { TaskKeyword } from '../Models/task_keyword';
 
 
-export const addKeyword = function (tasks: string[], transaction: Transaction)  {
+export const addKeyword = async function (tasks: string[], transaction: Transaction)  {
   const keywords: string[] = [];
   for (const task in tasks) {
     const words = tasks[task].split(' ');
@@ -12,16 +12,14 @@ export const addKeyword = function (tasks: string[], transaction: Transaction)  
       keywords.push(words[i]);
     }
   }
-
-  const uniques = Array.from(new Set(keywords))
   const records: {keyword: string, id: number}[] = []
 
-  for (const keyword of uniques) {
-    let word: any = Keyword.findOne({where: {keyword: keyword}, transaction})
+  for (const keyword of keywords) {
+    let word: any = await Keyword.findOne({where: {keyword: keyword}, transaction})
     if(!word) {
-      word = Keyword.create({ keyword }, { transaction });
+      word = await Keyword.create({ keyword }, { transaction });
+      records.push({keyword, id: word.id})
     }
-    records.push({keyword, id: word.id})
   }
 
   return records

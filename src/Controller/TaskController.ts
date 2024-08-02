@@ -40,8 +40,8 @@ export const generateTask = async function (
       creator_id,
       assignee_id: req.body.assignee_id,
       priority: req.body.priority,
+      start_date: req.body.start_date,
       expected_end_date: req.body.expected_end_date,
-      real_end_date: req.body.real_end_date,
       colum_id,
     };
 
@@ -50,7 +50,8 @@ export const generateTask = async function (
       throw createHttpError(400, `Could not create task. Please try again`);
     }
     const taskName = [task.name];
-    const records = addKeyword(taskName, transaction);
+    const records = await addKeyword(taskName, transaction);
+    console.log(records)
     for (const {id: keyword_id} of records) {
       await TaskKeyword.create({
         task_id: task.id,
@@ -64,7 +65,7 @@ export const generateTask = async function (
       .status(201)
       .json({ message: 'Task generated successfully', task });
   } catch (err) {
-    next(err);
+    return next(err);
   }
 };
 

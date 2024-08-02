@@ -1,4 +1,4 @@
-export const PM_PERMISSIONS = 0;
+export const PM_PERMISSIONS = 0
 
 export const VIEW_ROLE = 1;
 export const UPDATE_ROLE_USER = 2;

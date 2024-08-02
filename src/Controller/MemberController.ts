@@ -10,7 +10,7 @@ export const add = async function (
     let member: any = await MemberServices.add(req, req.body);
 
     return res
-      .status(200)
+      .status(201)
       .send({ message: 'add member success', 'added member': member });
   } catch (err) {
     next(err);

@@ -134,7 +134,6 @@ export const changeProjectOwner = async function (req: CustomRequest) {
       );
       throw error;
     }
-    
 
     let new_owner: any = await Member.findOne({
       where: {
@@ -145,10 +144,10 @@ export const changeProjectOwner = async function (req: CustomRequest) {
 
     await Promise.all([
       //update role new owner to pm
-       Project_role.update(
+      Project_role.update(
         {
           is_pm: true,
-          permissions: [0]
+          permissions: [0],
         },
         {
           where: {
@@ -159,7 +158,7 @@ export const changeProjectOwner = async function (req: CustomRequest) {
         },
       ),
       //update role old owner to other roles
-       Member.update(
+      Member.update(
         {
           project_role_id: req.body.new_project_role_id,
         },
@@ -181,14 +180,10 @@ export const changeProjectOwner = async function (req: CustomRequest) {
 };
 
 export const showRole = async function (id: number) {
-  try {
-    let roles = await Project_role.findAll({
-      where: {
-        project_id: id,
-      },
-    });
-    return roles;
-  } catch (error) {
-    throw error;
-  }
+  let roles = await Project_role.findAll({
+    where: {
+      project_id: id,
+    },
+  });
+  return roles;
 };

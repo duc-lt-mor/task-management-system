@@ -10,7 +10,7 @@ export const create = async function (
   try {
     let project: any = await ProjectServices.create(req, req.body);
     return res
-      .status(200)
+      .status(201)
       .json({ message: 'create project success', 'new project': project });
   } catch (err) {
     next(err);

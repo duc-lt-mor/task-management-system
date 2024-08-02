@@ -6,6 +6,7 @@ import { validationResult } from 'express-validator';
 import express from 'express';
 import createHttpError from 'http-errors';
 import { Op } from 'sequelize';
+import { Project_role } from '../Models/project_role';
 
 //them thanh vien vao project
 export const add = async function (req: express.Request, data: MemberData) {
@@ -92,3 +93,18 @@ export const show = async function (id: number) {
 
   return members;
 };
+
+export const findMember = async function (user_id: number, project_id: number) {
+  let member: any = await Member.findOne({
+    where: {
+      user_id: user_id,
+      project_id: project_id,
+    },
+    include: [
+      {
+        model: Project_role,
+      },
+    ],
+  });
+  return member
+}

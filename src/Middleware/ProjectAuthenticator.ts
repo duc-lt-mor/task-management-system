@@ -1,8 +1,7 @@
 import { CustomRequest } from '../Middleware/UserAuthenticator';
-import { Member } from '../Models/member';
 import express from 'express';
 import * as Role from '../Constant/Roles';
-import { Project_role } from '../Models/project_role';
+import { findMember } from '../Services/MemberServices';
 
 export const authenticateProject = function (permission: number) {
   return async (
@@ -14,24 +13,15 @@ export const authenticateProject = function (permission: number) {
       if (!req.user) {
         return res.status(401).json({ message: 'User not authenticated' });
       }
-
-      let member: any = await Member.findOne({
-        where: {
-          user_id: req.user.id,
-          project_id:
-            Number(req.params.project_id) || Number(req.body.project_id),
-        },
-        include: [
-          {
-            model: Project_role,
-          },
-        ],
-      });
+      if (req.user?.system_role_id == Role.ADMIN) {
+        next();
+      }
+      let project_id = req.body.project_id || req.params.project_id;
+      let member: any = await findMember(req.user?.id, Number(project_id));
 
       if (
-        req.user?.system_role_id == Role.ADMIN ||
         member?.project_role.permissions.includes(permission) ||
-        member?.project_role.permissions.includes(0)
+        member?.project_role.is_pm
       ) {
         next();
       } else {

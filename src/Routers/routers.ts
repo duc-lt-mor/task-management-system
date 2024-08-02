@@ -833,7 +833,7 @@ router.get('/user/projects', authenticator.verifyToken, user.showProject);
 router.post(
   '/task',
   authenticator.verifyToken,
-  TaskAut.authenticateCDTask(8),
+  ProjectAut.authenticateProject(8),
   ...validateTask(),
   task.generateTask,
 );
@@ -931,7 +931,7 @@ router.get('/task/', ProjectAut.authenticateProject(11), task.getTasks);
 router.delete(
   '/task/:id',
   authenticator.verifyToken,
-  TaskAut.authenticateCDTask(10),
+  ProjectAut.authenticateProject(10),
   task.deleteTask,
 );
 

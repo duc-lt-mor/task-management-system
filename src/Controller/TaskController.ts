@@ -4,10 +4,10 @@ import * as authenticator from '../Middleware/UserAuthenticator';
 import createHttpError from 'http-errors';
 import { Task } from '../Models/task';
 import { Colum } from '../Models/colum';
-import { Keyword } from '../Models/keyword';
 import { TaskKeyword } from '../Models/task_keyword';
 import { sequelize } from '../Config/config';
-import { addKeyword } from '../Services/KeywordServices';
+import * as keywords from '../Services/KeywordServices';
+import { Transaction } from 'sequelize';
 
 export const generateTask = async function (
   req: authenticator.CustomRequest,
@@ -50,17 +50,20 @@ export const generateTask = async function (
       throw createHttpError(400, `Could not create task. Please try again`);
     }
     const taskName = [task.name];
-    const records = await addKeyword(taskName, transaction);
-    console.log(records)
-    for (const {id: keyword_id} of records) {
-      await TaskKeyword.create({
-        task_id: task.id,
-        keyword_id
-      }, {transaction})
+    const records = await keywords.addKeyword(taskName, transaction, task.id);
+    console.log(records);
+    for (const { id: keyword_id } of records) {
+      await TaskKeyword.create(
+        {
+          task_id: task.id,
+          keyword_id,
+        },
+        { transaction },
+      );
     }
 
-    await transaction.commit()
-    
+    await transaction.commit();
+
     return res
       .status(201)
       .json({ message: 'Task generated successfully', task });
@@ -97,14 +100,12 @@ export const getTasks = async function (
   next: express.NextFunction,
 ) {
   try {
-    const tasks: any = await Task.findAll();
-    for (const task in tasks) {
-      console.log(tasks[task].name);
-    }
+    
+    const tasks = await keywords.search(req.query)
     if (!tasks) {
       throw createHttpError(404, `No tasks found`);
     }
-    return res.status(201).json(tasks);
+    return res.status(200).json(tasks);
   } catch (err) {
     return next(err);
   }

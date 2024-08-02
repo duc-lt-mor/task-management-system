@@ -907,7 +907,7 @@ router.get('/task/', ProjectAut.authenticateProject(11), task.getTasks);
  *    delete:
  *       summary: Delete a task in a project
  *       tags:
- *         - Colum
+ *         - Task
  *       parameters:
  *         - name: id
  *           in: path
@@ -939,11 +939,11 @@ router.delete(
  * @swagger
  * /task/{id}:
  *    put:
- *       summary: Delete a colum in a project
+ *       summary: Upddate a task in a project
  *       tags:
  *         - Task
  *       parameters:
- *         - name: col_id
+ *         - name: id
  *           in: path
  *           type: string
  *           required: true

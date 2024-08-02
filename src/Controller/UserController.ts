@@ -15,7 +15,6 @@ export const getLogin = async function (
       token,
     });
   } catch (err) {
-    console.log(err)
     next(err);
   }
 };

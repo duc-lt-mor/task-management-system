@@ -20,7 +20,9 @@ export const create = async function (req: express.Request, data: RoleData) {
   const t = await sequelize.transaction();
 
   try {
+    console.log(data.permissions[0])
     const errors = validationResult(req);
+    console.log(errors)
     if (!errors.isEmpty()) {
       const errorMessages = errors.array().map((e: any) => e.msg);
       const error = createHttpError(
@@ -29,6 +31,7 @@ export const create = async function (req: express.Request, data: RoleData) {
       );
       throw error;
     }
+
     let role: any = await Project_role.create(
       {
         name: data.name,
@@ -80,6 +83,7 @@ export const edit = async function (
     await t.commit();
     return role_updated;
   } catch (err) {
+    console.log(err)
     await t.rollback();
     throw err;
   }

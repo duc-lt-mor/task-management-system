@@ -8,7 +8,6 @@ import { Project } from '../Models/project';
 
 export const login = async function (data: any) {
   const { email, password } = data;
-  console.log(data);
   const user: any = await User.findOne({ where: { email } });
   if (!user) {
     const error = createHttpError(401, `Invalid username or password`);

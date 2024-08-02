@@ -118,7 +118,6 @@ export const edit = async function (
 ) {
   const t = await sequelize.transaction();
   let project: any = await findProjectById(id);
-
   if (!data.name) {
     data.name = project.name;
   }
@@ -144,7 +143,8 @@ export const edit = async function (
     );
 
     await t.commit();
-    return project;
+    let project_updated: any = await findProjectById(id);
+    return project_updated;
   } catch (err) {
     await t.rollback();
     throw err;

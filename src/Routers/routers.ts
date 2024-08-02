@@ -164,6 +164,11 @@ router.delete(
  *           in: path
  *           type: string
  *           required: true
+ *         - name: authorization
+ *           in: header
+ *           type: string
+ *           format: bearer
+ *           description: Bearer token for authentication
  *       responses:
  *         '200':
  *           description: OK
@@ -176,6 +181,7 @@ router.delete(
  */
 router.get(
   '/project/member/:project_id',
+  authenticator.verifyToken,
   ProjectAut.authenticateProject(5),
   MemberController.show,
 );
@@ -192,6 +198,11 @@ router.get(
  *           in: path
  *           type: string
  *           required: true
+ *         - name: authorization
+ *           in: header
+ *           type: string
+ *           format: bearer
+ *           description: Bearer token for authentication
  *       responses:
  *         '200':
  *           description: OK
@@ -204,6 +215,7 @@ router.get(
  */
 router.get(
   '/showrole/:project_id',
+  authenticator.verifyToken,
   ProjectAut.authenticateProject(1),
   RoleController.showRole,
 );
@@ -231,7 +243,7 @@ router.get(
  *                 example: 1
  *               project_role_id:
  *                 type: string
- *                 example: this is decripstion of project 1
+ *                 example: 1
  *               add_mem:
  *                 type: string
  *                 example: 'user name/email'
@@ -319,7 +331,7 @@ router.delete(
  *             properties:
  *               project_role_id:
  *                 type: string
- *                 example: project 1
+ *                 example: 1
  *       responses:
  *         '200':
  *           description: OK
@@ -335,51 +347,6 @@ router.put(
   authenticator.verifyToken,
   ProjectAut.authenticateProject(2),
   MemberController.editRole,
-);
-
-/**
- * @swagger
- * /project/role:
- *    post:
- *       summary: Create a role
- *       tags:
- *         - Role
- *       parameters:
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
- *         - name: body
- *           in: body
- *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *                 example: role 1
- *               project_id:
- *                 type: string
- *                 example: 1
- *               permissions:
- *                 type: string
- *                 example: [8,9,10,11]
- *       responses:
- *         '200':
- *           description: OK
- *         '401':
- *           description: Unauthorized
- *         '403':
- *           description: Forbiden
- *         '500':
- *           description: Internal Server Error
- */
-router.post(
-  '/project/role',
-  authenticator.verifyToken,
-  ProjectAut.authenticateProject(0),
-  ...validateRole.validateRole(),
-  RoleController.create,
 );
 
 /**
@@ -429,6 +396,53 @@ router.put(
 
 /**
  * @swagger
+ * /project/role:
+ *    post:
+ *       summary: Create a role
+ *       tags:
+ *         - Role
+ *       parameters:
+ *         - name: authorization
+ *           in: header
+ *           type: string
+ *           format: bearer
+ *           description: Bearer token for authentication
+ *         - name: body
+ *           in: body
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: role 1
+ *               project_id:
+ *                 type: string
+ *                 example: 1
+ *               permissions:
+ *                 type: array
+ *                 items:
+ *                   type: integer  
+ *                 example: [8,9,10,11]
+ *       responses:
+ *         '200':
+ *           description: OK
+ *         '401':
+ *           description: Unauthorized
+ *         '403':
+ *           description: Forbiden
+ *         '500':
+ *           description: Internal Server Error
+ */
+router.post(
+  '/project/role',
+  authenticator.verifyToken,
+  ProjectAut.authenticateProject(0),
+  ...validateRole.validateRole(),
+  RoleController.create,
+);
+
+/**
+ * @swagger
  * /project/role/{role_id}:
  *    put:
  *       summary: Update a role
@@ -453,7 +467,9 @@ router.put(
  *                 type: string
  *                 example: role 1
  *               permissions:
- *                 type: string
+ *                 type: array
+ *                 items:
+ *                   type: integer
  *                 example: [9,8,10]
  *       responses:
  *         '200':

@@ -1,7 +1,6 @@
 import { body, param } from 'express-validator';
 import { Member } from '../Models/member';
-
-import { PERMISSIONS } from '../Constant/Permissions';
+import { PERMISSIONS, PM_PERMISSIONS } from '../Constant/Permissions';
 import { Project_role } from '../Models/project_role';
 
 export const validateRole = function () {
@@ -9,18 +8,18 @@ export const validateRole = function () {
     body('name').notEmpty().withMessage('Please enter role name'),
     body('permissions')
       .notEmpty()
-      .withMessage('please enter at least one permission').custom((permissions) => {
-        let pm_permissions = [0];
-        let err = []
-        for (let p of permissions){
+      .withMessage('please enter at least one permission')
+      .custom((permissions) => {
+        let err = [];
+        for (let p of permissions) {
           if (!PERMISSIONS.includes(p)) {
-            err.push( p+" is not exit in permissions")
+            err.push(p + ' is not exit in permissions');
           }
-          if (pm_permissions.includes(p)){
-            err.push("you can have pm permission")
+          if (permissions.includes(PM_PERMISSIONS)) {
+            err.push('you can have pm permission');
           }
         }
-        if (err.length > 0){
+        if (err.length > 0) {
           throw err;
         }
       }),
@@ -65,15 +64,18 @@ export const validateChangeOwnerProject = function () {
           throw new Error('user not found');
         }
       }),
-    body("new_project_role_id").notEmpty().withMessage("please enter new project role id").custom(async (new_project_role_id) => {
-      let role: any = await Project_role.findOne({
-        where: {
-          id: Number(new_project_role_id),
-        },
-      });
-      if (!role.is_pm) {
-        throw new Error('you can not chose pm role');
-      }
-    }),
+    body('new_project_role_id')
+      .notEmpty()
+      .withMessage('please enter new project role id')
+      .custom(async (new_project_role_id) => {
+        let role: any = await Project_role.findOne({
+          where: {
+            id: Number(new_project_role_id),
+          },
+        });
+        if (!role.is_pm) {
+          throw new Error('you can not chose pm role');
+        }
+      }),
   ];
 };

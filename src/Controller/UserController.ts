@@ -10,12 +10,12 @@ export const getLogin = async function (
 ) {
   try {
     const token = await services.login(req.body);
-    req.cookies = token;
     return res.status(200).json({
       message: 'Login successful',
       token,
     });
   } catch (err) {
+    console.log(err)
     next(err);
   }
 };

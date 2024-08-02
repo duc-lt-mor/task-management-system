@@ -1,8 +1,7 @@
 import { CustomRequest } from '../Middleware/UserAuthenticator';
-import { Member } from '../Models/member';
 import express from 'express';
 import * as Role from '../Constant/Roles';
-import { Project_role } from '../Models/project_role';
+import { findMember } from '../Services/MemberServices';
 import { Task } from '../Models/task';
 import { Comment } from '../Models/comment';
 
@@ -16,29 +15,19 @@ export const authenticateCreateComment = function (permission: number) {
       if (!req.user) {
         return res.status(401).json({ message: 'User not authenticated' });
       }
+      if(req.user.system_role_id == Role.ADMIN ) {
+        next();
+      }
 
-      let member_found: any = Member.findOne({
-        where: {
-          user_id: req.user.id,
-          project_id: Number(req.body.project_id),
-        },
-        include: [
-          {
-            model: Project_role,
-          },
-        ],
-      });
+      let member: any = await findMember(req.user?.id, Number(req.body.project_id))
 
-      let task_found: any = Task.findOne({
+      let task: any =await Task.findOne({
         where: {
-          id: req.body.task_id,
+          id: req.params.id,
         },
       });
-
-      let [member, task] = await Promise.all([member_found, task_found]);
 
       if (
-        req.user.system_role_id == Role.ADMIN ||
         member?.project_role.permissions.includes(permission) ||
         member?.project_role.permissions.includes(0)
       ) {
@@ -66,16 +55,16 @@ export const authenticateUDComment = function (permission: number) {
       if (!req.user) {
         return res.status(401).json({ message: 'User not authenticated' });
       }
-
+      if (req.user?.system_role_id == Role.ADMIN) {
+        next();
+      } 
       let comment: any = await Comment.findOne({
         where: {
-          id: req.body.task_id,
+          id: req.params.id,
         },
       });
 
-      if (req.user?.system_role_id == Role.ADMIN) {
-        next();
-      } else if (comment.user_id == req.user.id) {
+       if (comment.user_id == req.user.id) {
         next();
       } else {
         return res

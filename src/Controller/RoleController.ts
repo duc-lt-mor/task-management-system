@@ -9,7 +9,7 @@ export const create = async function (
 ) {
   try {
     let role: any = await RoleServices.create(req, req.body);
-    return res.status(200).json({
+    return res.status(201).json({
       message:'create role success',
       "role updated": role
     });

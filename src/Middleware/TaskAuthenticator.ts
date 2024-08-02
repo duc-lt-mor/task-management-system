@@ -1,50 +1,9 @@
 import { CustomRequest } from '../Middleware/UserAuthenticator';
-import { Member } from '../Models/member';
 import express from 'express';
 import * as Role from '../Constant/Roles';
-import { System_role } from '../Models/system_role';
-import { Project_role } from '../Models/project_role';
+import { findMember } from '../Services/MemberServices';
 import { Task } from '../Models/task';
 
-export const authenticateCDTask = function (permission: number) {
-  return async (
-    req: CustomRequest,
-    res: express.Response,
-    next: express.NextFunction,
-  ) => {
-    try {
-      if (!req.user) {
-        return res.status(401).json({ message: 'User not authenticated' });
-      }
-
-      let member: any = await Member.findOne({
-        where: {
-          user_id: req.user.id,
-          project_id: Number(req.body.project_id),
-        },
-        include: [
-          {
-            model: Project_role,
-          },
-        ],
-      });
-
-      if (
-        req.user?.system_role_id == Role.ADMIN ||
-        member?.project_role.permissions.includes(permission) ||
-        member?.project_role.permissions.includes(0)
-      ) {
-        next();
-      } else {
-        return res
-          .status(403)
-          .json({ message: 'You do not have permission to access.' });
-      }
-    } catch (err) {
-      return res.status(500).json({ message: 'Internal error ' });
-    }
-  };
-};
 
 export const authenticateUpdateTask = function (permission: number) {
   return async (
@@ -56,31 +15,20 @@ export const authenticateUpdateTask = function (permission: number) {
       if (!req.user) {
         return res.status(401).json({ message: 'User not authenticated' });
       }
-
-      let member_found: any = Member.findOne({
-        where: {
-          user_id: req.user.id,
-          project_id: Number(req.body.project_id),
-        },
-        include: [
-          {
-            model: Project_role,
-          },
-        ],
-      });
-
-      let task_found: any = Task.findOne({
+      if (req.user?.system_role_id == Role.ADMIN ) {
+        next();
+      }
+      let project_id = req.body.project_id || req.params.project_id;
+      let member: any = await findMember(req.user?.id, Number(project_id));
+      let task: any = await Task.findOne({
         where: {
           id: req.params.id,
         },
       });
 
-      let [member, task] = await Promise.all([member_found, task_found]);
-
       if (
-        req.user?.system_role_id == Role.ADMIN ||
-        member?.project_role.permissions.includes(permission) ||
-        member?.project_role.permissions.includes(0)
+        task?.creator_id == req.user?.id ||
+        member?.project_role.is_pm
       ) {
         next();
       } else if (task?.assignee_id == req.user.id) {
@@ -97,42 +45,3 @@ export const authenticateUpdateTask = function (permission: number) {
   };
 };
 
-export const authenticateAssignTask = function (permission: number) {
-  return async (
-    req: CustomRequest,
-    res: express.Response,
-    next: express.NextFunction,
-  ) => {
-    try {
-      if (!req.user) {
-        return res.status(401).json({ message: 'User not authenticated' });
-      }
-
-      let member: any = await Member.findOne({
-        where: {
-          user_id: req.user.id,
-          project_id: Number(req.body.project_id),
-        },
-        include: [
-          {
-            model: Project_role,
-          },
-        ],
-      });
-
-      if (
-        req.user?.system_role_id == Role.ADMIN ||
-        member?.project_role.permissions.includes(permission) ||
-        member?.project_role.permissions.includes(0)
-      ) {
-        next();
-      } else {
-        return res
-          .status(403)
-          .json({ message: 'You do not have permission to access.' });
-      }
-    } catch (err) {
-      return res.status(500).json({ message: 'Internal error ' });
-    }
-  };
-};

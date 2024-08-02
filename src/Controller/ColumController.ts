@@ -27,7 +27,7 @@ export const edit = async function (
       req,
     );
 
-    res.status(201).send({ message: 'edit success', 'edited colum': colum });
+    res.status(200).send({ message: 'edit success', 'edited colum': colum });
   } catch (error) {
     next(error);
   }

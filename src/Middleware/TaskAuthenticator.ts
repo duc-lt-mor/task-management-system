@@ -4,8 +4,7 @@ import * as Role from '../Constant/Roles';
 import { findMember } from '../Services/MemberServices';
 import { Task } from '../Models/task';
 
-
-export const authenticateUpdateTask = function (permission: number) {
+export const authenticateUpdateTask = function () {
   return async (
     req: CustomRequest,
     res: express.Response,
@@ -15,10 +14,10 @@ export const authenticateUpdateTask = function (permission: number) {
       if (!req.user) {
         return res.status(401).json({ message: 'User not authenticated' });
       }
-      if (req.user?.system_role_id == Role.ADMIN ) {
+      if (req.user?.system_role_id == Role.ADMIN) {
         next();
       }
-      let project_id = req.body.project_id || req.params.project_id;
+      let project_id = req.query.project_id;
       let member: any = await findMember(req.user?.id, Number(project_id));
       let task: any = await Task.findOne({
         where: {
@@ -26,12 +25,7 @@ export const authenticateUpdateTask = function (permission: number) {
         },
       });
 
-      if (
-        task?.creator_id == req.user?.id ||
-        member?.project_role.is_pm
-      ) {
-        next();
-      } else if (task?.assignee_id == req.user.id) {
+      if (task?.creator_id == req.user?.id || member?.project_role.is_pm) {
         next();
       } else {
         return res
@@ -40,8 +34,44 @@ export const authenticateUpdateTask = function (permission: number) {
       }
     } catch (err) {
       console.log(req.user?.id);
-      return res.status(500).json({ message: 'Internal error ' + err });
+      return res.status(500).json({ message: 'Internal error ' });
     }
   };
 };
 
+export const authenticateUserUpdateTask = function () {
+  return async (
+    req: CustomRequest,
+    res: express.Response,
+    next: express.NextFunction,
+  ) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ message: 'User not authenticated' });
+      }
+      if (req.user?.system_role_id == Role.ADMIN) {
+        next();
+      }
+      let project_id = req.query.project_id || req.body.project_id;
+      let member: any = await findMember(req.user?.id, Number(project_id));
+      let task: any = await Task.findOne({
+        where: {
+          id: req.params.id,
+        },
+      });
+
+      if (task?.creator_id == req.user?.id || member?.project_role.is_pm) {
+        next();
+      } else if (task?.assignee_id == req.user?.id) {
+        next();
+      } else {
+        return res
+          .status(403)
+          .json({ message: 'You do not have permission to access.' });
+      }
+    } catch (err) {
+      console.log(req.user?.id);
+      return res.status(500).json({ message: 'Internal error ' });
+    }
+  };
+};

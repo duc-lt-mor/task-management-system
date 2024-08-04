@@ -1,7 +1,5 @@
 import { sequelize } from "../Config/config";
 import { DataTypes } from "sequelize";
-import { Task } from "./task";
-import { TaskKeyword } from "./task_keyword";
 
 export const Keyword = sequelize.define(
     'keywords',

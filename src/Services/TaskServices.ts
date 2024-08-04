@@ -1,10 +1,11 @@
 import { Task } from '../Models/task';
 import { Project } from '../Models/project';
-import { Op } from 'sequelize';
-import { Keyword } from '../Models/keyword';
+import { Transaction } from 'sequelize';
+import { sequelize } from '../Config/config';
+import { TaskKeyword } from '../Models/task_keyword';
 
-export const create = function (data: any) {
-  return Task.create(data);
+export const create = function (data: any, transaction: Transaction) {
+  return Task.create(data, { transaction });
 };
 
 export const generateKey = async function (project_id: number) {
@@ -27,69 +28,57 @@ export const get = function () {
   return Task.findAll();
 };
 
-export const update = async function (id: number, data: any) {
-  const task: any = await find(id);
-  if (!task) {
-    return { success: false };
-  }
-
- try {
- let tas: any =  await Task.update({
-    assignee_id: data.assignee_id,
-    priority: data.priority,
-    real_end_date: data.real_end_date
-  },{
-    where: {
-      id: id
-    }
-  })
-  return tas
- } catch (error) {
-  console.log(error)
-  throw error
- }
-};
-
-export const deleteTask = function (id: number) {
-  return Task.destroy({ where: { id } });
-};
-
-export const addKeyword = function (parts: string[]) {
-  for (const part of parts) {
-    Keyword.create({part})
-  }
-}
-
-export const search = async function (value: string | number) {
-  const isNumeric = !isNaN(Number(value))
-  const conditions: any[] = [
-    {name: {[Op.like]: `%${value}`}},
-    {key: {[Op.like]: `%${value}`}},
-    ...(isNumeric? [
-      { creator_id: value },
-      { project_id: value },
-      { assignee_id: value },
-      { priority: value }
-    ]: [])
-  ]
-
-  const tasks = await Task.findAll({
-    include: [
+export const updateAsAssignee = async function (id: number, data: any) {
+  try {
+    let tas: any = await Task.update(
       {
-        model: Keyword,
-        where: {
-          keyword: {
-            [Op.like]: `%${value}`,
-          },
-        },
-        through: {
-          attributes: []
-        }
+        colum_id: data.colum_id,
+        real_end_date: data.real_end_date,
       },
-    ], where: {
-      [Op.or]: conditions
-    }
-  });
-  
-  return tasks
+      {
+        where: {
+          id: id,
+        },
+      },
+    );
+    let task: any = await find(id);
+    return task;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const update = async function (id: number, data: any) {
+  try {
+    let tas: any = await Task.update(
+      {
+        colum_id: data.colum_id,
+        real_end_date: data.real_end_date,
+        priority: data.priority,
+        assignee_id: data.assignee_id,
+        start_date: data.start_date,
+      },
+      {
+        where: {
+          id: id,
+        },
+      },
+    );
+    let task: any = await find(id);
+    return task;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deleteTask = async function (id: number) {
+  const t = await sequelize.transaction();
+  try {
+    await TaskKeyword.destroy({ where: { task_id: id }, transaction: t });
+    await Task.destroy({ where: { id }, transaction: t });
+    await t.commit();
+  } catch (error) {
+    await t.rollback();
+    throw error;
+  }
 };

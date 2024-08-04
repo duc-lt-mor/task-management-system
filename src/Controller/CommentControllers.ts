@@ -20,7 +20,7 @@ export const generate = async function (
     if (!comment) {
       throw createHttpError(400, `Could not generate comment`);
     }
-    return res.status(200).json(`Commented successfully`);
+    return res.status(200).json({ 'Commented successfully': comment });
   } catch (err) {
     return next(err);
   }
@@ -32,7 +32,7 @@ export const reply = async function (
   next: express.NextFunction,
 ) {
   try {
-    const { task_id, content, parent_id } = req.body;
+    const { task_id, content, parent_id, user_id } = req.body;
     if (!content) {
       throw createHttpError(400, 'Content is required');
     }
@@ -48,6 +48,7 @@ export const reply = async function (
       const replyComment = await services.reply({
         content,
         task_id,
+        user_id,
         parent_id: parentComment.id, // Set the parentId to link this as a reply
       });
 
@@ -109,10 +110,9 @@ export const update = async function (
       throw error;
     }
 
-    await services.update(id, { content, createdAt: new Date() });
-    await comment.save();
+    let comment_updated = await services.update(id, content);
 
-    return res.status(200).json(comment);
+    return res.status(200).json(comment_updated);
   } catch (err) {
     return next(err);
   }
@@ -136,8 +136,8 @@ export const destroy = async function (
         `You are not authorized to deleted this comment`,
       );
     } else {
-      const deleted = services.destroy(id);
-      return res.status(200).json({ message: `Deleted`, deleted });
+      await services.destroy(id);
+      return res.status(200).json({ message: `Deleted` });
     }
   } catch (err) {
     return next(err);

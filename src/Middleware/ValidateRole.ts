@@ -61,7 +61,7 @@ export const validateChangeOwnerProject = function () {
           },
         });
         if (!member) {
-          throw new Error('user not found');
+          throw new Error('user is not in this project');
         }
       }),
     body('new_project_role_id')

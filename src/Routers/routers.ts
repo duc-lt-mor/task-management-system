@@ -12,6 +12,7 @@ import * as CommentAut from '../Middleware/CommentAuthenticator';
 import * as user from '../Controller/UserController';
 import * as validateRole from '../Middleware/ValidateRole';
 import * as task from '../Controller/TaskController';
+import * as search from '../Controller/KeywordController';
 import { validateTask } from '../Middleware/TaskValidator';
 import * as userValidator from '../Middleware/UserValidator';
 import * as comment from '../Controller/CommentControllers';
@@ -620,7 +621,7 @@ router.post(
  *                       type: interger
  *                     index:
  *                       type: interger
- *                 example: [{"id":9, "index":2}]
+ *                 example: [{"id":9, "index":2},{"id":9, "index":2},{"id":9, "index":2},{"id":9, "index":2}]
  *       responses:
  *         '200':
  *           description: OK
@@ -816,6 +817,71 @@ router.get('/user/projects', authenticator.verifyToken, user.showProject);
 
 /**
  * @swagger
+ * /search/project:
+ *    get:
+ *       summary: find a project
+ *       tags:
+ *         - Search
+ *       parameters:
+ *         - name: name
+ *           in: query
+ *           type: string
+ *           required: true
+ *         - name: key
+ *           in: query
+ *           type: string
+ *         - name: authorization
+ *           in: header
+ *           type: string
+ *           format: bearer
+ *           description: Bearer token for authentication
+ *       responses:
+ *         '200':
+ *           description: OK
+ *         '401':
+ *           description: Unauthorized
+ *         '403':
+ *           description: Forbiden
+ *         '500':
+ *           description: Internal Server Error
+ */
+router.get(
+  '/search/project',
+  authenticator.verifyToken,
+  ProjectController.search,
+);
+
+/**
+ * @swagger
+ * /search/user:
+ *    get:
+ *       summary: find a user
+ *       tags:
+ *         - Search
+ *       parameters:
+ *         - name: email
+ *           in: query
+ *           type: string
+ *           required: true
+ *         - name: authorization
+ *           in: header
+ *           type: string
+ *           format: bearer
+ *           description: Bearer token for authentication
+ *       responses:
+ *         '200':
+ *           description: OK
+ *         '401':
+ *           description: Unauthorized
+ *         '403':
+ *           description: Forbiden
+ *         '500':
+ *           description: Internal Server Error
+ */
+router.get('/search/user', authenticator.verifyToken, user.find);
+
+/**
+ * @swagger
  * /task:
  *    post:
  *       summary: Create a task in a project
@@ -844,9 +910,15 @@ router.get('/user/projects', authenticator.verifyToken, user.showProject);
  *               priority:
  *                 type: string
  *                 example: high
+ *               start_date:
+ *                 type: string
+ *                 example: 2024-08-09
  *               expected_end_date:
  *                 type: string
  *                 example: 2024-08-19
+ *               assignee_id:
+ *                 type: string
+ *                 example: 11
  *       responses:
  *         '200':
  *           description: OK
@@ -905,16 +977,61 @@ router.get(
 
 /**
  * @swagger
- * /project/tasks/{project_id}:
+ * /search/task:
  *    get:
- *       summary: Get all tasks in a project
+ *       summary: Search task
+ *       tags:
+ *         - Search
+ *       parameters:
+ *         - name: project_id
+ *           in: query
+ *           type: string
+ *         - name: names
+ *           in: query
+ *           type: string
+ *         - name: priority
+ *           in: query
+ *           type: string
+ *         - name: assignee_id
+ *           in: query
+ *           type: string
+ *         - name: authorization
+ *           in: header
+ *           type: string
+ *           format: bearer
+ *           description: Bearer token for authentication
+ *       responses:
+ *         '200':
+ *           description: OK
+ *         '401':
+ *           description: Unauthorized
+ *         '403':
+ *           description: Forbiden
+ *         '500':
+ *           description: Internal Server Error
+ */
+router.get('/search/task', search.search);
+
+/**
+ * @swagger
+ * /project/tasks:
+ *    get:
+ *       summary: Search task in a project
  *       tags:
  *         - Project
  *       parameters:
  *         - name: project_id
- *           in: path
+ *           in: query
  *           type: string
- *           required: true
+ *         - name: names
+ *           in: query
+ *           type: string
+ *         - name: priority
+ *           in: query
+ *           type: string
+ *         - name: assignee_id
+ *           in: query
+ *           type: string
  *         - name: authorization
  *           in: header
  *           type: string
@@ -931,7 +1048,7 @@ router.get(
  *           description: Internal Server Error
  */
 router.get(
-  '/project/tasks/:project_id',
+  '/project/tasks',
   authenticator.verifyToken,
   ProjectAut.authenticateProject(11),
   task.getTasks,
@@ -949,6 +1066,9 @@ router.get(
  *           in: path
  *           type: string
  *           required: true
+ *         - name: project_id
+ *           in: query
+ *           type: string
  *         - name: authorization
  *           in: header
  *           type: string
@@ -964,6 +1084,7 @@ router.get(
  *         '500':
  *           description: Internal Server Error
  */
+
 router.delete(
   '/task/:id',
   authenticator.verifyToken,
@@ -975,7 +1096,7 @@ router.delete(
  * @swagger
  * /task/{id}:
  *    put:
- *       summary: Upddate a task in a project
+ *       summary: Upddate a task in a project as a assignee
  *       tags:
  *         - Task
  *       parameters:
@@ -983,6 +1104,9 @@ router.delete(
  *           in: path
  *           type: string
  *           required: true
+ *         - name: project_id
+ *           in: query
+ *           type: string
  *         - name: authorization
  *           in: header
  *           type: string
@@ -993,9 +1117,12 @@ router.delete(
  *           schema:
  *             type: object
  *             properties:
- *               project_id:
+ *               colum_id:
  *                 type: string
  *                 example: 1
+ *               real_end_date:
+ *                 type: string
+ *                 example: 2024-08-29
  *       responses:
  *         '200':
  *           description: OK
@@ -1009,7 +1136,64 @@ router.delete(
 router.put(
   '/task/:id',
   authenticator.verifyToken,
-  TaskAut.authenticateUpdateTask(9),
+  TaskAut.authenticateUserUpdateTask(),
+  task.updateAsAssignee,
+);
+
+/**
+ * @swagger
+ * /update/task/{id}:
+ *    put:
+ *       summary: Upddate a task in a project as a pm/task creator
+ *       tags:
+ *         - Task
+ *       parameters:
+ *         - name: id
+ *           in: path
+ *           type: string
+ *           required: true
+ *         - name: project_id
+ *           in: query
+ *           type: string
+ *         - name: authorization
+ *           in: header
+ *           type: string
+ *           format: bearer
+ *           description: Bearer token for authentication
+ *         - name: body
+ *           in: body
+ *           schema:
+ *             type: object
+ *             properties:
+ *               colum_id:
+ *                 type: string
+ *                 example: 1
+ *               real_end_date:
+ *                 type: string
+ *                 example: 2024-08-29
+ *               start_date:
+ *                 type: string
+ *                 example: 2024-08-19
+ *               assignee_id:
+ *                 type: string
+ *                 example: 22
+ *               priority:
+ *                 type: string
+ *                 example: high
+ *       responses:
+ *         '200':
+ *           description: OK
+ *         '401':
+ *           description: Unauthorized
+ *         '403':
+ *           description: Forbiden
+ *         '500':
+ *           description: Internal Server Error
+ */
+router.put(
+  '/update/task/:id',
+  authenticator.verifyToken,
+  TaskAut.authenticateUpdateTask(),
   task.update,
 );
 
@@ -1117,6 +1301,9 @@ router.put(
  *           schema:
  *             type: object
  *             properties:
+ *               project_id:
+ *                 type: string
+ *                 example: 1
  *               content:
  *                 type: string
  *                 example: example comment

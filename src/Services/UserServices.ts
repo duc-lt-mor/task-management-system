@@ -5,6 +5,7 @@ import createHttpError from 'http-errors';
 import * as tokenService from './TokenService';
 import { Member } from '../Models/member';
 import { Project } from '../Models/project';
+import { Op } from 'sequelize';
 
 export const login = async function (data: any) {
   const { email, password } = data;
@@ -47,7 +48,13 @@ export const register = async function (data: UserData) {
 };
 
 export const find = function (email: string) {
-  return User.findOne({ where: { email: email } });
+  return User.findOne({
+    where: {
+      email: {
+        [Op.like]: `${email}%`,
+      },
+    },
+  });
 };
 
 export const get = function () {

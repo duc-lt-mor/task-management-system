@@ -8,6 +8,8 @@ import express from 'express';
 import createHttpError from 'http-errors';
 import { CustomRequest } from '../Middleware/UserAuthenticator';
 import { Project_role } from '../Models/project_role';
+import { Op } from 'sequelize';
+import { Task } from '../Models/task';
 // lay ra 1 project
 export const findProjectById = async (id: number) => {
   let project = await Project.findOne({
@@ -162,6 +164,12 @@ export const destroy = async (id: number) => {
       transaction: t,
     });
     await Promise.all([
+      Task.destroy({
+        where: {
+          project_id: id,
+        },
+        transaction: t,
+      }),
       Member.destroy({
         where: {
           project_id: id,
@@ -189,4 +197,31 @@ export const destroy = async (id: number) => {
     await t.rollback();
     throw error;
   }
+};
+
+export const search = async function (query: any) {
+  let { name, key } = query;
+  if (!name && !key) {
+    return await Project.findAll();
+  }
+
+  const filter: any = {
+    where: {},
+  };
+
+  if (name) {
+    filter.where.name = {
+      [Op.like]: `${name}%`,
+    };
+  }
+
+  if (key) {
+    filter.where.key = {
+      [Op.like]: `${key}%`,
+    };
+  }
+
+  let project = await Project.findAll(filter);
+
+  return project;
 };

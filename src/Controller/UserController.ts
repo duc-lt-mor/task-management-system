@@ -96,3 +96,21 @@ export const showProject = async function (
     next(err);
   }
 };
+
+export const find = async function (
+  req: CustomRequest,
+  res: express.Response,
+  next: express.NextFunction,
+) {
+  try {
+    let email: any = req.query?.email;
+    let user = await services.find(email);
+    if (user) {
+      return res.status(200).json({ message: user });
+    } else {
+      return res.status(404).json('user not found');
+    }
+  } catch (error) {
+    next(error);
+  }
+};

@@ -322,6 +322,7 @@ router.delete(
  *         - name: authorization
  *           in: header
  *           type: string
+ *           expamle: Bearer
  *           format: bearer
  *           description: Bearer token for authentication
  *         - name: body
@@ -330,6 +331,9 @@ router.delete(
  *             type: object
  *             properties:
  *               project_role_id:
+ *                 type: string
+ *                 example: 1
+ *               project_id:
  *                 type: string
  *                 example: 1
  *       responses:
@@ -420,8 +424,6 @@ router.put(
  *                 example: 1
  *               permissions:
  *                 type: array
- *                 items:
- *                   type: integer  
  *                 example: [8,9,10,11]
  *       responses:
  *         '200':
@@ -468,9 +470,10 @@ router.post(
  *                 example: role 1
  *               permissions:
  *                 type: array
- *                 items:
- *                   type: integer
  *                 example: [9,8,10]
+ *               project_id:
+ *                 type: string
+ *                 example: 1
  *       responses:
  *         '200':
  *           description: OK
@@ -506,9 +509,14 @@ router.put(
  *           type: string
  *           format: bearer
  *           description: Bearer token for authentication
- *         - name: project_id
+ *         - name: body
  *           in: body
- *           type: string
+ *           schema:
+ *             type: object
+ *             properties:
+ *               project_id:
+ *                 type: string
+ *                 example: 1
  *       responses:
  *         '200':
  *           description: OK
@@ -580,7 +588,7 @@ router.post(
  *       tags:
  *         - Colum
  *       parameters:
- *         - name: project_id
+ *         - name: col_id
  *           in: path
  *           type: string
  *           required: true
@@ -594,6 +602,9 @@ router.post(
  *           schema:
  *             type: object
  *             properties:
+ *               project_id:
+ *                 type: string
+ *                 example: 1
  *               name:
  *                 type: string
  *                 example: colum 1
@@ -856,14 +867,18 @@ router.post(
 
 /**
  * @swagger
- * /task/{id}:
+ * /task:
  *    get:
  *       summary: get a task in a project
  *       tags:
  *         - Task
  *       parameters:
  *         - name: id
- *           in: path
+ *           in: query
+ *           type: string
+ *           required: true
+ *         - name: project_id
+ *           in: query
  *           type: string
  *           required: true
  *         - name: authorization
@@ -882,7 +897,7 @@ router.post(
  *           description: Internal Server Error
  */
 router.get(
-  '/task/:id',
+  '/task',
   authenticator.verifyToken,
   ProjectAut.authenticateProject(11),
   task.getTask,
@@ -915,7 +930,12 @@ router.get(
  *         '500':
  *           description: Internal Server Error
  */
-router.get('/task/', ProjectAut.authenticateProject(11), task.getTasks);
+router.get(
+  '/project/tasks/:project_id',
+  authenticator.verifyToken,
+  ProjectAut.authenticateProject(11),
+  task.getTasks,
+);
 
 /**
  * @swagger
@@ -1011,6 +1031,9 @@ router.put(
  *           schema:
  *             type: object
  *             properties:
+ *               project_id:
+ *                 type: string
+ *                 example: 1
  *               task_id:
  *                 type: string
  *                 example: 1
@@ -1072,7 +1095,7 @@ router.post(
 router.put(
   '/comment/:id',
   authenticator.verifyToken,
-  CommentAut.authenticateUDComment,
+  CommentAut.authenticateUDComment(),
   comment.update,
 );
 
@@ -1150,7 +1173,7 @@ router.post(
 router.delete(
   '/comment/:id',
   authenticator.verifyToken,
-  CommentAut.authenticateUDComment,
+  CommentAut.authenticateUDComment(),
   comment.destroy,
 );
 

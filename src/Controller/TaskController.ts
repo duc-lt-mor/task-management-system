@@ -57,7 +57,7 @@ export const getTask = async function (
   next: express.NextFunction,
 ) {
   try {
-    const taskId = parseInt(req.params.id);
+    const taskId = Number(req.query.id);
     if (!taskId) {
       throw createHttpError(404, `Task id not found`);
     }
@@ -78,7 +78,11 @@ export const getTasks = async function (
   next: express.NextFunction,
 ) {
   try {
-    const tasks: any = await Task.findAll();
+    const tasks: any = await Task.findAll({
+      where: {
+        project_id: Number(req.params.project_id),
+      },
+    });
     for (const task in tasks) {
       console.log(tasks[task].name);
     }
@@ -114,9 +118,9 @@ export const update = async function (
       throw createHttpError(400, `Couldn't update task data`);
     }
 
-    return res.status(200).json("update task success");
+    return res.status(200).json('update task success');
   } catch (err) {
-    console.log(err)
+    console.log(err);
     return next(err);
   }
 };

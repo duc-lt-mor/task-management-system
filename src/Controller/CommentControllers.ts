@@ -15,14 +15,13 @@ export const generate = async function (
       user_id: req.user?.id,
       content: req.body.content,
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     });
     if (!comment) {
-      throw createHttpError(400, `Could not generate comment`)
+      throw createHttpError(400, `Could not generate comment`);
     }
     return res.status(200).json(`Commented successfully`);
   } catch (err) {
-    console.log(err)
     return next(err);
   }
 };

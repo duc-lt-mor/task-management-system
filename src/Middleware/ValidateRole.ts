@@ -8,14 +8,15 @@ export const validateRole = function () {
     body('name').notEmpty().withMessage('Please enter role name'),
     body('permissions')
       .notEmpty()
-      .withMessage('please enter at least one permission').custom((permissions) => {
-        let err = []
-        for (let p of permissions){
-          if (!PERMISSIONS.includes(p)) {
+      .withMessage('please enter at least one permission')
+      .custom((permissions) => {
+        let err = [];
+        for (let p of permissions) {
+          if (!PERMISSIONS.includes(Number(p))) {
             err.push(p + ' is not exit in permissions');
           }
-          if (permissions.includes(PM_PERMISSIONS)){
-            err.push("you can have pm permission")
+          if (permissions.includes(PM_PERMISSIONS)) {
+            err.push('you can have pm permission');
           }
         }
         if (err.length > 0) {
@@ -72,7 +73,7 @@ export const validateChangeOwnerProject = function () {
             id: Number(new_project_role_id),
           },
         });
-        if (!role.is_pm) {
+        if (role.is_pm) {
           throw new Error('you can not chose pm role');
         }
       }),

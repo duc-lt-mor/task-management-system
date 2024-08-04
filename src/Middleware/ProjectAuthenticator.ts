@@ -16,7 +16,8 @@ export const authenticateProject = function (permission: number) {
       if (req.user?.system_role_id == Role.ADMIN) {
         next();
       }
-      let project_id = req.body.project_id || req.params.project_id;
+      let project_id =
+        req.body.project_id || req.params.project_id || req.query.project_id;
       let member: any = await findMember(req.user?.id, Number(project_id));
 
       if (
@@ -30,7 +31,7 @@ export const authenticateProject = function (permission: number) {
         });
       }
     } catch (err) {
-      return res.status(500).json({ message: 'Internal error ' });
+      return res.status(500).json({ message: 'Internal error ' + err });
     }
   };
 };

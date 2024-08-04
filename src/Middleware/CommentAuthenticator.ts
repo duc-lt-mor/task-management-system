@@ -15,15 +15,18 @@ export const authenticateCreateComment = function (permission: number) {
       if (!req.user) {
         return res.status(401).json({ message: 'User not authenticated' });
       }
-      if(req.user.system_role_id == Role.ADMIN ) {
+      if (req.user.system_role_id == Role.ADMIN) {
         next();
       }
 
-      let member: any = await findMember(req.user?.id, Number(req.body.project_id))
+      let member: any = await findMember(
+        req.user?.id,
+        Number(req.body.project_id),
+      );
 
-      let task: any =await Task.findOne({
+      let task: any = await Task.findOne({
         where: {
-          id: req.params.id,
+          id: req.body.task_id,
         },
       });
 
@@ -40,12 +43,12 @@ export const authenticateCreateComment = function (permission: number) {
           .json({ message: 'You do not have permission to access.' });
       }
     } catch (err) {
-      return res.status(500).json({ message: 'Internal error ' });
+      return res.status(500).json({ message: 'Internal error ' + err });
     }
   };
 };
 
-export const authenticateUDComment = function (permission: number) {
+export const authenticateUDComment = function () {
   return async (
     req: CustomRequest,
     res: express.Response,
@@ -57,14 +60,14 @@ export const authenticateUDComment = function (permission: number) {
       }
       if (req.user?.system_role_id == Role.ADMIN) {
         next();
-      } 
+      }
       let comment: any = await Comment.findOne({
         where: {
           id: req.params.id,
         },
       });
 
-       if (comment.user_id == req.user.id) {
+      if (comment.user_id == req.user.id) {
         next();
       } else {
         return res

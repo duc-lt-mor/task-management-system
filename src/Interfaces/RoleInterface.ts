@@ -3,5 +3,5 @@ export interface RoleData {
   name: string;
   is_pm: number;
   project_id: number;
-  permissions: any;
+  permissions: JSON;
 }

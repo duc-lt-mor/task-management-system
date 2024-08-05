@@ -63,11 +63,16 @@ export const editRole = async function (id: number, data: MemberData) {
   const t = await sequelize.transaction();
 
   try {
-   let member: any = await Member.update(
+    await Member.update(
       { project_role_id: Number(data.project_role_id) },
       { where: { id: id }, transaction: t },
     );
     await t.commit();
+    let member: any = await Member.findOne({
+      where: {
+        id: id,
+      },
+    });
     return member;
   } catch (err) {
     await t.rollback();
@@ -80,9 +85,6 @@ export const show = async function (id: number) {
   let members = await Member.findAll({
     where: {
       project_id: id,
-    },
-    attributes: {
-      exclude: ['id'],
     },
     include: [
       {
@@ -106,5 +108,19 @@ export const findMember = async function (user_id: number, project_id: number) {
       },
     ],
   });
-  return member
-}
+  return member;
+};
+
+export const findById = async function (id: number) {
+  let member: any = await Member.findOne({
+    where: {
+      id: id,
+    },
+    include: [
+      {
+        model: Project_role,
+      },
+    ],
+  });
+  return member;
+};

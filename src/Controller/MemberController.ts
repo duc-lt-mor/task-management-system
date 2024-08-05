@@ -37,11 +37,14 @@ export const editRole = async function (
   next: express.NextFunction,
 ) {
   try {
-    let member: any = await MemberServices.editRole(Number(req.params.member_id), req.body);
+    let member: any = await MemberServices.editRole(
+      Number(req.params.member_id),
+      req.body,
+    );
 
     return res
-    .status(200)
-    .send({ message: 'edit member role success', 'member ': member });
+      .status(200)
+      .send({ message: 'edit member role success', 'member ': member });
   } catch (err) {
     next(err);
   }
@@ -55,6 +58,19 @@ export const show = async function (
   try {
     let members = await MemberServices.show(Number(req.params.project_id));
 
+    res.status(200).send(members);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const findById = async function (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
+) {
+  try {
+    let members = await MemberServices.findById(Number(req.params.member_id));
     res.status(200).send(members);
   } catch (err) {
     next(err);

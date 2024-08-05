@@ -1,8 +1,8 @@
 import jwt, { Secret, SignOptions } from 'jsonwebtoken';
 import express from 'express';
-import { UserPayload } from '../Interfaces/UserInterfaces'
+import { UserPayload } from '../Interfaces/UserInterfaces';
 import dotenv from 'dotenv';
-
+import * as Role from '../Constant/Roles';
 dotenv.config();
 
 const JWT_SECRET_KEY: Secret = process.env.JWT_SECRET as Secret;
@@ -23,7 +23,7 @@ export const authenticateJWT = function (
       JWT_SECRET_KEY,
       (err: any, user: any) => {
         if (err) {
-          return res.status(403).send('Unauthorization');
+          return res.status(403).send('Unauthorization' + err);
         }
         req.user = user as UserPayload;
         next();
@@ -48,6 +48,18 @@ export const verifyToken = async function (
     req.user = decoded as UserPayload;
     next();
   } catch (err) {
-    res.status(401).json({ message: 'Token verification failed' });
+    return next(err);
+  }
+};
+
+export const isServerAdmin = (
+  req: CustomRequest,
+  res: express.Response,
+  next: express.NextFunction,
+) => {
+  if (req.user?.system_role_id == Role.ADMIN) {
+    next();
+  } else {
+    return res.status(403).send('You do not have permission');
   }
 };

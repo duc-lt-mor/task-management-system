@@ -68,7 +68,7 @@ export const create = async function (req: CustomRequest, data: ProjectData) {
       ],
       { transaction: t },
     );
-    // khoi tao 3 role mac dinh
+    // khoi tao 2 role mac dinh
     let project_role: any = await Project_role.bulkCreate(
       [
         {

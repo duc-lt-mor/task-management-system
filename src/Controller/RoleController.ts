@@ -10,8 +10,8 @@ export const create = async function (
   try {
     let role: any = await RoleServices.create(req, req.body);
     return res.status(201).json({
-      message:'create role success',
-      "role updated": role
+      message: 'create role success',
+      'role updated': role,
     });
   } catch (err) {
     next(err);
@@ -24,10 +24,14 @@ export const edit = async function (
   next: express.NextFunction,
 ) {
   try {
-    let role: any = await RoleServices.edit(Number(req.params.role_id), req, req.body);
+    let role: any = await RoleServices.edit(
+      Number(req.params.role_id),
+      req,
+      req.body,
+    );
     return res.status(200).json({
-      message:'edit role success',
-      "role updated": role
+      message: 'edit role success',
+      'role updated': role,
     });
   } catch (err) {
     next(err);
@@ -53,8 +57,10 @@ export const changeProjectOwner = async function (
   next: express.NextFunction,
 ) {
   try {
-   let new_owner: any = await RoleServices.changeProjectOwner(req);
-    return res.status(200).json({message:'change owner success', 'new_owner': new_owner});
+    let new_owner: any = await RoleServices.changeProjectOwner(req);
+    return res
+      .status(200)
+      .json({ message: 'change owner success', new_owner: new_owner });
   } catch (err) {
     next(err);
   }
@@ -71,4 +77,4 @@ export const showRole = async function name(
   } catch (err) {
     next(err);
   }
-}
+};

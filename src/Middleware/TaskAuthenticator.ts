@@ -4,7 +4,6 @@ import * as Role from '../Constant/Roles';
 import { findMember } from '../Services/MemberServices';
 import { Task } from '../Models/task';
 
-
 export const authenticateUpdateTask = function (permission: number) {
   return async (
     req: CustomRequest,
@@ -15,10 +14,11 @@ export const authenticateUpdateTask = function (permission: number) {
       if (!req.user) {
         return res.status(401).json({ message: 'User not authenticated' });
       }
-      if (req.user?.system_role_id == Role.ADMIN ) {
+      if (req.user?.system_role_id == Role.ADMIN) {
         next();
+        return;
       }
-      let project_id = req.body.project_id || req.params.project_id;
+      let project_id = req.body.project_id;
       let member: any = await findMember(req.user?.id, Number(project_id));
       let task: any = await Task.findOne({
         where: {
@@ -26,12 +26,9 @@ export const authenticateUpdateTask = function (permission: number) {
         },
       });
 
-      if (
-        task?.creator_id == req.user?.id ||
-        member?.project_role.is_pm
-      ) {
+      if (task?.creator_id == req.user?.id || member?.project_role.is_pm) {
         next();
-      } else if (task?.assignee_id == req.user.id) {
+      } else if (task?.assignee_id == req.user?.id) {
         next();
       } else {
         return res
@@ -44,4 +41,3 @@ export const authenticateUpdateTask = function (permission: number) {
     }
   };
 };
-

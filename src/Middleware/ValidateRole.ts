@@ -11,15 +11,18 @@ export const validateRole = function () {
       .withMessage('please enter at least one permission')
       .custom((permissions) => {
         let err = [];
-        for (let p of permissions) {
+        let arr = JSON.parse(`[${permissions}]`);
+        for (let p of arr) {
           if (!PERMISSIONS.includes(Number(p))) {
             err.push(p + ' is not exit in permissions');
           }
-          if (permissions.includes(PM_PERMISSIONS)) {
-            err.push('you can have pm permission');
-          }
+          
+        }
+        if (arr.includes(PM_PERMISSIONS)) {
+          err.push('you can not have pm permission');
         }
         if (err.length > 0) {
+
           throw err;
         }
       }),

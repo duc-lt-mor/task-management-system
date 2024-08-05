@@ -28,44 +28,43 @@ export const get = function () {
   return Task.findAll();
 };
 
-export const updateAsAssignee = async function (id: number, data: any) {
-  try {
-    let tas: any = await Task.update(
-      {
-        colum_id: data.colum_id,
-        real_end_date: data.real_end_date,
-      },
-      {
-        where: {
-          id: id,
-        },
-      },
-    );
-    let task: any = await find(id);
-    return task;
-  } catch (error) {
-    throw error;
-  }
-};
 
 export const update = async function (id: number, data: any) {
   try {
-    let tas: any = await Task.update(
-      {
-        colum_id: data.colum_id,
-        real_end_date: data.real_end_date,
-        priority: data.priority,
-        assignee_id: data.assignee_id,
-        start_date: data.start_date,
-      },
-      {
-        where: {
-          id: id,
-        },
-      },
-    );
+
     let task: any = await find(id);
-    return task;
+
+    if (task.assignee_id == data.assignee_id) {
+      await Task.update(
+        {
+          colum_id: data.colum_id,
+          real_end_date: data.real_end_date,
+        },
+        {
+          where: {
+            id: id,
+          },
+        },
+      );
+    }
+    else {
+      await Task.update(
+        {
+          colum_id: data.colum_id,
+          real_end_date: data.real_end_date,
+          priority: data.priority,
+          assignee_id: data.assignee_id,
+          start_date: data.start_date,
+        },
+        {
+          where: {
+            id: id,
+          },
+        },
+      );
+    }
+    let updated_task: any = await find(id);
+    return updated_task;
   } catch (error) {
     throw error;
   }

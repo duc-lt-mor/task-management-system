@@ -8,14 +8,12 @@ export const create = async function (
   next: express.NextFunction,
 ) {
   try {
-    console.log(req.body.permissions);
     let role: any = await RoleServices.create(req, req.body);
     return res.status(201).json({
       message: 'create role success',
       'role updated': role,
     });
   } catch (err: any) {
-    console.log(err.msg);
     next(err);
   }
 };

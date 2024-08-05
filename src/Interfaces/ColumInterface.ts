@@ -4,8 +4,5 @@ export interface ColumData {
   name: string;
   index: number;
   project_id: number;
-  array_index: {
-    id: number;
-    index: number;
-  }[];
+  array_index: string;
 }

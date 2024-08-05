@@ -99,41 +99,9 @@ export const getTasks = async function (
 ) {
   try {
     let tasks: any = await keywords.search(req.query);
-    if (tasks.length == 0) {
-      throw createHttpError(404, `No tasks found`);
-    } else {
-      return res.status(200).json(tasks);
-    }
+
+    return res.status(200).json(tasks);
   } catch (err) {
-    return next(err);
-  }
-};
-
-export const updateAsAssignee = async function (
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction,
-) {
-  try {
-    const taskId = parseInt(req.params.id);
-
-    if (isNaN(taskId)) {
-      return res.status(400).json({ message: 'Invalid task ID' });
-    }
-
-    const updateData = {
-      colum_id: req.body.colum_id,
-      real_end_date: req.body.real_end_date,
-    };
-
-    let result: any = await services.updateAsAssignee(taskId, updateData);
-    if (!result) {
-      throw createHttpError(400, `Couldn't update task data`);
-    }
-
-    return res.status(200).json('update task success');
-  } catch (err) {
-    console.log(err);
     return next(err);
   }
 };

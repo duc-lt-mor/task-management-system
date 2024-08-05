@@ -12,7 +12,6 @@ import * as CommentAut from '../Middleware/CommentAuthenticator';
 import * as user from '../Controller/UserController';
 import * as validateRole from '../Middleware/ValidateRole';
 import * as task from '../Controller/TaskController';
-import * as search from '../Controller/KeywordController';
 import { validateTask } from '../Middleware/TaskValidator';
 import * as userValidator from '../Middleware/UserValidator';
 import * as comment from '../Controller/CommentControllers';
@@ -26,34 +25,32 @@ const router = express.Router();
  *       summary: Create a project
  *       tags:
  *         - Project
- *       parameters:
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
- *         - name: body
- *           in: body
- *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *                 example: project 1
- *               key:
- *                 type: string
- *                 example: proj1
- *               decripstion:
- *                 type: string
- *                 example: this is decripstion of project 1
- *               expected_end_date:
- *                 type: string
- *                 format: date
- *                 example: '2024-08-09'
- *             required:
- *               - name
- *               - key
- *               - expected_end_date
+ *       security:
+ *         - bearerAuth: []
+ *       requestBody:
+ *         require: true
+ *         content: 
+ *           application/x-www-form-urlencoded:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 name:
+ *                   type: string
+ *                   example: project 1
+ *                 key:
+ *                   type: string
+ *                   example: proj1
+ *                 decripstion:
+ *                   type: string
+ *                   example: this is decripstion of project 1
+ *                 expected_end_date:
+ *                   type: string
+ *                   format: date
+ *                   example: '2024-08-09'
+ *               required:
+ *                 - name
+ *                 - key
+ *                 - expected_end_date
  *       responses:
  *         '200':
  *           description: OK
@@ -74,33 +71,37 @@ router.post(
  *       summary: Update a project
  *       tags:
  *         - Project
+ *       security:
+ *         - bearerAuth: []
  *       parameters:
  *         - name: project_id
  *           in: path
  *           type: string
  *           required: true
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
- *         - name: body
- *           in: body
- *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *                 example: project 1
- *               decripstion:
- *                 type: string
- *                 example: this is decripstion of project 1
- *               expected_end_date:
- *                 type: string
- *                 format: date
- *                 example: '2024-08-09'
- *             required:
- *               - expected_end_date
+ *       requestBody:
+ *         require: true
+ *         content: 
+ *           application/x-www-form-urlencoded:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 name:
+ *                   type: string
+ *                   example: project 1
+ *                 decripstion:
+ *                   type: string
+ *                   example: this is decripstion of project 1
+ *                 expected_end_date:
+ *                   type: string
+ *                   format: date
+ *                   example: '2024-08-09'
+ *                 real_end_date:
+ *                   type: string
+ *                   format: date
+ *                   example: '2024-08-09'
+ *               required:
+ *                 - name
+ *                 - expected_end_date
  *       responses:
  *         '200':
  *           description: OK
@@ -126,16 +127,13 @@ router.put(
  *       summary: Delete a project
  *       tags:
  *         - Project
+ *       security:
+ *         - bearerAuth: []
  *       parameters:
  *         - name: project_id
  *           in: path
  *           type: string
  *           required: true
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
  *       responses:
  *         '200':
  *           description: OK
@@ -160,16 +158,13 @@ router.delete(
  *       summary: Return a list member of a project
  *       tags:
  *         - Project
+ *       security:
+ *         - bearerAuth: []
  *       parameters:
  *         - name: project_id
  *           in: path
  *           type: string
  *           required: true
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
  *       responses:
  *         '200':
  *           description: OK
@@ -194,16 +189,13 @@ router.get(
  *       summary: Show roles of a project
  *       tags:
  *         - Project
+ *       security:
+ *         - bearerAuth: []
  *       parameters:
  *         - name: project_id
  *           in: path
  *           type: string
  *           required: true
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
  *       responses:
  *         '200':
  *           description: OK
@@ -228,26 +220,28 @@ router.get(
  *       summary: Add a user to a project
  *       tags:
  *         - Member
- *       parameters:
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
- *         - name: body
- *           in: body
- *           schema:
- *             type: object
- *             properties:
- *               project_id:
- *                 type: string
- *                 example: 1
- *               project_role_id:
- *                 type: string
- *                 example: 1
- *               add_mem:
- *                 type: string
- *                 example: 'user name/email'
+ *       security:
+ *         - bearerAuth: []
+ *       requestBody:
+ *         require: true
+ *         content: 
+ *           application/x-www-form-urlencoded:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 project_id:
+ *                   type: string
+ *                   example: 1
+ *                 project_role_id:
+ *                   type: string
+ *                   example: this is decripstion of project 1
+ *                 add_mem:
+ *                   type: string
+ *                   example: abc@gmail.com
+ *               required:
+ *                 - project_id
+ *                 - project_role_id
+ *                 - add_mem
  *       responses:
  *         '200':
  *           description: OK
@@ -278,19 +272,20 @@ router.post(
  *           in: path
  *           type: string
  *           required: true
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
- *         - name: body
- *           in: body
- *           schema:
- *             type: object
- *             properties:
- *               project_id:
- *                 type: string
- *                 example: 1
+ *       security:
+ *         - bearerAuth: []
+ *       requestBody:
+ *         require: true
+ *         content: 
+ *           application/x-www-form-urlencoded:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 project_id:
+ *                   type: string
+ *                   example: 1
+ *               required:
+ *                 - project_id
  *       responses:
  *         '200':
  *           description: OK
@@ -320,23 +315,24 @@ router.delete(
  *           in: path
  *           type: string
  *           required: true
- *         - name: authorization
- *           in: header
- *           type: string
- *           expamle: Bearer
- *           format: bearer
- *           description: Bearer token for authentication
- *         - name: body
- *           in: body
- *           schema:
- *             type: object
- *             properties:
- *               project_role_id:
- *                 type: string
- *                 example: 1
- *               project_id:
- *                 type: string
- *                 example: 1
+ *       security:
+ *         - bearerAuth: []
+ *       requestBody:
+ *         require: true
+ *         content: 
+ *           application/x-www-form-urlencoded:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 project_id:
+ *                   type: string
+ *                   example: 1
+ *                 project_role_id:
+ *                   type: string
+ *                   example: this is decripstion of project 1
+ *               required:
+ *                 - project_id
+ *                 - project_role_id
  *       responses:
  *         '200':
  *           description: OK
@@ -361,26 +357,28 @@ router.put(
  *       summary: Change owner of a project
  *       tags:
  *         - Project
- *       parameters:
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
- *         - name: body
- *           in: body
- *           schema:
- *             type: object
- *             properties:
- *               new_owner_id:
- *                 type: string
- *                 example: 1
- *               project_id:
- *                 type: string
- *                 example: 1
- *               new_project_role_id:
- *                 type: string
- *                 example: 1
+ *       security:
+ *         - bearerAuth: []
+ *       requestBody:
+ *         require: true
+ *         content: 
+ *           application/x-www-form-urlencoded:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 project_id:
+ *                   type: string
+ *                   example: project 1
+ *                 new_project_role_id:
+ *                   type: string
+ *                   example: this is decripstion of project 1
+ *                 new_owner_id:
+ *                   type: string
+ *                   example: 1
+ *               required:
+ *                 - project_id
+ *                 - new_project_role_id
+ *                 - new_owner_id
  *       responses:
  *         '200':
  *           description: OK
@@ -406,33 +404,33 @@ router.put(
  *       summary: Create a role
  *       tags:
  *         - Role
- *       parameters:
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
- *         - name: body
- *           in: body
- *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *                 example: role 1
- *               project_id:
- *                 type: string
- *                 example: 1
- *               permissions:
- *                 type: array
- *                 example: [8,9,10,11]
+ *       security:
+ *         - bearerAuth: []
+ *       requestBody:
+ *         require: true
+ *         content: 
+ *           application/x-www-form-urlencoded:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 name:
+ *                   type: string
+ *                   example: project 1
+ *                 project_id:
+ *                   type: string
+ *                   example: 1
+ *                 permissions:
+ *                   type: array
+ *                   items:
+ *                     type: integer
+ *                   example: [8,9,10,11]
+ *               required:
+ *                 - name
+ *                 - project_id
+ *                 - permissions
  *       responses:
  *         '200':
  *           description: OK
- *         '401':
- *           description: Unauthorized
- *         '403':
- *           description: Forbiden
  *         '500':
  *           description: Internal Server Error
  */
@@ -456,25 +454,30 @@ router.post(
  *           in: path
  *           type: string
  *           required: true
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
- *         - name: body
- *           in: body
- *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *                 example: role 1
- *               permissions:
- *                 type: array
- *                 example: [9,8,10]
- *               project_id:
- *                 type: string
- *                 example: 1
+ *       security:
+ *         - bearerAuth: []
+ *       requestBody:
+ *         require: true
+ *         content: 
+ *           application/x-www-form-urlencoded:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 name:
+ *                   type: string
+ *                   example: project 1
+ *                 project_id:
+ *                   type: string
+ *                   example: 1
+ *                 permissions:
+ *                   type: array
+ *                   items:
+ *                     type: integer
+ *                   example: [8,9,10,11]
+ *               required:
+ *                 - name
+ *                 - project_id
+ *                 - permissions
  *       responses:
  *         '200':
  *           description: OK
@@ -495,7 +498,7 @@ router.put(
 
 /**
  * @swagger
- * /project/role/{role_id}:
+ * /role/{role_id}:
  *    delete:
  *       summary: Delete a role
  *       tags:
@@ -505,19 +508,20 @@ router.put(
  *           in: path
  *           type: string
  *           required: true
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
- *         - name: body
- *           in: body
- *           schema:
- *             type: object
- *             properties:
- *               project_id:
- *                 type: string
- *                 example: 1
+ *       security:
+ *         - bearerAuth: []
+ *       requestBody:
+ *         require: true
+ *         content: 
+ *           application/x-www-form-urlencoded:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 project_id:
+ *                   type: string
+ *                   example: 1
+ *               required:
+ *                 - project_id
  *       responses:
  *         '200':
  *           description: OK
@@ -543,26 +547,32 @@ router.delete(
  *       summary: Create a colum in a project
  *       tags:
  *         - Colum
- *       parameters:
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
- *         - name: body
- *           in: body
- *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *                 example: colum 1
- *               col_type:
- *                 type: string
- *                 example: todo/ in_progress/done/custom
- *               project_id:
- *                 type: string
- *                 example: 1
+ *       security:
+ *         - bearerAuth: []
+ *       requestBody:
+ *         require: true
+ *         content: 
+ *           application/x-www-form-urlencoded:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 project_id:
+ *                   type: string
+ *                   example: project 1
+ *                 col_type:
+ *                   type: string
+ *                   enum:
+ *                     - todo
+ *                     - in_progress
+ *                     - done
+ *                     - custom
+ *                 name:
+ *                   type: string
+ *                   example: col 1
+ *               required:
+ *                 - project_id
+ *                 - col_type
+ *                 - name
  *       responses:
  *         '200':
  *           description: OK
@@ -593,35 +603,43 @@ router.post(
  *           in: path
  *           type: string
  *           required: true
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
- *         - name: body
- *           in: body
- *           schema:
- *             type: object
- *             properties:
- *               project_id:
- *                 type: string
- *                 example: 1
- *               name:
- *                 type: string
- *                 example: colum 1
- *               col_type:
- *                 type: string
- *                 example: todo/in_progress/done/custom
- *               array_index:
- *                 type: array
- *                 items:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: interger
- *                     index:
- *                       type: interger
- *                 example: [{"id":9, "index":2},{"id":9, "index":2},{"id":9, "index":2},{"id":9, "index":2}]
+ *       security:
+ *         - bearerAuth: []
+ *       requestBody:
+ *         require: true
+ *         content: 
+ *           application/x-www-form-urlencoded:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 project_id:
+ *                   type: string
+ *                   example: project 1
+ *                 col_type:
+ *                   type: string
+ *                   enum:
+ *                     - todo
+ *                     - in_progress
+ *                     - done
+ *                     - custom
+ *                 name:
+ *                   type: string
+ *                   example: col 1
+ *                 array_index:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: interger
+ *                       index:
+ *                         type: interger
+ *                   example: [{"id":9, "index":2},{"id":9, "index":2},{"id":9, "index":2},{"id":9, "index":2}]
+ *               required:
+ *                 - project_id
+ *                 - col_type
+ *                 - name
+ *                 - array_index
  *       responses:
  *         '200':
  *           description: OK
@@ -652,19 +670,18 @@ router.put(
  *           in: path
  *           type: string
  *           required: true
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
- *         - name: body
- *           in: body
- *           schema:
- *             type: object
- *             properties:
- *               project_id:
- *                 type: string
- *                 example: 1
+ *       security:
+ *         - bearerAuth: []
+ *       requestBody:
+ *         require: true
+ *         content: 
+ *           application/x-www-form-urlencoded:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 project_id:
+ *                   type: string
+ *                   example: 1
  *       responses:
  *         '200':
  *           description: OK
@@ -690,18 +707,19 @@ router.delete(
  *       summary: Login
  *       tags:
  *         - User
- *       parameters:
- *         - name: body
- *           in: body
- *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *                 example: any@gmail.com
- *               password:
- *                 type: string
- *                 example: password
+ *       requestBody:
+ *         require: true
+ *         content: 
+ *           application/x-www-form-urlencoded:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 email:
+ *                   type: string
+ *                   example: any@gmail.com
+ *                 password:
+ *                   type: string
+ *                   example: password
  *       responses:
  *         '200':
  *           description: OK
@@ -721,30 +739,31 @@ router.post('/login', user.getLogin);
  *       summary: Register
  *       tags:
  *         - User
- *       parameters:
- *         - name: body
- *           in: body
- *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *                 example: colum 1
- *               email:
- *                 type: string
- *                 example: any@gmail.com
- *               password:
- *                 type: string
- *                 example: password
- *               passwordConfirm:
- *                 type: string
- *                 example: password
- *               phone_number:
- *                 type: string
- *                 example: 123456
- *               system_role_id:
- *                 type: string
- *                 example: 2
+ *       requestBody:
+ *         require: true
+ *         content: 
+ *           application/x-www-form-urlencoded:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 name:
+ *                   type: string
+ *                   example: john sena
+ *                 email:
+ *                   type: string
+ *                   example: any@gmail.com
+ *                 password:
+ *                   type: string
+ *                   example: password
+ *                 passwordConfirm:
+ *                   type: string
+ *                   example: password
+ *                 phone_number:
+ *                   type: string
+ *                   example: 123456
+ *                 system_role_id:
+ *                   type: string
+ *                   example: 2
  *       responses:
  *         '200':
  *           description: OK
@@ -773,11 +792,8 @@ router.post(
  *           in: path
  *           type: string
  *           required: true
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
+ *       security:
+ *         - bearerAuth: []
  *       responses:
  *         '200':
  *           description: OK
@@ -797,12 +813,8 @@ router.delete('/user/:userId', authenticator.isServerAdmin, user.deleteUser);
  *       summary: Return a list of projects in which user is a member
  *       tags:
  *         - User
- *       parameters:
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
+ *       security:
+ *         - bearerAuth: []
  *       responses:
  *         '200':
  *           description: OK
@@ -827,11 +839,6 @@ router.get('/user/projects', authenticator.verifyToken, user.showProject);
  *           in: query
  *           type: string
  *           required: true
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
  *       responses:
  *         '200':
  *           description: OK
@@ -851,38 +858,39 @@ router.get('/search/user', authenticator.verifyToken, user.find);
  *       summary: Create a task in a project
  *       tags:
  *         - Task
- *       parameters:
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
- *         - name: body
- *           in: body
- *           schema:
- *             type: object
- *             properties:
- *               project_id:
- *                 type: string
- *                 example: 1
- *               name:
- *                 type: string
- *                 example: fix bug
- *               description:
- *                 type: string
- *                 example: this is description
- *               priority:
- *                 type: string
- *                 example: high
- *               start_date:
- *                 type: string
- *                 example: 2024-08-09
- *               expected_end_date:
- *                 type: string
- *                 example: 2024-08-19
- *               assignee_id:
- *                 type: string
- *                 example: 11
+ *       security:
+ *         - bearerAuth: []
+ *       requestBody:
+ *         require: true
+ *         content: 
+ *           application/x-www-form-urlencoded:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 project_id:
+ *                   type: string
+ *                   example: 1
+ *                 name:
+ *                   type: string
+ *                   example: fix bug
+ *                 description:
+ *                   type: string
+ *                   example: this is description
+ *                 priority:
+ *                   type: string
+ *                   enum:
+ *                     - low
+ *                     - medium
+ *                     - high
+ *                 start_date:
+ *                   type: string
+ *                   example: 2024-08-09
+ *                 expected_end_date:
+ *                   type: string
+ *                   example: 2024-08-19
+ *                 assignee_id:
+ *                   type: string
+ *                   example: 11
  *       responses:
  *         '200':
  *           description: OK
@@ -912,6 +920,7 @@ router.post(
  *         - name: project_id
  *           in: query
  *           type: string
+ *           require: true
  *         - name: names
  *           in: query
  *           type: string
@@ -921,11 +930,8 @@ router.post(
  *         - name: assignee_id
  *           in: query
  *           type: string
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
+ *       security:
+ *         - bearerAuth: []
  *       responses:
  *         '200':
  *           description: OK
@@ -950,19 +956,23 @@ router.get(
  *       summary: Delete a task in a project
  *       tags:
  *         - Task
+ *       security:
+ *         - bearerAuth: [] 
  *       parameters:
  *         - name: id
  *           in: path
  *           type: string
  *           required: true
- *         - name: project_id
- *           in: query
- *           type: string
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
+ *       requestBody:
+ *         require: true
+ *         content: 
+ *           application/x-www-form-urlencoded:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 project_id:
+ *                   type: string
+ *                   example: 1
  *       responses:
  *         '200':
  *           description: OK
@@ -981,94 +991,47 @@ router.delete(
   task.deleteTask,
 );
 
-/**
- * @swagger
- * /task/{id}:
- *    put:
- *       summary: Upddate a task in a project as a assignee
- *       tags:
- *         - Task
- *       parameters:
- *         - name: id
- *           in: path
- *           type: string
- *           required: true
- *         - name: project_id
- *           in: query
- *           type: string
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
- *         - name: body
- *           in: body
- *           schema:
- *             type: object
- *             properties:
- *               colum_id:
- *                 type: string
- *                 example: 1
- *               real_end_date:
- *                 type: string
- *                 example: 2024-08-29
- *       responses:
- *         '200':
- *           description: OK
- *         '401':
- *           description: Unauthorized
- *         '403':
- *           description: Forbiden
- *         '500':
- *           description: Internal Server Error
- */
-router.put(
-  '/task/:id',
-  authenticator.verifyToken,
-  TaskAut.authenticateUserUpdateTask(),
-  task.updateAsAssignee,
-);
 
 /**
  * @swagger
  * /update/task/{id}:
  *    put:
- *       summary: Upddate a task in a project as a pm/task creator
+ *       summary: Upddate a task in a project 
  *       tags:
  *         - Task
- *       parameters:
- *         - name: id
- *           in: path
- *           type: string
- *           required: true
- *         - name: project_id
- *           in: query
- *           type: string
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
- *         - name: body
- *           in: body
- *           schema:
- *             type: object
- *             properties:
- *               colum_id:
- *                 type: string
- *                 example: 1
- *               real_end_date:
- *                 type: string
- *                 example: 2024-08-29
- *               start_date:
- *                 type: string
- *                 example: 2024-08-19
- *               assignee_id:
- *                 type: string
- *                 example: 22
- *               priority:
- *                 type: string
- *                 example: high
+ *       security:
+ *         - bearerAuth: []
+ *       requestBody:
+ *         require: true
+ *         content: 
+ *           application/x-www-form-urlencoded:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 project_id:
+ *                   type: string
+ *                   example: 1
+ *                 name:
+ *                   type: string
+ *                   example: fix bug
+ *                 description:
+ *                   type: string
+ *                   example: this is description
+ *                 priority:
+ *                   type: string
+ *                   enum:
+ *                     - low
+ *                     - medium
+ *                     - high
+ *                 start_date:
+ *                   type: string
+ *                   example: 2024-08-09
+ *                 expected_end_date:
+ *                   type: string
+ *                   example: 2024-08-19
+ *                 assignee_id:
+ *                   type: string
+ *                   example: 11
  *       responses:
  *         '200':
  *           description: OK
@@ -1093,26 +1056,24 @@ router.put(
  *       summary: Create a comment in a project
  *       tags:
  *         - Comment
- *       parameters:
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
- *         - name: body
- *           in: body
- *           schema:
- *             type: object
- *             properties:
- *               project_id:
- *                 type: string
- *                 example: 1
- *               task_id:
- *                 type: string
- *                 example: 1
- *               content:
- *                 type: string
- *                 example: example comment
+ *       security:
+ *         - bearerAuth: []
+ *       requestBody:
+ *         require: true
+ *         content: 
+ *           application/x-www-form-urlencoded:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 project_id:
+ *                   type: string
+ *                   example: 1
+ *                 task_id:
+ *                   type: string
+ *                   example: 1
+ *                 content:
+ *                   type: string
+ *                   example: example comment
  *       responses:
  *         '200':
  *           description: OK
@@ -1137,24 +1098,23 @@ router.post(
  *       summary: Edit a comment in a project
  *       tags:
  *         - Comment
+ *       security:
+ *         - bearerAuth: [] 
  *       parameters:
  *         - name: id
  *           in: path
  *           type: string
  *           required: true
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
- *         - name: body
- *           in: body
- *           schema:
- *             type: object
- *             properties:
- *               content:
- *                 type: string
- *                 example: example comment
+ *       requestBody:
+ *         require: true
+ *         content: 
+ *           application/x-www-form-urlencoded:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 content:
+ *                   type: string
+ *                   example: example comment
  *       responses:
  *         '200':
  *           description: OK
@@ -1179,29 +1139,27 @@ router.put(
  *       summary: Reply a comment in a project
  *       tags:
  *         - Comment
- *       parameters:
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
- *         - name: body
- *           in: body
- *           schema:
- *             type: object
- *             properties:
- *               project_id:
- *                 type: string
- *                 example: 1
- *               content:
- *                 type: string
- *                 example: example comment
- *               task_id:
- *                 type: string
- *                 example: 1
- *               parent_id:
- *                 type: string
- *                 example: 2
+ *       security:
+ *         - bearerAuth: [] 
+ *       requestBody:
+ *         require: true
+ *         content: 
+ *           application/x-www-form-urlencoded:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 project_id:
+ *                   type: string
+ *                   example: 1
+ *                 content:
+ *                   type: string
+ *                   example: example comment
+ *                 task_id:
+ *                   type: string
+ *                   example: 1
+ *                 parent_id:
+ *                   type: string
+ *                   example: 2
  *       responses:
  *         '200':
  *           description: OK
@@ -1226,16 +1184,13 @@ router.post(
  *       summary: Delete a comment in a project
  *       tags:
  *         - Comment
+ *       security:
+ *         - bearerAuth: [] 
  *       parameters:
  *         - name: id
  *           in: path
  *           type: string
  *           required: true
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
  *       responses:
  *         '200':
  *           description: OK

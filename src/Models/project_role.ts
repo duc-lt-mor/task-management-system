@@ -15,7 +15,7 @@ export const Project_role = sequelize.define('project_roles', {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  decripstion: {
+  description: {
     type: DataTypes.STRING,
     allowNull: true,
   },

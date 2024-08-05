@@ -815,41 +815,7 @@ router.delete('/user/:userId', authenticator.isServerAdmin, user.deleteUser);
  */
 router.get('/user/projects', authenticator.verifyToken, user.showProject);
 
-/**
- * @swagger
- * /search/project:
- *    get:
- *       summary: find a project
- *       tags:
- *         - Search
- *       parameters:
- *         - name: name
- *           in: query
- *           type: string
- *           required: true
- *         - name: key
- *           in: query
- *           type: string
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
- *       responses:
- *         '200':
- *           description: OK
- *         '401':
- *           description: Unauthorized
- *         '403':
- *           description: Forbiden
- *         '500':
- *           description: Internal Server Error
- */
-router.get(
-  '/search/project',
-  authenticator.verifyToken,
-  ProjectController.search,
-);
+
 
 /**
  * @swagger
@@ -937,80 +903,6 @@ router.post(
   task.generateTask,
 );
 
-/**
- * @swagger
- * /task:
- *    get:
- *       summary: get a task in a project
- *       tags:
- *         - Task
- *       parameters:
- *         - name: id
- *           in: query
- *           type: string
- *           required: true
- *         - name: project_id
- *           in: query
- *           type: string
- *           required: true
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
- *       responses:
- *         '200':
- *           description: OK
- *         '401':
- *           description: Unauthorized
- *         '403':
- *           description: Forbiden
- *         '500':
- *           description: Internal Server Error
- */
-router.get(
-  '/task',
-  authenticator.verifyToken,
-  ProjectAut.authenticateProject(11),
-  task.getTask,
-);
-
-/**
- * @swagger
- * /search/task:
- *    get:
- *       summary: Search task
- *       tags:
- *         - Search
- *       parameters:
- *         - name: project_id
- *           in: query
- *           type: string
- *         - name: names
- *           in: query
- *           type: string
- *         - name: priority
- *           in: query
- *           type: string
- *         - name: assignee_id
- *           in: query
- *           type: string
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
- *       responses:
- *         '200':
- *           description: OK
- *         '401':
- *           description: Unauthorized
- *         '403':
- *           description: Forbiden
- *         '500':
- *           description: Internal Server Error
- */
-router.get('/search/task', search.search);
 
 /**
  * @swagger
@@ -1048,7 +940,7 @@ router.get('/search/task', search.search);
  *           description: Internal Server Error
  */
 router.get(
-  '/project/tasks',
+  '/task',
   authenticator.verifyToken,
   ProjectAut.authenticateProject(11),
   task.getTasks,

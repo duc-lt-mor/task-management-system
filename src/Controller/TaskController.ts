@@ -12,9 +12,8 @@ export const generateTask = async function (
   res: express.Response,
   next: express.NextFunction,
 ) {
+  const transaction = await sequelize.transaction();
   try {
-    const transaction = await sequelize.transaction();
-
     // Ensure user is authenticated
     if (!req.user) {
       return res.status(401).json({ message: 'User not authenticated' });
@@ -49,7 +48,6 @@ export const generateTask = async function (
     }
     const taskName = [task.name];
     const records = await keywords.addKeyword(taskName, transaction, task.id);
-    console.log(records);
     for (const { id: keyword_id } of records) {
       await TaskKeyword.create(
         {
@@ -66,7 +64,8 @@ export const generateTask = async function (
       .status(201)
       .json({ message: 'Task generated successfully', task });
   } catch (err) {
-    return next(err);
+    // await transaction.rollback();
+     next(err);
   }
 };
 
@@ -100,7 +99,7 @@ export const getTasks = async function (
   try {
     let tasks: any = await keywords.search(req.query);
     if (tasks.length == 0) {
-      throw createHttpError(404, `No tasks found`);
+      return res.send(`[]`)
     } else {
       return res.status(200).json(tasks);
     }

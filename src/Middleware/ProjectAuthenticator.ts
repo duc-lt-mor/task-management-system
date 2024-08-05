@@ -15,6 +15,7 @@ export const authenticateProject = function (permission: number) {
       }
       if (req.user?.system_role_id == Role.ADMIN) {
         next();
+        return;
       }
       let project_id =
         req.body.project_id || req.params.project_id || req.query.project_id;
@@ -25,6 +26,7 @@ export const authenticateProject = function (permission: number) {
         member?.project_role.is_pm
       ) {
         next();
+        return;
       } else {
         return res.status(403).json({
           message: 'You do not have permission to access.',

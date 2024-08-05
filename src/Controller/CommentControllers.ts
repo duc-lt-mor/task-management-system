@@ -2,21 +2,29 @@ import express from 'express';
 import * as services from '../Services/CommentServices';
 import createHttpError from 'http-errors';
 import * as authenticator from '../Middleware/UserAuthenticator';
+import { sequelize } from '../Config/config';
+import { Comment } from '../Models/comment';
 
 export const generate = async function (
   req: authenticator.CustomRequest,
   res: express.Response,
   next: express.NextFunction,
 ) {
+  const transaction = await sequelize.transaction();
   try {
     const task_id = req.body.task_id;
-    const comment: any = await services.generate({
-      task_id,
-      user_id: req.user?.id,
-      content: req.body.content,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
+    const comment: any = await services.generate(
+      {
+        task_id,
+        user_id: req.user?.id,
+        content: req.body.content,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      transaction,
+    );
+
+    transaction.commit();
     if (!comment) {
       throw createHttpError(400, `Could not generate comment`);
     }
@@ -31,27 +39,37 @@ export const reply = async function (
   res: express.Response,
   next: express.NextFunction,
 ) {
+  const transaction = await sequelize.transaction();
   try {
-    const { task_id, content, parent_id, user_id } = req.body;
-    if (!content) {
+    const data = {
+      task_id: req.body.task_id,
+      parent_id: req.body.parent_id,
+      user_id: req.user?.id,
+      content: req.body.content,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    if (!data.content) {
       throw createHttpError(400, 'Content is required');
     }
 
     // Find the parent comment using the comment key
-    const parentComment: any = await services.find(parent_id);
+    const parentComment: any = await services.find(data.parent_id);
     if (!parentComment) {
       throw createHttpError(404, 'Parent comment not found');
     }
 
     // Create the reply comment
     try {
-      const replyComment = await services.reply({
-        content,
-        task_id,
-        user_id,
-        parent_id: parentComment.id, // Set the parentId to link this as a reply
+      const replyComment = await services.reply({data},transaction);
+
+      await Comment.increment('repliesCount', {
+        by: 1,
+        where: {id: data.parent_id},
+        transaction,
       });
 
+      await transaction.commit();
       return res.status(200).json(replyComment);
     } catch (error) {
       throw createHttpError(500, 'Failed to create reply comment');
@@ -86,8 +104,7 @@ export const find = async function (
     const id = parseInt(req.params.id);
     const comment = await services.find(id);
     if (!comment) {
-      const error = createHttpError(400, `Could not find comment`);
-      throw error;
+      throw createHttpError(400, `Could not find comment`);
     }
     return res.status(200).json(comment);
   } catch (err) {
@@ -106,8 +123,7 @@ export const update = async function (
     const comment: any = await services.find(id);
 
     if (!comment) {
-      const error = createHttpError(404, `Comment not found`);
-      throw error;
+      throw createHttpError(404, `Comment not found`);
     }
 
     let comment_updated = await services.update(id, content);

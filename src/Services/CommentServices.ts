@@ -1,12 +1,12 @@
-import createHttpError from 'http-errors';
 import { Comment } from '../Models/comment';
+import { Transaction } from 'sequelize';
 
-export const generate = async function (data: any) {
-  return await Comment.create(data);
+export const generate = async function (data: any, transaction: Transaction) {
+  return await Comment.create(data, { transaction });
 };
 
-export const reply = function (data: any) {
-  return Comment.create(data);
+export const reply = function (data: any, transaction: Transaction) {
+  return Comment.create(data,  { transaction });
 };
 
 export const get = async () => {

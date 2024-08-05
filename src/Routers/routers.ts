@@ -29,7 +29,7 @@ const router = express.Router();
  *         - bearerAuth: []
  *       requestBody:
  *         require: true
- *         content: 
+ *         content:
  *           application/x-www-form-urlencoded:
  *             schema:
  *               type: object
@@ -80,7 +80,7 @@ router.post(
  *           required: true
  *       requestBody:
  *         require: true
- *         content: 
+ *         content:
  *           application/x-www-form-urlencoded:
  *             schema:
  *               type: object
@@ -184,7 +184,7 @@ router.get(
 
 /**
  * @swagger
- * /showrole/{project_id}:
+ * /showRole/{project_id}:
  *    get:
  *       summary: Show roles of a project
  *       tags:
@@ -207,7 +207,7 @@ router.get(
  *           description: Internal Server Error
  */
 router.get(
-  '/showrole/:project_id',
+  '/showRole/:project_id',
   authenticator.verifyToken,
   ProjectAut.authenticateProject(1),
   RoleController.showRole,
@@ -224,7 +224,7 @@ router.get(
  *         - bearerAuth: []
  *       requestBody:
  *         require: true
- *         content: 
+ *         content:
  *           application/x-www-form-urlencoded:
  *             schema:
  *               type: object
@@ -276,7 +276,7 @@ router.post(
  *         - bearerAuth: []
  *       requestBody:
  *         require: true
- *         content: 
+ *         content:
  *           application/x-www-form-urlencoded:
  *             schema:
  *               type: object
@@ -319,7 +319,7 @@ router.delete(
  *         - bearerAuth: []
  *       requestBody:
  *         require: true
- *         content: 
+ *         content:
  *           application/x-www-form-urlencoded:
  *             schema:
  *               type: object
@@ -352,6 +352,36 @@ router.put(
 
 /**
  * @swagger
+ * /member/{member_id}:
+ *    get:
+ *       summary: Find a user from project
+ *       tags:
+ *         - Member
+ *       parameters:
+ *         - name: member_id
+ *           in: path
+ *           type: string
+ *           required: true
+ *       security:
+ *         - bearerAuth: []
+ *       responses:
+ *         '200':
+ *           description: OK
+ *         '401':
+ *           description: Unauthorized
+ *         '403':
+ *           description: Forbiden
+ *         '500':
+ *           description: Internal Server Error
+ */
+router.get(
+  '/member/:member_id',
+  authenticator.verifyToken,
+  MemberController.findById,
+);
+
+/**
+ * @swagger
  * /change_owner:
  *    put:
  *       summary: Change owner of a project
@@ -361,7 +391,7 @@ router.put(
  *         - bearerAuth: []
  *       requestBody:
  *         require: true
- *         content: 
+ *         content:
  *           application/x-www-form-urlencoded:
  *             schema:
  *               type: object
@@ -408,7 +438,7 @@ router.put(
  *         - bearerAuth: []
  *       requestBody:
  *         require: true
- *         content: 
+ *         content:
  *           application/x-www-form-urlencoded:
  *             schema:
  *               type: object
@@ -458,7 +488,7 @@ router.post(
  *         - bearerAuth: []
  *       requestBody:
  *         require: true
- *         content: 
+ *         content:
  *           application/x-www-form-urlencoded:
  *             schema:
  *               type: object
@@ -512,7 +542,7 @@ router.put(
  *         - bearerAuth: []
  *       requestBody:
  *         require: true
- *         content: 
+ *         content:
  *           application/x-www-form-urlencoded:
  *             schema:
  *               type: object
@@ -551,7 +581,7 @@ router.delete(
  *         - bearerAuth: []
  *       requestBody:
  *         require: true
- *         content: 
+ *         content:
  *           application/x-www-form-urlencoded:
  *             schema:
  *               type: object
@@ -607,7 +637,7 @@ router.post(
  *         - bearerAuth: []
  *       requestBody:
  *         require: true
- *         content: 
+ *         content:
  *           application/x-www-form-urlencoded:
  *             schema:
  *               type: object
@@ -674,7 +704,7 @@ router.put(
  *         - bearerAuth: []
  *       requestBody:
  *         require: true
- *         content: 
+ *         content:
  *           application/x-www-form-urlencoded:
  *             schema:
  *               type: object
@@ -709,7 +739,7 @@ router.delete(
  *         - User
  *       requestBody:
  *         require: true
- *         content: 
+ *         content:
  *           application/x-www-form-urlencoded:
  *             schema:
  *               type: object
@@ -741,7 +771,7 @@ router.post('/login', user.getLogin);
  *         - User
  *       requestBody:
  *         require: true
- *         content: 
+ *         content:
  *           application/x-www-form-urlencoded:
  *             schema:
  *               type: object
@@ -862,7 +892,7 @@ router.get('/search/user', authenticator.verifyToken, user.find);
  *         - bearerAuth: []
  *       requestBody:
  *         require: true
- *         content: 
+ *         content:
  *           application/x-www-form-urlencoded:
  *             schema:
  *               type: object
@@ -957,7 +987,7 @@ router.get(
  *       tags:
  *         - Task
  *       security:
- *         - bearerAuth: [] 
+ *         - bearerAuth: []
  *       parameters:
  *         - name: id
  *           in: path
@@ -965,7 +995,7 @@ router.get(
  *           required: true
  *       requestBody:
  *         require: true
- *         content: 
+ *         content:
  *           application/x-www-form-urlencoded:
  *             schema:
  *               type: object
@@ -991,19 +1021,18 @@ router.delete(
   task.deleteTask,
 );
 
-
 /**
  * @swagger
  * /update/task/{id}:
  *    put:
- *       summary: Upddate a task in a project 
+ *       summary: Upddate a task in a project
  *       tags:
  *         - Task
  *       security:
  *         - bearerAuth: []
  *       requestBody:
  *         require: true
- *         content: 
+ *         content:
  *           application/x-www-form-urlencoded:
  *             schema:
  *               type: object
@@ -1060,7 +1089,7 @@ router.put(
  *         - bearerAuth: []
  *       requestBody:
  *         require: true
- *         content: 
+ *         content:
  *           application/x-www-form-urlencoded:
  *             schema:
  *               type: object
@@ -1099,7 +1128,7 @@ router.post(
  *       tags:
  *         - Comment
  *       security:
- *         - bearerAuth: [] 
+ *         - bearerAuth: []
  *       parameters:
  *         - name: id
  *           in: path
@@ -1107,7 +1136,7 @@ router.post(
  *           required: true
  *       requestBody:
  *         require: true
- *         content: 
+ *         content:
  *           application/x-www-form-urlencoded:
  *             schema:
  *               type: object
@@ -1140,10 +1169,10 @@ router.put(
  *       tags:
  *         - Comment
  *       security:
- *         - bearerAuth: [] 
+ *         - bearerAuth: []
  *       requestBody:
  *         require: true
- *         content: 
+ *         content:
  *           application/x-www-form-urlencoded:
  *             schema:
  *               type: object
@@ -1185,7 +1214,7 @@ router.post(
  *       tags:
  *         - Comment
  *       security:
- *         - bearerAuth: [] 
+ *         - bearerAuth: []
  *       parameters:
  *         - name: id
  *           in: path

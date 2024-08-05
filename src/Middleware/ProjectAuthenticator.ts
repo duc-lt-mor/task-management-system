@@ -26,6 +26,7 @@ export const authenticateProject = function (permission: number) {
         member?.project_role.is_pm
       ) {
         next();
+        return;
       } else {
         return res.status(403).json({
           message: 'You do not have permission to access.',

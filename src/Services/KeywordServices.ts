@@ -44,7 +44,7 @@ export const search = async function (query: any) {
   };
 
   if (names) {
-    const keywordsArray = names.split(`-`);
+    const keywordsArray = names.split(` `);
     const keywords: any = await Keyword.findAll({
       where: {
         keyword: {

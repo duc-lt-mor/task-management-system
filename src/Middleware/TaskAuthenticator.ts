@@ -51,6 +51,7 @@ export const authenticateUserUpdateTask = function () {
       }
       if (req.user?.system_role_id == Role.ADMIN) {
         next();
+        return;
       }
       let project_id = req.query.project_id || req.body.project_id;
       let member: any = await findMember(req.user?.id, Number(project_id));

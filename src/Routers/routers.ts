@@ -155,7 +155,7 @@ router.delete(
 
 /**
  * @swagger
- * /project/member/{project_id}:
+ * /showMember/{project_id}:
  *    get:
  *       summary: Return a list member of a project
  *       tags:
@@ -181,7 +181,7 @@ router.delete(
  *           description: Internal Server Error
  */
 router.get(
-  '/project/member/:project_id',
+  '/showMember/:project_id',
   authenticator.verifyToken,
   ProjectAut.authenticateProject(5),
   MemberController.show,
@@ -401,7 +401,7 @@ router.put(
 
 /**
  * @swagger
- * /project/role:
+ * /role:
  *    post:
  *       summary: Create a role
  *       tags:
@@ -437,7 +437,7 @@ router.put(
  *           description: Internal Server Error
  */
 router.post(
-  '/project/role',
+  '/role',
   authenticator.verifyToken,
   ProjectAut.authenticateProject(0),
   ...validateRole.validateRole(),
@@ -446,7 +446,7 @@ router.post(
 
 /**
  * @swagger
- * /project/role/{role_id}:
+ * /role/{role_id}:
  *    put:
  *       summary: Update a role
  *       tags:
@@ -486,7 +486,7 @@ router.post(
  *           description: Internal Server Error
  */
 router.put(
-  '/project/role/:role_id',
+  '/role/:role_id',
   authenticator.verifyToken,
   ProjectAut.authenticateProject(0),
   ...validateRole.validateRole(),
@@ -529,7 +529,7 @@ router.put(
  *           description: Internal Server Error
  */
 router.delete(
-  '/project/role/:role_id',
+  '/role/:role_id',
   authenticator.verifyToken,
   ProjectAut.authenticateProject(0),
   ...validateRole.validateDelete(),
@@ -817,42 +817,6 @@ router.get('/user/projects', authenticator.verifyToken, user.showProject);
 
 /**
  * @swagger
- * /search/project:
- *    get:
- *       summary: find a project
- *       tags:
- *         - Search
- *       parameters:
- *         - name: name
- *           in: query
- *           type: string
- *           required: true
- *         - name: key
- *           in: query
- *           type: string
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
- *       responses:
- *         '200':
- *           description: OK
- *         '401':
- *           description: Unauthorized
- *         '403':
- *           description: Forbiden
- *         '500':
- *           description: Internal Server Error
- */
-router.get(
-  '/search/project',
-  authenticator.verifyToken,
-  ProjectController.search,
-);
-
-/**
- * @swagger
  * /search/user:
  *    get:
  *       summary: find a user
@@ -939,47 +903,9 @@ router.post(
 
 /**
  * @swagger
- * /task:
+ * /tasks:
  *    get:
- *       summary: get a task in a project
- *       tags:
- *         - Task
- *       parameters:
- *         - name: id
- *           in: query
- *           type: string
- *           required: true
- *         - name: project_id
- *           in: query
- *           type: string
- *           required: true
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
- *       responses:
- *         '200':
- *           description: OK
- *         '401':
- *           description: Unauthorized
- *         '403':
- *           description: Forbiden
- *         '500':
- *           description: Internal Server Error
- */
-router.get(
-  '/task',
-  authenticator.verifyToken,
-  ProjectAut.authenticateProject(11),
-  task.getTask,
-);
-
-/**
- * @swagger
- * /search/task:
- *    get:
- *       summary: Search task
+ *       summary: Search task in a project
  *       tags:
  *         - Search
  *       parameters:
@@ -1010,45 +936,8 @@ router.get(
  *         '500':
  *           description: Internal Server Error
  */
-router.get('/search/task', search.search);
-
-/**
- * @swagger
- * /project/tasks:
- *    get:
- *       summary: Search task in a project
- *       tags:
- *         - Project
- *       parameters:
- *         - name: project_id
- *           in: query
- *           type: string
- *         - name: names
- *           in: query
- *           type: string
- *         - name: priority
- *           in: query
- *           type: string
- *         - name: assignee_id
- *           in: query
- *           type: string
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
- *       responses:
- *         '200':
- *           description: OK
- *         '401':
- *           description: Unauthorized
- *         '403':
- *           description: Forbiden
- *         '500':
- *           description: Internal Server Error
- */
 router.get(
-  '/project/tasks',
+  '/tasks',
   authenticator.verifyToken,
   ProjectAut.authenticateProject(11),
   task.getTasks,

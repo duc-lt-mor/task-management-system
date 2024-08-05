@@ -8,14 +8,17 @@ export const Login = sequelize.define('logins', {
     autoIncrement: true,
     primaryKey: true,
   },
-  failed_attemp: {
+  failed_attempt: {
     type: DataTypes.INTEGER,
     allowNull: true,
+    defaultValue: 0
   },
-  last_failed_attemp: {
+  last_failed_attempt: {
     type: DataTypes.DATE,
     allowNull: true,
   },
+}, {
+  timestamps: true
 });
 
 User.hasMany(Login, {

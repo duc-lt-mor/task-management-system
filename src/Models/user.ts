@@ -24,6 +24,11 @@ export const User = sequelize.define('users', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+
+  isLocked: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false
+  }
 });
 System_role.hasMany(User, {
   foreignKey: 'system_role_id',

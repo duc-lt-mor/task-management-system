@@ -3,19 +3,25 @@ import { User } from '../Models/user';
 import { UserData } from '../Interfaces/UserInterfaces';
 import createHttpError from 'http-errors';
 import * as tokenService from './TokenService';
+import { Login } from '../Models/login';
 
 export const login = async function (data: any) {
+  
   const { email, password } = data;
   const user: any = await User.findOne({ where: { email } });
   if (!user) {
     const error = createHttpError(401, `Invalid username or password`);
     throw error;
   }
+  const login: any = await Login.findOne({ where: { user_id: user.id } });
 
   const compare: boolean = await bcrypt.compare(password, user.password);
   if (!compare) {
-    const error = createHttpError(401, `Invalid username or password`);
-    throw error;
+    await recordAttempt(user.id, false)
+    if (login.failed_attempt >= 5) {
+      await lock(user)
+      throw createHttpError(403, `Account locked due to too many failed login attempts! Please try again later`)
+    }
   }
   const token: string = tokenService.generateToken({
     id: user.id,
@@ -66,3 +72,22 @@ export const setPhone = async function (email: string, phone: number) {
 export const deleteUser = function (id: number) {
   return User.destroy({ where: { id } });
 };
+
+export const recordAttempt = async function(user_id: number, success: boolean) {
+  const login: any = await Login.findOne({where: {user_id: user_id}})
+
+  if(success) {
+      login.failed_attempt = 0
+      login.last_failed_attempt = null
+  } else {
+      login.failed_attempt += 1
+      login.last_failed_attempt = new Date()
+  }
+
+  await login.save()
+}
+
+export const lock = async function (user: any) {
+  user.isLocked = true
+  await user.save()
+}

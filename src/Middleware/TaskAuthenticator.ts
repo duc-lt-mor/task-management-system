@@ -5,6 +5,7 @@ import { findMember } from '../Services/MemberServices';
 import { Task } from '../Models/task';
 
 export const authenticateUpdateTask = function () {
+<<<<<<< HEAD
   return async (
     req: CustomRequest,
     res: express.Response,
@@ -40,6 +41,8 @@ export const authenticateUpdateTask = function () {
 };
 
 export const authenticateUserUpdateTask = function () {
+=======
+>>>>>>> 6d6bf71c373c27d0b0c6927f43d886df07a5b6c7
   return async (
     req: CustomRequest,
     res: express.Response,
@@ -51,8 +54,13 @@ export const authenticateUserUpdateTask = function () {
       }
       if (req.user?.system_role_id == Role.ADMIN) {
         next();
+        return;
       }
+<<<<<<< HEAD
       let project_id = req.query.project_id || req.body.project_id;
+=======
+      let project_id = req.body.project_id;
+>>>>>>> 6d6bf71c373c27d0b0c6927f43d886df07a5b6c7
       let member: any = await findMember(req.user?.id, Number(project_id));
       let task: any = await Task.findOne({
         where: {

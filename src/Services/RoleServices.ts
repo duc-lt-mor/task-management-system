@@ -34,7 +34,7 @@ export const create = async function (req: express.Request, data: RoleData) {
 
     let role: any = await Project_role.create(
       {
-        name: data.name,
+        name: data.name.toLowerCase(),
         is_pm: false,
         project_id: data.project_id,
         permissions: data.permissions,
@@ -75,7 +75,7 @@ export const edit = async function (
     }
     await Project_role.update(
       {
-        name: data.name,
+        name: data.name.toLowerCase(),
         permissions: data.permissions,
       },
       { where: { id: id }, transaction: t },

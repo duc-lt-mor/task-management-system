@@ -26,7 +26,7 @@ export const create = async function (data: ColumData, req: express.Request) {
     let colum: any = await Colum.create(
       {
         col_type: data.col_type,
-        name: data.name,
+        name: data.name.toLowerCase(),
         col_index: cols + 1,
         project_id: data.project_id,
       },
@@ -47,7 +47,7 @@ export const edit = async function (
 ) {
   const t = await sequelize.transaction();
 
-  let indexs = data.array_index;
+  let indexs = JSON.parse(`[${data.array_index}]`);
   //lay ra cot can sua
   let colum: any = await Colum.findOne({
     where: {
@@ -72,7 +72,7 @@ export const edit = async function (
     }
     await Promise.all([
       await Promise.all(
-        indexs.map(async (inde) =>
+        indexs.map(async (inde: any) =>
           Colum.update(
             { col_index: inde.index },
             { where: { id: inde.id }, transaction: t },
@@ -82,7 +82,7 @@ export const edit = async function (
 
       await Colum.update(
         {
-          name: data.name,
+          name: data.name.toLowerCase(),
           col_type: data.col_type,
         },
         { where: { id: id }, transaction: t },

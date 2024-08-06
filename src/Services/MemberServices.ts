@@ -110,3 +110,17 @@ export const findMember = async function (user_id: number, project_id: number) {
   });
   return member;
 };
+
+export const findById = async function (id: number) {
+  let member: any = await Member.findOne({
+    where: {
+      id: id,
+    },
+    include: [
+      {
+        model: Project_role,
+      },
+    ],
+  });
+  return member;
+};

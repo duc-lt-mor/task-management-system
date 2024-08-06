@@ -1,6 +1,6 @@
 import * as ProjectController from '../Controller/ProjectController';
 import * as ValidateProject from '../Middleware/ValidateProject';
-import * as ColumController from '../Controller/ColumController';
+import * as ColumController from '../Controller/ColumnController';
 import * as ValidateColum from '../Middleware/ValidateColum';
 import * as ValidateMember from '../Middleware/ValidateMember';
 import * as MemberController from '../Controller/MemberController';

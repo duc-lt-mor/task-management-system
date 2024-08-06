@@ -41,6 +41,7 @@ export const search = async function (query: any) {
 
   const filter: any = {
     where: {},
+    
   };
 
   if (names) {

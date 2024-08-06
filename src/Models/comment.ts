@@ -26,7 +26,7 @@ export const Comment = sequelize.define(
       allowNull: true,
     },
 
-    repliesCount: {
+    replies_count: {
       type: DataTypes.INTEGER,
       allowNull: true
     }

@@ -1265,8 +1265,7 @@ router.delete(
 router.get(
   '/task/:id/comment',
   authenticator.verifyToken,
-  CommentAut.authenticateUDComment(),
-  comment.destroy,
+  comment.get,
 );
 
 export default router;

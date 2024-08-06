@@ -61,18 +61,17 @@ export const reply = async function (
 
     // Create the reply comment
     try {
-      const replyComment = await services.reply({ data }, transaction);
-
-      await Comment.increment('repliesCount', {
+      const replyComment = await services.reply(data,transaction)
+      await Comment.increment('replies_count', {
         by: 1,
-        where: { id: data.parent_id },
-        transaction,
+        where: { id: data.parent_id  }
+        , transaction:transaction
       });
 
       await transaction.commit();
       return res.status(200).json(replyComment);
     } catch (error) {
-      throw createHttpError(500, 'Failed to create reply comment');
+      throw createHttpError(500, 'Failed to create reply comment' + error);
     }
   } catch (err) {
     return next(err);

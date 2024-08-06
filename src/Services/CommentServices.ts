@@ -5,8 +5,8 @@ export const generate = async function (data: any, transaction: Transaction) {
   return await Comment.create(data, { transaction });
 };
 
-export const reply = function (data: any, transaction: Transaction) {
-  return Comment.create(data,  { transaction });
+export const reply = async function (data: any, transaction: Transaction) {
+  return await Comment.create(data, { transaction });
 };
 
 export const get = function (task_id: number) {
@@ -18,7 +18,7 @@ export const getReplies = function(data: any) {
 }
 
 export const find = function (id: number) {
-  return Comment.findOne({ where: { id: id } });
+  return Comment.findByPk(id);
 };
 
 export const update = async function (id: number, content: string) {

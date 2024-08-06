@@ -12,7 +12,6 @@ import * as CommentAut from '../Middleware/CommentAuthenticator';
 import * as user from '../Controller/UserController';
 import * as validateRole from '../Middleware/ValidateRole';
 import * as task from '../Controller/TaskController';
-import * as search from '../Controller/KeywordController';
 import { validateTask } from '../Middleware/TaskValidator';
 import * as userValidator from '../Middleware/UserValidator';
 import * as comment from '../Controller/CommentControllers';
@@ -166,11 +165,6 @@ router.delete(
  *           in: path
  *           type: string
  *           required: true
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
  *       responses:
  *         '200':
  *           description: OK
@@ -202,11 +196,6 @@ router.get(
  *           in: path
  *           type: string
  *           required: true
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
  *       responses:
  *         '200':
  *           description: OK
@@ -393,9 +382,9 @@ router.get(
 
 /**
  * @swagger
- * /project/role:
- *    post:
- *       summary: Create a role
+ * /change_owner:
+ *    put:
+ *       summary: Change owner of a project
  *       tags:
  *         - Project
  *       security:
@@ -430,12 +419,12 @@ router.get(
  *         '500':
  *           description: Internal Server Error
  */
-router.post(
-  '/project/role',
+router.put(
+  '/change_owner',
   authenticator.verifyToken,
   ProjectAut.authenticateProject(0),
-  ...validateRole.validateRole(),
-  RoleController.create,
+  ...validateRole.validateChangeOwnerProject(),
+  RoleController.changeProjectOwner,
 );
 
 /**
@@ -868,8 +857,6 @@ router.delete('/user/:userId', authenticator.isServerAdmin, user.deleteUser);
  */
 router.get('/user/projects', authenticator.verifyToken, user.showProject);
 
-
-
 /**
  * @swagger
  * /search/user:
@@ -882,11 +869,6 @@ router.get('/user/projects', authenticator.verifyToken, user.showProject);
  *           in: query
  *           type: string
  *           required: true
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
  *       responses:
  *         '200':
  *           description: OK
@@ -906,38 +888,39 @@ router.get('/search/user', authenticator.verifyToken, user.find);
  *       summary: Create a task in a project
  *       tags:
  *         - Task
- *       parameters:
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
- *         - name: body
- *           in: body
- *           schema:
- *             type: object
- *             properties:
- *               project_id:
- *                 type: string
- *                 example: 1
- *               name:
- *                 type: string
- *                 example: fix bug
- *               description:
- *                 type: string
- *                 example: this is description
- *               priority:
- *                 type: string
- *                 example: high
- *               start_date:
- *                 type: string
- *                 example: 2024-08-09
- *               expected_end_date:
- *                 type: string
- *                 example: 2024-08-19
- *               assignee_id:
- *                 type: string
- *                 example: 11
+ *       security:
+ *         - bearerAuth: []
+ *       requestBody:
+ *         require: true
+ *         content:
+ *           application/x-www-form-urlencoded:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 project_id:
+ *                   type: string
+ *                   example: 1
+ *                 name:
+ *                   type: string
+ *                   example: fix bug
+ *                 description:
+ *                   type: string
+ *                   example: this is description
+ *                 priority:
+ *                   type: string
+ *                   enum:
+ *                     - low
+ *                     - medium
+ *                     - high
+ *                 start_date:
+ *                   type: string
+ *                   example: 2024-08-09
+ *                 expected_end_date:
+ *                   type: string
+ *                   example: 2024-08-19
+ *                 assignee_id:
+ *                   type: string
+ *                   example: 11
  *       responses:
  *         '200':
  *           description: OK
@@ -956,18 +939,18 @@ router.post(
   task.generateTask,
 );
 
-
 /**
  * @swagger
- * /project/tasks:
+ * /tasks:
  *    get:
  *       summary: Search task in a project
  *       tags:
- *         - Project
+ *         - Search
  *       parameters:
  *         - name: project_id
  *           in: query
  *           type: string
+ *           require: true
  *         - name: names
  *           in: query
  *           type: string
@@ -977,11 +960,8 @@ router.post(
  *         - name: assignee_id
  *           in: query
  *           type: string
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
+ *       security:
+ *         - bearerAuth: []
  *       responses:
  *         '200':
  *           description: OK
@@ -993,7 +973,7 @@ router.post(
  *           description: Internal Server Error
  */
 router.get(
-  '/task',
+  '/tasks',
   authenticator.verifyToken,
   ProjectAut.authenticateProject(11),
   task.getTasks,
@@ -1006,19 +986,23 @@ router.get(
  *       summary: Delete a task in a project
  *       tags:
  *         - Task
+ *       security:
+ *         - bearerAuth: []
  *       parameters:
  *         - name: id
  *           in: path
  *           type: string
  *           required: true
- *         - name: project_id
- *           in: query
- *           type: string
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
+ *       requestBody:
+ *         require: true
+ *         content:
+ *           application/x-www-form-urlencoded:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 project_id:
+ *                   type: string
+ *                   example: 1
  *       responses:
  *         '200':
  *           description: OK
@@ -1039,35 +1023,44 @@ router.delete(
 
 /**
  * @swagger
- * /task/{id}:
+ * /update/task/{id}:
  *    put:
- *       summary: Upddate a task in a project as a assignee
+ *       summary: Upddate a task in a project
  *       tags:
  *         - Task
- *       parameters:
- *         - name: id
- *           in: path
- *           type: string
- *           required: true
- *         - name: project_id
- *           in: query
- *           type: string
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
- *         - name: body
- *           in: body
- *           schema:
- *             type: object
- *             properties:
- *               colum_id:
- *                 type: string
- *                 example: 1
- *               real_end_date:
- *                 type: string
- *                 example: 2024-08-29
+ *       security:
+ *         - bearerAuth: []
+ *       requestBody:
+ *         require: true
+ *         content:
+ *           application/x-www-form-urlencoded:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 project_id:
+ *                   type: string
+ *                   example: 1
+ *                 name:
+ *                   type: string
+ *                   example: fix bug
+ *                 description:
+ *                   type: string
+ *                   example: this is description
+ *                 priority:
+ *                   type: string
+ *                   enum:
+ *                     - low
+ *                     - medium
+ *                     - high
+ *                 start_date:
+ *                   type: string
+ *                   example: 2024-08-09
+ *                 expected_end_date:
+ *                   type: string
+ *                   example: 2024-08-19
+ *                 assignee_id:
+ *                   type: string
+ *                   example: 11
  *       responses:
  *         '200':
  *           description: OK
@@ -1082,63 +1075,6 @@ router.put(
   '/task/:id',
   authenticator.verifyToken,
   TaskAut.authenticateUpdateTask(),
-  task.updateAsAssignee,
-);
-
-/**
- * @swagger
- * /update/task/{id}:
- *    put:
- *       summary: Upddate a task in a project as a pm/task creator
- *       tags:
- *         - Task
- *       parameters:
- *         - name: id
- *           in: path
- *           type: string
- *           required: true
- *         - name: project_id
- *           in: query
- *           type: string
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
- *         - name: body
- *           in: body
- *           schema:
- *             type: object
- *             properties:
- *               colum_id:
- *                 type: string
- *                 example: 1
- *               real_end_date:
- *                 type: string
- *                 example: 2024-08-29
- *               start_date:
- *                 type: string
- *                 example: 2024-08-19
- *               assignee_id:
- *                 type: string
- *                 example: 22
- *               priority:
- *                 type: string
- *                 example: high
- *       responses:
- *         '200':
- *           description: OK
- *         '401':
- *           description: Unauthorized
- *         '403':
- *           description: Forbiden
- *         '500':
- *           description: Internal Server Error
- */
-router.put(
-  '/update/task/:id',
-  authenticator.verifyToken,
-  TaskAut.authenticateUpdateTask(),
   task.update,
 );
 
@@ -1149,26 +1085,24 @@ router.put(
  *       summary: Create a comment in a project
  *       tags:
  *         - Comment
- *       parameters:
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
- *         - name: body
- *           in: body
- *           schema:
- *             type: object
- *             properties:
- *               project_id:
- *                 type: string
- *                 example: 1
- *               task_id:
- *                 type: string
- *                 example: 1
- *               content:
- *                 type: string
- *                 example: example comment
+ *       security:
+ *         - bearerAuth: []
+ *       requestBody:
+ *         require: true
+ *         content:
+ *           application/x-www-form-urlencoded:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 project_id:
+ *                   type: string
+ *                   example: 1
+ *                 task_id:
+ *                   type: string
+ *                   example: 1
+ *                 content:
+ *                   type: string
+ *                   example: example comment
  *       responses:
  *         '200':
  *           description: OK
@@ -1193,24 +1127,23 @@ router.post(
  *       summary: Edit a comment in a project
  *       tags:
  *         - Comment
+ *       security:
+ *         - bearerAuth: []
  *       parameters:
  *         - name: id
  *           in: path
  *           type: string
  *           required: true
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
- *         - name: body
- *           in: body
- *           schema:
- *             type: object
- *             properties:
- *               content:
- *                 type: string
- *                 example: example comment
+ *       requestBody:
+ *         require: true
+ *         content:
+ *           application/x-www-form-urlencoded:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 content:
+ *                   type: string
+ *                   example: example comment
  *       responses:
  *         '200':
  *           description: OK
@@ -1235,29 +1168,27 @@ router.put(
  *       summary: Reply a comment in a project
  *       tags:
  *         - Comment
- *       parameters:
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
- *         - name: body
- *           in: body
- *           schema:
- *             type: object
- *             properties:
- *               project_id:
- *                 type: string
- *                 example: 1
- *               content:
- *                 type: string
- *                 example: example comment
- *               task_id:
- *                 type: string
- *                 example: 1
- *               parent_id:
- *                 type: string
- *                 example: 2
+ *       security:
+ *         - bearerAuth: []
+ *       requestBody:
+ *         require: true
+ *         content:
+ *           application/x-www-form-urlencoded:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 project_id:
+ *                   type: string
+ *                   example: 1
+ *                 content:
+ *                   type: string
+ *                   example: example comment
+ *                 task_id:
+ *                   type: string
+ *                   example: 1
+ *                 parent_id:
+ *                   type: string
+ *                   example: 2
  *       responses:
  *         '200':
  *           description: OK
@@ -1282,16 +1213,13 @@ router.post(
  *       summary: Delete a comment in a project
  *       tags:
  *         - Comment
+ *       security:
+ *         - bearerAuth: []
  *       parameters:
  *         - name: id
  *           in: path
  *           type: string
  *           required: true
- *         - name: authorization
- *           in: header
- *           type: string
- *           format: bearer
- *           description: Bearer token for authentication
  *       responses:
  *         '200':
  *           description: OK
@@ -1307,6 +1235,38 @@ router.delete(
   authenticator.verifyToken,
   CommentAut.authenticateUDComment(),
   comment.destroy,
+);
+
+
+/**
+ * @swagger
+ * /task/{id}/comment:
+ *    get:
+ *       summary: Get comment in a task
+ *       tags:
+ *         - Task
+ *       security:
+ *         - bearerAuth: []
+ *       parameters:
+ *         - name: id
+ *           in: path
+ *           type: string
+ *           required: true
+ *       responses:
+ *         '200':
+ *           description: OK
+ *         '401':
+ *           description: Unauthorized
+ *         '403':
+ *           description: Forbiden
+ *         '500':
+ *           description: Internal Server Error
+ */
+router.get(
+  '/task/:id/comment',
+  authenticator.verifyToken,
+  CommentAut.authenticateUDComment(),
+  comment.get,
 );
 
 export default router;

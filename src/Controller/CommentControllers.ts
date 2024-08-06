@@ -42,7 +42,7 @@ export const reply = async function (
   const transaction = await sequelize.transaction();
   try {
     const data = {
-      task_id: req.body.task_id,
+      task_id: Number(req.body.task_id),
       parent_id: req.body.parent_id,
       user_id: req.user?.id,
       content: req.body.content,
@@ -61,9 +61,9 @@ export const reply = async function (
 
     // Create the reply comment
     try {
-      const replyComment = await services.reply({ data }, transaction);
+      const replyComment = await services.reply(data, transaction);
 
-      await Comment.increment('repliesCount', {
+      await Comment.increment('replies_count', {
         by: 1,
         where: { id: data.parent_id },
         transaction,
@@ -72,9 +72,11 @@ export const reply = async function (
       await transaction.commit();
       return res.status(200).json(replyComment);
     } catch (error) {
+      console.log(error)
       throw createHttpError(500, 'Failed to create reply comment');
     }
   } catch (err) {
+    await transaction.rollback()
     return next(err);
   }
 };
@@ -170,7 +172,7 @@ export const destroy = async function (
         const parentComment: any = await services.find(comment.parent_id);
 
         if (parentComment) {
-          await Comment.increment('repliesCount', {
+          await Comment.increment('replies_count', {
             by: -1,
             where: { id: parentComment.id },
           });

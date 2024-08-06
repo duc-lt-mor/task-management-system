@@ -20,18 +20,20 @@ export const create = async function (req: express.Request, data: RoleData) {
   const t = await sequelize.transaction();
 
   try {
-    const errors = validationResult(req);
+    const errors: any = validationResult(req);
     if (!errors.isEmpty()) {
       const errorMessages = errors.array().map((e: any) => e.msg);
-      const error = createHttpError(
-        400,
-        JSON.stringify(errorMessages, null, 2),
-      );
-      throw error;
+      if (errorMessages != 'Invalid value') {
+        const error = createHttpError(
+          400,
+          JSON.stringify(errorMessages, null, 2),
+        );
+        throw error;
+      }
     }
     let role: any = await Project_role.create(
       {
-        name: data.name,
+        name: data.name.toLowerCase(),
         is_pm: false,
         project_id: data.project_id,
         permissions: data.permissions,
@@ -59,19 +61,20 @@ export const edit = async function (
   }
 
   try {
-    const errors = validationResult(req);
-
+    const errors: any = validationResult(req);
     if (!errors.isEmpty()) {
       const errorMessages = errors.array().map((e: any) => e.msg);
-      const error = createHttpError(
-        400,
-        JSON.stringify(errorMessages, null, 2),
-      );
-      throw error;
+      if (errorMessages != 'Invalid value') {
+        const error = createHttpError(
+          400,
+          JSON.stringify(errorMessages, null, 2),
+        );
+        throw error;
+      }
     }
     let role_updated: any = await Project_role.update(
       {
-        name: data.name,
+        name: data.name.toLowerCase(),
         permissions: data.permissions,
       },
       { where: { id: id }, transaction: t },

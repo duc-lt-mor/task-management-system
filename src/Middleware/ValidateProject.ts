@@ -1,15 +1,14 @@
 import { Project } from '../Models/project';
 import { Op } from 'sequelize';
 import { body } from 'express-validator';
-import * as express from 'express'
 
 export const validateCreate = function () {
   return [
     body('name').notEmpty().withMessage("Please enter project name").trim().custom(async (name) => {
-
+      
       let project_found = await Project.findOne({
         where: {
-          name: name,
+          name: name.toLowerCase(),
         },
       });
 
@@ -22,7 +21,7 @@ export const validateCreate = function () {
 
       let project_found = await Project.findOne({
         where: {
-          key: key,
+          key: key.toLowerCase(),
         },
       });
 

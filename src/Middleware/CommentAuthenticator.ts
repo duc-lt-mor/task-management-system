@@ -17,6 +17,7 @@ export const authenticateCreateComment = function (permission: number) {
       }
       if(req.user.system_role_id == Role.ADMIN ) {
         next();
+        return;
       }
 
       let member: any = await findMember(req.user?.id, Number(req.body.project_id))
@@ -29,7 +30,7 @@ export const authenticateCreateComment = function (permission: number) {
 
       if (
         member?.project_role.permissions.includes(permission) ||
-        member?.project_role.permissions.includes(0)
+        member?.project_role.is_pm
       ) {
         next();
       } else if (task?.assignee_id == req.user.id) {
@@ -57,6 +58,7 @@ export const authenticateUDComment = function (permission: number) {
       }
       if (req.user?.system_role_id == Role.ADMIN) {
         next();
+        return;
       } 
       let comment: any = await Comment.findOne({
         where: {

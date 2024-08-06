@@ -8,10 +8,16 @@ export const validateRole = function () {
     body('name')
       .notEmpty()
       .withMessage('Please enter role name')
-      .custom((name) => {
-        let lower_name: string = name.toLowerCase();
-        if (lower_name == 'default') {
-          throw new Error('this name is not availiable');
+      .custom(async (name) => {
+       
+        let role: any = await Project_role.findOne({
+          where: {
+            name: name.toLowerCase()
+          }
+        }) 
+
+        if (role) {
+          throw new Error('this name is already exit');
         }
       }),
     body('permissions')
@@ -45,7 +51,7 @@ export const validateDelete = function () {
         },
       });
 
-      if (role.name == 'default' || role.is_pm) {
+      if (role.is_pm) {
         throw new Error('you can not delete this role');
       }
       //dem so user co role can xoa

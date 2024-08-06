@@ -4,7 +4,7 @@ import * as Role from '../Constant/Roles';
 import { findMember } from '../Services/MemberServices';
 import { Task } from '../Models/task';
 
-export const authenticateUpdateTask = function (permission: number) {
+export const authenticateUpdateTask = function () {
   return async (
     req: CustomRequest,
     res: express.Response,

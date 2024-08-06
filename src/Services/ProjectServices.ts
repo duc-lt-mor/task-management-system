@@ -35,8 +35,8 @@ export const create = async function (req: CustomRequest, data: ProjectData) {
 
     let project: any = await Project.create(
       {
-        name: data.name,
-        key: data.key,
+        name: data.name.toLowerCase(),
+        key: data.key.toUpperCase(),
         decripstion: data.decriptstion,
         creator_id: req.user?.id,
         expected_end_date: data.expected_end_date,
@@ -136,7 +136,7 @@ export const edit = async function (
     }
     await Project.update(
       {
-        name: data.name,
+        name: data.name.toLowerCase(),
         decripstion: data.decriptstion,
         expected_end_date: data.expected_end_date,
       },

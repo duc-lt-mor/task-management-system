@@ -26,7 +26,7 @@ export const create = async function (data: ColumData, req: express.Request) {
     let colum: any = await Colum.create(
       {
         col_type: data.col_type,
-        name: data.name,
+        name: data.name.toLowerCase(),
         col_index: cols + 1,
         project_id: data.project_id,
       },
@@ -82,7 +82,7 @@ export const edit = async function (
 
       await Colum.update(
         {
-          name: data.name,
+          name: data.name.toLowerCase(),
           col_type: data.col_type,
         },
         { where: { id: id }, transaction: t },

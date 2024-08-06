@@ -34,7 +34,7 @@ export const addKeyword = async function (
 };
 
 export const search = async function (query: any) {
-  const { names, priority, status, assignee_id, project_id } = query;
+  const { names, priority, status, assignee_id, project_id, startDate, endDate } = query;
   if (!names && !priority && !status && !assignee_id && !project_id) {
     return await Task.findAll();
   }
@@ -98,6 +98,12 @@ export const search = async function (query: any) {
 
   if (project_id) {
     filter.where.project_id = project_id;
+  }
+
+  if (startDate && endDate) {
+    filter.where.createdAt = {
+      [Op.between]: [new Date(startDate), new Date(endDate)],
+    };
   }
 
   const tasks: any = await Task.findAll(filter);

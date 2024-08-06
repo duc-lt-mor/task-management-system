@@ -9,9 +9,13 @@ export const reply = function (data: any, transaction: Transaction) {
   return Comment.create(data,  { transaction });
 };
 
-export const get = async () => {
-  return await Comment.findAll();
+export const get = function () {
+  return Comment.findAll();
 };
+
+export const getReplies = function(data: any) {
+  return Comment.findAll(data)
+}
 
 export const find = function (id: number) {
   return Comment.findOne({ where: { id: id } });

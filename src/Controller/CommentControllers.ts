@@ -61,11 +61,11 @@ export const reply = async function (
 
     // Create the reply comment
     try {
-      const replyComment = await services.reply({data},transaction);
+      const replyComment = await services.reply({ data }, transaction);
 
       await Comment.increment('repliesCount', {
         by: 1,
-        where: {id: data.parent_id},
+        where: { id: data.parent_id },
         transaction,
       });
 
@@ -112,6 +112,19 @@ export const find = async function (
   }
 };
 
+export const getReplies = async function (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
+) {
+  const parent_id = req.params.id;
+  const replies = await services.getReplies(parent_id);
+  if (!replies) {
+    return [];
+  }
+  return res.status(200).json(replies);
+};
+
 export const update = async function (
   req: express.Request,
   res: express.Response,
@@ -152,8 +165,20 @@ export const destroy = async function (
         `You are not authorized to deleted this comment`,
       );
     } else {
-      await services.destroy(id);
-      return res.status(200).json({ message: `Deleted` });
+      if (comment.parent_id !== null) {
+        const parentComment: any = await services.find(comment.parent_id);
+
+        if (parentComment) {
+          await Comment.increment('repliesCount', {
+            by: -1,
+            where: { id: parentComment.id },
+          });
+
+        }
+      }
+
+      await services.destroy(id)
+      return res.status(200).json(`Deleted`)
     }
   } catch (err) {
     return next(err);

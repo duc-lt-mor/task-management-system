@@ -7,19 +7,6 @@ export const validateRole = function () {
   return [
     body('name')
       .notEmpty()
-<<<<<<< HEAD
-      .withMessage('please enter at least one permission')
-      .custom((permissions) => {
-        let err = [];
-        for (let p of permissions) {
-          if (!PERMISSIONS.includes(Number(p))) {
-            err.push(p + ' is not exit in permissions');
-          }
-          if (permissions.includes(PM_PERMISSIONS)) {
-            err.push('you can have pm permission');
-          }
-        }
-=======
       .withMessage('Please enter role name')
       .custom(async (name) => {
        
@@ -47,7 +34,6 @@ export const validateRole = function () {
         if (arr.includes(PM_PERMISSIONS)) {
           err.push('you can not have pm permission');
         }
->>>>>>> 6d6bf71c373c27d0b0c6927f43d886df07a5b6c7
         if (err.length > 0) {
           throw err;
         }

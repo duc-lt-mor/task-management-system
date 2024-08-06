@@ -3,6 +3,9 @@ import { User } from '../Models/user';
 import { UserData } from '../Interfaces/UserInterfaces';
 import createHttpError from 'http-errors';
 import * as tokenService from './TokenService';
+import { Member } from '../Models/member';
+import { Project } from '../Models/project';
+import { Op } from 'sequelize';
 
 export const login = async function (data: any) {
   const { email, password } = data;
@@ -17,6 +20,7 @@ export const login = async function (data: any) {
     const error = createHttpError(401, `Invalid username or password`);
     throw error;
   }
+
   const token: string = tokenService.generateToken({
     id: user.id,
     email: user.email,
@@ -32,22 +36,33 @@ export const register = async function (data: UserData) {
     name: data.name,
     email: data.email,
     password: hashedPassword,
-    systemRoleID: data.systemRoleID,
+    phone_number: data.phone_number,
+    system_role_id: data.system_role_id,
   });
   if (user) {
-    return user
-  } else{ 
+    return user;
+  } else {
     const error = createHttpError(401, `Can't create user`);
-    throw error
+    throw error;
   }
 };
 
 export const find = function (email: string) {
-  return User.findOne({ where: { email } });
+  return User.findOne({
+    where: {
+      email: {
+        [Op.like]: `${email}%`,
+      },
+    },
+  });
 };
 
 export const get = function () {
-  return User.findAll();
+  return User.findAll({
+    where: {
+      system_role_id: 2,
+    },
+  });
 };
 
 export const setPhone = async function (email: string, phone: number) {
@@ -55,7 +70,7 @@ export const setPhone = async function (email: string, phone: number) {
 
   if (!user) {
     const error = createHttpError(404, `User not found`);
-    throw error
+    throw error;
   }
 
   Object.assign(user, phone);
@@ -65,4 +80,23 @@ export const setPhone = async function (email: string, phone: number) {
 
 export const deleteUser = function (id: number) {
   return User.destroy({ where: { id } });
+};
+
+export const showProject = async (id: number) => {
+  let projects = await Member.findAll({
+    where: {
+      user_id: id,
+    },
+    include: [
+      {
+        model: Project,
+      },
+    ],
+  });
+
+  if (!projects) {
+    throw new Error('you do not in any project');
+  } else {
+    return projects;
+  }
 };

@@ -1291,9 +1291,9 @@ router.get('/task/:id/comment', authenticator.verifyToken, comment.get);
  *           description: Internal Server Error
  */
 router.get(
-  '/project/:project_id/finishtask',
+  '/project/:id/finishtask',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject,
+  ProjectAut.authenticateProject(11),
   Statistic.showFinishOnDateTask,
 );
 
@@ -1323,9 +1323,9 @@ router.get(
  *           description: Internal Server Error
  */
 router.get(
-  '/project/:project_id/unfinishtask',
+  '/project/:id/unfinishtask',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject,
+  ProjectAut.authenticateProject(11),
   Statistic.showUnfinishedTask,
 );
 
@@ -1355,9 +1355,9 @@ router.get(
  *           description: Internal Server Error
  */
 router.get(
-  '/project/:project_id/finishtask',
+  '/project/:id/finishlatetask',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject,
+  ProjectAut.authenticateProject(11),
   Statistic.showBehindDateTask,
 );
 

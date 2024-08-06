@@ -17,7 +17,7 @@ export const showFinishOnDateTask = async function (id: number) {
   let onDateTask: any = await Task.findAll({
     where: {
       expected_end_date: {
-        [Op.gte]: `real_end_date`
+        [Op.gte]: Sequelize.col(`real_end_date`)
       },
       project_id: id
     },
@@ -29,7 +29,8 @@ export const showFinishOnDateTask = async function (id: number) {
 export const showUnfinishedTask = async function (id: number) {
   const unfinishedTasks = await Task.findAll({
     where: {
-      real_end_date: null
+      real_end_date: null,
+      project_id: id
     }
   })
 

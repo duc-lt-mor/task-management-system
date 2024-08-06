@@ -11,7 +11,7 @@ export const showFinishOnDateTask = async function (
     let total_ondate_task = await Statistic.showFinishOnDateTask(
       Number(req.params.id),
     );
-    let b: number = (total_ondate_task.length() / total_task) * 100;
+    let b: number = (total_ondate_task.length / total_task) * 100;
     res.status(200).json({
       message: 'phan tram so tac hoan thanh dung han ' + b.toFixed(2),
       total_ondate_task,
@@ -31,7 +31,7 @@ export const showUnfinishedTask = async function (
     const unfinished: any = await Statistic.showUnfinishedTask(
       Number(req.params.id),
     );
-    let percent: number = (unfinished.length() / total_task) * 100;
+    let percent: number = (unfinished.length / total_task) * 100;
     if (unfinished) {
       return res
         .status(200)
@@ -55,7 +55,7 @@ export const showBehindDateTask = async function (
     const lateTasks: any = await Statistic.showFinishBehindDateTask(
       Number(req.params.id),
     );
-    let percent: number = (lateTasks.length() / total_task) * 100;
+    let percent: number = (lateTasks.length / total_task) * 100;
     if (lateTasks) {
       return res
         .status(200)

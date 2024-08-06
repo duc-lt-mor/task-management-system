@@ -1,8 +1,6 @@
 import { Project } from '../Models/project';
 import { Op } from 'sequelize';
 import { body } from 'express-validator';
-<<<<<<< HEAD
-import * as express from 'express';
 
 export const validateCreate = function () {
   return [
@@ -13,27 +11,13 @@ export const validateCreate = function () {
       .custom(async (name) => {
         let project_found = await Project.findOne({
           where: {
-            name: name,
+            name: name.toLowerCase(),
           },
         });
-
         if (project_found) {
           throw new Error('project name already been used');
         }
       }),
-=======
-
-export const validateCreate = function () {
-  return [
-    body('name').notEmpty().withMessage("Please enter project name").trim().custom(async (name) => {
-      
-      let project_found = await Project.findOne({
-        where: {
-          name: name.toLowerCase(),
-        },
-      });
->>>>>>> 45a82ac3094324623631b68effbe6a59e4308d7b
-
     body('key')
       .notEmpty()
       .withMessage('Please enter project key')
@@ -41,29 +25,14 @@ export const validateCreate = function () {
       .custom(async (key) => {
         let project_found = await Project.findOne({
           where: {
-            key: key,
+            key: key.toLowerCase(),
           },
         });
 
-<<<<<<< HEAD
         if (project_found) {
           throw new Error('project key already been used');
         }
       }),
-=======
-    body('key').notEmpty().withMessage('Please enter project key').trim().custom(async (key) => {
-
-      let project_found = await Project.findOne({
-        where: {
-          key: key.toLowerCase(),
-        },
-      });
-
-      if (project_found) {
-        throw new Error('project key already been used');
-      }
-    }),
->>>>>>> 45a82ac3094324623631b68effbe6a59e4308d7b
 
     body('expected_end_date').custom(async (expected_end_date) => {
       validateExpectED(expected_end_date);

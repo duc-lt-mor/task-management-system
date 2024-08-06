@@ -7,8 +7,6 @@ export const validateRole = function () {
   return [
     body('name')
       .notEmpty()
-<<<<<<< HEAD
-=======
       .withMessage('Please enter role name')
       .custom(async (name) => {
        
@@ -24,7 +22,6 @@ export const validateRole = function () {
       }),
     body('permissions')
       .notEmpty()
->>>>>>> 45a82ac3094324623631b68effbe6a59e4308d7b
       .withMessage('please enter at least one permission')
       .custom((permissions) => {
         let err = [];
@@ -39,10 +36,6 @@ export const validateRole = function () {
           err.push('you can not have pm permission');
         }
         if (err.length > 0) {
-<<<<<<< HEAD
-
-=======
->>>>>>> 45a82ac3094324623631b68effbe6a59e4308d7b
           throw err;
         }
       }),

@@ -62,11 +62,7 @@ export const authenticateUDComment = function () {
       if (req.user?.system_role_id == Role.ADMIN) {
         next();
         return;
-<<<<<<< HEAD
-      }
-=======
       } 
->>>>>>> 45a82ac3094324623631b68effbe6a59e4308d7b
       let comment: any = await Comment.findOne({
         where: {
           id: req.params.id,

@@ -1,5 +1,5 @@
 import { Comment } from '../Models/comment';
-import { Transaction } from 'sequelize';
+import { Transaction, where } from 'sequelize';
 
 export const generate = async function (data: any, transaction: Transaction) {
   return await Comment.create(data, { transaction });
@@ -9,8 +9,8 @@ export const reply = function (data: any, transaction: Transaction) {
   return Comment.create(data,  { transaction });
 };
 
-export const get = function () {
-  return Comment.findAll();
+export const get = function (task_id: number) {
+  return Comment.findAll({where: {parent_id: null, task_id: task_id}});
 };
 
 export const getReplies = function(data: any) {

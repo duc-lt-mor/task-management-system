@@ -15,6 +15,7 @@ import * as task from '../Controller/TaskController';
 import { validateTask } from '../Middleware/TaskValidator';
 import * as userValidator from '../Middleware/UserValidator';
 import * as comment from '../Controller/CommentControllers';
+import * as Statistic from '../Controller/StatisticController';
 import express from 'express';
 const router = express.Router();
 
@@ -150,6 +151,7 @@ router.delete(
   ProjectAut.authenticateProject(0),
   ProjectController.destroy,
 );
+router.get('/project/statistis/:project_id', Statistic.showFinishOnDateTask);
 
 /**
  * @swagger
@@ -1237,7 +1239,6 @@ router.delete(
   comment.destroy,
 );
 
-
 /**
  * @swagger
  * /task/{id}/comment:
@@ -1262,10 +1263,102 @@ router.delete(
  *         '500':
  *           description: Internal Server Error
  */
+router.get('/task/:id/comment', authenticator.verifyToken, comment.get);
+
+
+/**
+ * @swagger
+ * /project/{id}/finishtask:
+ *    get:
+ *       summary: Statisticalize finished task in a project
+ *       tags:
+ *         - Project
+ *       security:
+ *         - bearerAuth: []
+ *       parameters:
+ *         - name: id
+ *           in: path
+ *           type: string
+ *           required: true
+ *       responses:
+ *         '200':
+ *           description: OK
+ *         '401':
+ *           description: Unauthorized
+ *         '403':
+ *           description: Forbiden
+ *         '500':
+ *           description: Internal Server Error
+ */
 router.get(
-  '/task/:id/comment',
+  '/project/:project_id/finishtask',
   authenticator.verifyToken,
-  comment.get,
+  ProjectAut.authenticateProject,
+  Statistic.showFinishOnDateTask,
+);
+
+
+/**
+ * @swagger
+ * /project/{id}/unfinishtask:
+ *    get:
+ *       summary: Statisticalize unfinished task in a project
+ *       tags:
+ *         - Project
+ *       security:
+ *         - bearerAuth: []
+ *       parameters:
+ *         - name: id
+ *           in: path
+ *           type: string
+ *           required: true
+ *       responses:
+ *         '200':
+ *           description: OK
+ *         '401':
+ *           description: Unauthorized
+ *         '403':
+ *           description: Forbiden
+ *         '500':
+ *           description: Internal Server Error
+ */
+router.get(
+  '/project/:project_id/unfinishtask',
+  authenticator.verifyToken,
+  ProjectAut.authenticateProject,
+  Statistic.showUnfinishedTask,
+);
+
+
+/**
+ * @swagger
+ * /project/{id}/finishlatetask:
+ *    get:
+ *       summary: Statisticalize finished late task in a project
+ *       tags:
+ *         - Project
+ *       security:
+ *         - bearerAuth: []
+ *       parameters:
+ *         - name: id
+ *           in: path
+ *           type: string
+ *           required: true
+ *       responses:
+ *         '200':
+ *           description: OK
+ *         '401':
+ *           description: Unauthorized
+ *         '403':
+ *           description: Forbiden
+ *         '500':
+ *           description: Internal Server Error
+ */
+router.get(
+  '/project/:project_id/finishtask',
+  authenticator.verifyToken,
+  ProjectAut.authenticateProject,
+  Statistic.showBehindDateTask,
 );
 
 export default router;

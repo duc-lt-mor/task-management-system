@@ -1,14 +1,14 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../Config/config';
-export const Role = sequelize.define('roles', {
+export const Project_role = sequelize.define('project_roles', {
   id: {
     type: DataTypes.INTEGER,
     allowNull: false,
     autoIncrement: true,
     primaryKey: true,
   },
-  key: {
-    type: DataTypes.STRING,
+  is_pm: {
+    type: DataTypes.BOOLEAN,
     allowNull: false,
   },
   name: {
@@ -19,4 +19,11 @@ export const Role = sequelize.define('roles', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  project_id: {
+    type: DataTypes.INTEGER
+  },
+  permissions: {
+    type: DataTypes.JSON,
+    allowNull: false
+  }
 });

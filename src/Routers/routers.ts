@@ -1072,7 +1072,7 @@ router.delete(
  *           description: Internal Server Error
  */
 router.put(
-  '/update/task/:id',
+  '/task/:id',
   authenticator.verifyToken,
   TaskAut.authenticateUpdateTask(),
   task.update,
@@ -1232,6 +1232,38 @@ router.post(
  */
 router.delete(
   '/comment/:id',
+  authenticator.verifyToken,
+  CommentAut.authenticateUDComment(),
+  comment.destroy,
+);
+
+
+/**
+ * @swagger
+ * /task/{id}/comment:
+ *    get:
+ *       summary: Get comment in a task
+ *       tags:
+ *         - Task
+ *       security:
+ *         - bearerAuth: []
+ *       parameters:
+ *         - name: id
+ *           in: path
+ *           type: string
+ *           required: true
+ *       responses:
+ *         '200':
+ *           description: OK
+ *         '401':
+ *           description: Unauthorized
+ *         '403':
+ *           description: Forbiden
+ *         '500':
+ *           description: Internal Server Error
+ */
+router.get(
+  '/task/:id/comment',
   authenticator.verifyToken,
   CommentAut.authenticateUDComment(),
   comment.destroy,

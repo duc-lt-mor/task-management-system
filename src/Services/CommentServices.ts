@@ -9,8 +9,13 @@ export const reply = function (data: any, transaction: Transaction) {
   return Comment.create(data,  { transaction });
 };
 
-export const get = function () {
-  return Comment.findAll();
+export const get = function (id: number) {
+  return Comment.findAll({
+    where: {
+      parent_id: null,
+      task_id: id 
+    }
+  });
 };
 
 export const getReplies = function(data: any) {

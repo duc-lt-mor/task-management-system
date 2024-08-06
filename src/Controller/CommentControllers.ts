@@ -84,7 +84,8 @@ export const get = async function (
   next: express.NextFunction,
 ) {
   try {
-    const comments = await services.get();
+    const id = Number(req.params.id)
+    const comments = await services.get(id);
     if (!comments) {
       const error = createHttpError(400, `Could not get comments`);
       throw error;

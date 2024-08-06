@@ -234,7 +234,7 @@ router.get(
  *                   example: 1
  *                 project_role_id:
  *                   type: string
- *                   example: this is decripstion of project 1
+ *                   example: 1
  *                 add_mem:
  *                   type: string
  *                   example: abc@gmail.com
@@ -329,7 +329,7 @@ router.delete(
  *                   example: 1
  *                 project_role_id:
  *                   type: string
- *                   example: this is decripstion of project 1
+ *                   example: 1
  *               required:
  *                 - project_id
  *                 - project_role_id

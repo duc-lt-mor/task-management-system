@@ -70,7 +70,7 @@ export const create = async function (req: CustomRequest, data: ProjectData) {
       ],
       { transaction: t },
     );
-    // khoi tao 2 role mac dinh
+    // khoi tao 3 role mac dinh
     let project_role: any = await Project_role.bulkCreate(
       [
         {
@@ -82,13 +82,13 @@ export const create = async function (req: CustomRequest, data: ProjectData) {
         {
           is_pm: false,
           name: 'Leader',
-          permissions: [8, 9, 10, 11, 12],
+          permissions: [1, 5, 8, 9, 10, 11, 12, 13, 14, 15],
           project_id: project.id,
         },
         {
           is_pm: false,
           name: 'User',
-          permissions: [],
+          permissions: [1, 5, 11],
           project_id: project.id,
         },
       ],

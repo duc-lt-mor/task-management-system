@@ -18,7 +18,7 @@ export const authenticateUpdateTask = function () {
         next();
         return;
       }
-      let project_id = req.query.project_id || req.body.project_id;
+      let project_id = req.body.project_id;
       let member: any = await findMember(req.user?.id, Number(project_id));
       let task: any = await Task.findOne({
         where: {
@@ -41,4 +41,3 @@ export const authenticateUpdateTask = function () {
     }
   };
 };
-

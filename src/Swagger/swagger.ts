@@ -10,16 +10,18 @@ export const options = {
     },
     components: {
       securitySchemes: {
-          bearerAuth: {
-              type: 'http',
-              scheme: 'bearer',
-              bearerFormat: 'JWT',
-          }
-      }
-  },
-  security: [{
-      bearerAuth: []
-  }],
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
+    },
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
     servers: [
       {
         url: 'http://localhost:3000',

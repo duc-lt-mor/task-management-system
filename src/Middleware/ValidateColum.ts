@@ -5,31 +5,32 @@ import { body, param } from 'express-validator';
 
 export const validateCreate = function () {
   return [
-    body('name').notEmpty().trim().custom(async (name, { req }) => {
-  
-      let colum: any = await Colum.findOne({
-        where: {
-          name: name,
-          project_id: Number(req.body.project_id),
-        },
-      });
+    body('name')
+      .notEmpty()
+      .trim()
+      .custom(async (name, { req }) => {
+        
+        let colum: any = await Colum.findOne({
+          where: {
+            name: name.toLowerCase(),
+            project_id: Number(req.body.project_id),
+          },
+        });
 
-      if (colum) {
-        throw new Error('name already been used');
-      }
-    }),
+        if (colum) {
+          throw new Error('name already been used');
+        }
+      }),
   ];
 };
 
 export const validateUpdate = function () {
   return [
     body('project_id').custom(async (project_id, { req }) => {
-      
-      if (isNaN(req.body.project_id) || !req.body.project_id) {
+      if (isNaN(req.body.project_id)) {
         throw new Error('Project ID must be a number');
       }
 
-      
       const check_name = await Colum.findOne({
         where: {
           name: req.body.name,
@@ -51,7 +52,7 @@ export const validateDelete = function () {
       let id: number = Number(col_id);
 
       //dem so task hien co trong mot cot
-      let tasks_count: any =  Task.count({
+      let tasks_count: any = Task.count({
         where: {
           colum_id: id,
         },
@@ -64,7 +65,7 @@ export const validateDelete = function () {
         },
       });
 
-     let [tasks, colum] = await Promise.all([tasks_count, colum_found]);
+      let [tasks, colum] = await Promise.all([tasks_count, colum_found]);
 
       if (colum?.col_type != 'custom') {
         //kiem tra xem cot can xoa co phai cot default khong

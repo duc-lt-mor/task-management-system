@@ -16,3 +16,4 @@ export const generateToken = function (user: UserPayload) {
   
     return jwt.sign(payload, JWT_SECRET_KEY, options);
   };
+  

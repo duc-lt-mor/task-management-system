@@ -5,9 +5,26 @@ import { Project_role } from '../Models/project_role';
 
 export const validateRole = function () {
   return [
-    body('name').notEmpty().withMessage('Please enter role name'),
+    body('name')
+      .notEmpty()
+<<<<<<< HEAD
+=======
+      .withMessage('Please enter role name')
+      .custom(async (name) => {
+       
+        let role: any = await Project_role.findOne({
+          where: {
+            name: name.toLowerCase()
+          }
+        }) 
+
+        if (role) {
+          throw new Error('this name is already exit');
+        }
+      }),
     body('permissions')
       .notEmpty()
+>>>>>>> 45a82ac3094324623631b68effbe6a59e4308d7b
       .withMessage('please enter at least one permission')
       .custom((permissions) => {
         let err = [];
@@ -22,7 +39,10 @@ export const validateRole = function () {
           err.push('you can not have pm permission');
         }
         if (err.length > 0) {
+<<<<<<< HEAD
 
+=======
+>>>>>>> 45a82ac3094324623631b68effbe6a59e4308d7b
           throw err;
         }
       }),
@@ -33,7 +53,15 @@ export const validateDelete = function () {
   return [
     param('role_id').custom(async (role_id) => {
       let id: number = Number(role_id);
+      let role: any = await Project_role.findOne({
+        where: {
+          id: id,
+        },
+      });
 
+      if (role.is_pm) {
+        throw new Error('you can not delete this role');
+      }
       //dem so user co role can xoa
       let users: number = await Member.count({
         where: {

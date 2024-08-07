@@ -5,7 +5,17 @@ export const validateTask = function () {
     body(`name`).notEmpty().withMessage(`Please enter task name`),
     body(`description`).notEmpty().withMessage(`Please enter task description`),
     body(`priority`).notEmpty().withMessage(`Please insert task priority`),
-    body('start_date').notEmpty().withMessage('Please enter the start date'),
+    body('start_date')
+      .notEmpty()
+      .withMessage('Please enter the start date')
+      .custom((value) => {
+        const start_date = new Date(value)
+        const current_date = new Date()
+        if (start_date.getDate() <= current_date.getDate()) {
+          throw new Error('Start date must be set after the current date and time')
+        }
+        return true
+      }),
     body('expected_end_date')
       .notEmpty()
       .withMessage('Please enter the desired completion date')

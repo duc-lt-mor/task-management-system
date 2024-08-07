@@ -6,6 +6,7 @@ import { Colum } from '../Models/colum';
 import { TaskKeyword } from '../Models/task_keyword';
 import { sequelize } from '../Config/config';
 import * as keywords from '../Services/KeywordServices';
+import { validationResult } from 'express-validator';
 
 export const generateTask = async function (
   req: authenticator.CustomRequest,
@@ -14,6 +15,16 @@ export const generateTask = async function (
 ) {
   const transaction = await sequelize.transaction();
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const errorMessages = errors.array().map((e: any) => e.msg);
+      const error = createHttpError(
+        400,
+        JSON.stringify(errorMessages, null, 2),
+      );
+      throw error;
+    }
+
     // Ensure user is authenticated
     if (!req.user) {
       return res.status(401).json({ message: 'User not authenticated' });
@@ -35,7 +46,7 @@ export const generateTask = async function (
       name: req.body.name,
       description: req.body.description,
       creator_id,
-      assignee_id: req.body.assignee_id,
+      assignee_id: Number(req.body.assignee_id),
       priority: req.body.priority,
       start_date: req.body.start_date,
       expected_end_date: req.body.expected_end_date,
@@ -65,7 +76,7 @@ export const generateTask = async function (
       .json({ message: 'Task generated successfully', task });
   } catch (err) {
     // await transaction.rollback();
-     next(err);
+    next(err);
   }
 };
 
@@ -99,7 +110,7 @@ export const getTasks = async function (
   try {
     let tasks: any = await keywords.search(req.query);
     if (tasks.length == 0) {
-      return res.send(`[]`)
+      return res.send(`[]`);
     } else {
       return res.status(200).json(tasks);
     }
@@ -143,6 +154,16 @@ export const update = async function (
   next: express.NextFunction,
 ) {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const errorMessages = errors.array().map((e: any) => e.msg);
+      const error = createHttpError(
+        400,
+        JSON.stringify(errorMessages, null, 2),
+      );
+      throw error;
+    }
+    
     const taskId = parseInt(req.params.id);
 
     if (isNaN(taskId)) {

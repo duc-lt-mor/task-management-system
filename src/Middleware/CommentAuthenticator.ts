@@ -20,16 +20,16 @@ export const authenticateCreateComment = function (permission: number) {
         return;
       }
 
-      let member: any = await findMember(
-        req.user?.id,
-        Number(req.body.project_id),
-      );
-
+      
       let task: any = await Task.findOne({
         where: {
           id: req.body.task_id,
         },
       });
+      let member: any = await findMember(
+        req.user?.id,
+        task.project_id,
+      );
 
       if (
         member?.project_role.permissions.includes(permission) ||

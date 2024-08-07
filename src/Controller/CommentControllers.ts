@@ -86,13 +86,18 @@ export const get = async function (
   next: express.NextFunction,
 ) {
   try {
-    const id = Number(req.params.id)
-    const comments = await services.get(id);
-    if (!comments) {
-      const error = createHttpError(400, `Could not get comments`);
-      throw error;
+    const task_id = Number(req.query.task_id);
+    const parent_id = Number(req.query.parent_id)
+    let comments: any = []
+    let replies: any = []
+    if (task_id !== null) {
+      comments = await services.get(task_id);
     }
-    return res.status(200).json(comments);
+    
+    if (parent_id !== null) {
+      replies = await services.getReplies(parent_id)
+    }
+    return res.status(200).json({comments, replies})
   } catch (err) {
     return next(err);
   }
@@ -120,12 +125,17 @@ export const getReplies = async function (
   res: express.Response,
   next: express.NextFunction,
 ) {
-  const parent_id = req.params.id;
-  const replies = await services.getReplies(parent_id);
-  if (!replies) {
-    return [];
-  }
-  return res.status(200).json(replies);
+  try {
+    const parent_id = Number(req.query.parent_id);
+    const replies = await services.getReplies(parent_id);
+    if (!replies) {
+      return [];
+    }
+    return res.status(200).json(replies);
+  } catch(err) {
+    next(err)
+  } 
+  
 };
 
 export const update = async function (

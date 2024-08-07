@@ -13,8 +13,8 @@ export const get = function (task_id: number) {
   return Comment.findAll({where: {parent_id: null, task_id: task_id}});
 };
 
-export const getReplies = function(data: any) {
-  return Comment.findAll(data)
+export const getReplies = function(parent_id: number) {
+  return Comment.findAll({where: {parent_id: parent_id}})
 }
 
 export const find = function (id: number) {

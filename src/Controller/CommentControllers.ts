@@ -4,6 +4,7 @@ import createHttpError from 'http-errors';
 import * as authenticator from '../Middleware/UserAuthenticator';
 import { sequelize } from '../Config/config';
 import { Comment } from '../Models/comment';
+import { Task } from '../Models/task';
 
 export const generate = async function (
   req: authenticator.CustomRequest,
@@ -14,6 +15,10 @@ export const generate = async function (
   try {
     
     const task_id = req.body.task_id;
+    const task = await Task.findByPk(task_id)
+    if (task == null) {
+      throw new Error('Task not found')
+    } 
     const comment: any = await services.generate(
       {
         task_id,

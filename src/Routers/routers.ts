@@ -1003,6 +1003,11 @@ router.delete(
  *         - Task
  *       security:
  *         - bearerAuth: []
+ *       parameters:
+ *         - name: id
+ *           in: path
+ *           type: string
+ *           required: true
  *       requestBody:
  *         required: true
  *         content:
@@ -1050,6 +1055,7 @@ router.put(
   '/task/:id',
   authenticator.verifyToken,
   TaskAut.authenticateUpdateTask(),
+  ...validateTask(),
   task.update,
 );
 
@@ -1163,8 +1169,6 @@ router.put(
  *                   type: integer
  *                   example: 2
  *               required:
- *                 - project_id
- *                 - task_id
  *                 - parent_id
  *                 - content
  *       responses:

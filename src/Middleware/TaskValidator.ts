@@ -10,20 +10,21 @@ export const validateTask = function () {
     body(`project_id`)
       .notEmpty()
       .withMessage(`Please insert project id`)
-      .custom((value) => {
-        const project = Project.findByPk(value);
-        if (!project) {
+      .custom(async (value) => {
+        const project = await Project.findByPk(value);
+        if (project == null) {
           throw new Error('Project does not exist');
         }
         return true;
       }),
     body('start_date')
       .notEmpty()
+      .isISO8601()
       .withMessage('Please enter the start date')
       .custom((value) => {
         const start_date = new Date(value);
         const current_date = new Date();
-        if (start_date.getDate() <= current_date.getDate()) {
+        if (start_date.getTime() <= current_date.getTime()) {
           throw new Error(
             'Start date must be set after the current date and time',
           );
@@ -32,6 +33,7 @@ export const validateTask = function () {
       }),
     body('expected_end_date')
       .notEmpty()
+      .isISO8601()
       .withMessage('Please enter the desired completion date')
       .custom((value, { req }) => {
         const start_date = new Date(req.body.start_date);

@@ -3,7 +3,6 @@ import { sequelize } from '../Config/config';
 import { Project } from './project';
 import { Colum } from './colum';
 import { User } from './user';
-import { Keyword } from './keyword';
 export const Task = sequelize.define(
   'tasks',
   {

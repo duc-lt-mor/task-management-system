@@ -27,7 +27,11 @@ export const validateCreate = function () {
           where: {
             key: key.toLowerCase(),
           },
+          
         });
+        if (project_found) {
+          throw new Error('project name already been used');
+        }
       }),
     body('key')
       .notEmpty()

@@ -1,5 +1,5 @@
 import { Comment } from '../Models/comment';
-import { Transaction, where } from 'sequelize';
+import { Transaction } from 'sequelize';
 
 export const generate = async function (data: any, transaction: Transaction) {
   return await Comment.create(data, { transaction });

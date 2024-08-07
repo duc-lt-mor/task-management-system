@@ -1,9 +1,4 @@
-import { User } from '../Models/user';
-import { Member } from '../Models/member';
-import * as ProjectServices from '../Services/ProjectServices';
-import { Op } from 'sequelize';
 import { body } from 'express-validator';
-import { Project_role } from '../Models/project_role';
 
 export const addUser = function () {
   return [

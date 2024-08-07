@@ -75,7 +75,7 @@ export const generateTask = async function (
       .status(201)
       .json({ message: 'Task generated successfully', task });
   } catch (err) {
-    // await transaction.rollback();
+    await transaction.rollback();
     next(err);
   }
 };
@@ -134,7 +134,7 @@ export const update = async function (
       );
       throw error;
     }
-    
+
     const taskId = parseInt(req.params.id);
 
     if (isNaN(taskId)) {

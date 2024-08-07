@@ -1,5 +1,3 @@
-import { Http2ServerRequest } from "http2";
-
 export const options = {
   definition: {
     openapi: '3.0.0',

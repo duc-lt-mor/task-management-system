@@ -140,6 +140,7 @@ export const edit = async function (
         name: data.name.toLowerCase(),
         decripstion: data.decriptstion,
         expected_end_date: data.expected_end_date,
+        real_end_date: data.real_end_date
       },
       { where: { id: id }, transaction: t },
     );

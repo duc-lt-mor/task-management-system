@@ -58,6 +58,9 @@ export const validateUpdate = function () {
     body('expected_end_date').custom(async (expected_end_date) => {
       validateExpectED(expected_end_date);
     }),
+    body('real_end_date').custom(async (real_end_date) => {
+      validateExpectED(real_end_date);
+    })
   ];
 };
 
@@ -70,6 +73,6 @@ const validateExpectED = (expected_end_date: string) => {
   let current_date: Date = new Date();
 
   if (create_date < current_date || isNaN(create_date.getTime())) {
-    throw new Error(`expected end date must later than ${current_date}`);
+    throw new Error(`end date must later than ${current_date}`);
   }
 };

@@ -28,7 +28,8 @@ export const Comment = sequelize.define(
 
     replies_count: {
       type: DataTypes.INTEGER,
-      allowNull: true
+      allowNull: false,
+      defaultValue: 0
     }
   },
   {

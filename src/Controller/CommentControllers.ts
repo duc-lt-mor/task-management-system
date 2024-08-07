@@ -12,6 +12,7 @@ export const generate = async function (
 ) {
   const transaction = await sequelize.transaction();
   try {
+    
     const task_id = req.body.task_id;
     const comment: any = await services.generate(
       {
@@ -41,14 +42,20 @@ export const reply = async function (
 ) {
   const transaction = await sequelize.transaction();
   try {
+    const parent_id = req.body.parent_id;
+    const comment: any = await Comment.findByPk(parent_id);
+    if (!comment) {
+      throw new Error('comment not found')
+    }
     const data = {
-      task_id: req.body.task_id,
-      parent_id: req.body.parent_id,
+      task_id: comment.task_id,
       user_id: req.user?.id,
+      parent_id,
       content: req.body.content,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
+
     if (!data.content) {
       throw createHttpError(400, 'Content is required');
     }
@@ -61,7 +68,8 @@ export const reply = async function (
 
     // Create the reply comment
     try {
-      const replyComment = await services.reply(data,transaction)
+      const replyComment = await services.reply(data, transaction);
+
       await Comment.increment('replies_count', {
         by: 1,
         where: { id: data.parent_id  }
@@ -74,6 +82,7 @@ export const reply = async function (
       throw createHttpError(500, 'Failed to create reply comment' + error);
     }
   } catch (err) {
+    await transaction.rollback();
     return next(err);
   }
 };
@@ -83,13 +92,18 @@ export const get = async function (
   next: express.NextFunction,
 ) {
   try {
-    const id = Number(req.query.id)
-    const comments = await services.get(id);
-    if (!comments) {
-      const error = createHttpError(400, `Could not get comments`);
-      throw error;
+    const task_id = Number(req.query.task_id);
+    const parent_id = Number(req.query.parent_id);
+    let comments: any = [];
+    let replies: any = [];
+    if (task_id !== null) {
+      comments = await services.get(task_id);
     }
-    return res.status(200).json(comments);
+
+    if (parent_id !== null) {
+      replies = await services.getReplies(parent_id);
+    }
+    return res.status(200).json({ comments, replies });
   } catch (err) {
     return next(err);
   }
@@ -117,12 +131,16 @@ export const getReplies = async function (
   res: express.Response,
   next: express.NextFunction,
 ) {
-  const parent_id = req.params.id;
-  const replies = await services.getReplies(parent_id);
-  if (!replies) {
-    return [];
+  try {
+    const parent_id = Number(req.query.parent_id);
+    const replies = await services.getReplies(parent_id);
+    if (!replies) {
+      return [];
+    }
+    return res.status(200).json(replies);
+  } catch (err) {
+    next(err);
   }
-  return res.status(200).json(replies);
 };
 
 export const update = async function (
@@ -169,16 +187,15 @@ export const destroy = async function (
         const parentComment: any = await services.find(comment.parent_id);
 
         if (parentComment) {
-          await Comment.increment('repliesCount', {
+          await Comment.increment('replies_count', {
             by: -1,
             where: { id: parentComment.id },
           });
-
         }
       }
 
-      await services.destroy(id)
-      return res.status(200).json(`Deleted`)
+      await services.destroy(id);
+      return res.status(200).json(`Deleted`);
     }
   } catch (err) {
     return next(err);

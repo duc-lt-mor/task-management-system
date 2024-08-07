@@ -1,12 +1,12 @@
 import { Colum } from '../Models/colum';
 import { Op } from 'sequelize';
-import { ColumData } from '../Interfaces/ColumInterface';
+import { ColumnData } from '../Interfaces/ColumnInterface';
 import { sequelize } from '../Config/config';
 import { validationResult } from 'express-validator';
 import express from 'express';
 import createHttpError from 'http-errors';
 
-export const create = async function (data: ColumData, req: express.Request) {
+export const create = async function (data: ColumnData, req: express.Request) {
   const t = await sequelize.transaction();
 
   let cols: number = await Colum.count({
@@ -42,7 +42,7 @@ export const create = async function (data: ColumData, req: express.Request) {
 
 export const edit = async function (
   id: number,
-  data: ColumData,
+  data: ColumnData,
   req: express.Request,
 ) {
   const t = await sequelize.transaction();

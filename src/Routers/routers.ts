@@ -1,6 +1,6 @@
 import * as ProjectController from '../Controller/ProjectController';
 import * as ValidateProject from '../Middleware/ValidateProject';
-import * as ColumController from '../Controller/ColumController';
+import * as ColumController from '../Controller/ColumnController';
 import * as ValidateColum from '../Middleware/ValidateColum';
 import * as ValidateMember from '../Middleware/ValidateMember';
 import * as MemberController from '../Controller/MemberController';
@@ -946,7 +946,7 @@ router.post(
  *           description: Internal Server Error
  */
 router.get(
-  '/task',
+  '/tasks',
   authenticator.verifyToken,
   ProjectAut.authenticateProject(11),
   task.getTasks,
@@ -1069,10 +1069,6 @@ router.put(
  *             schema:
  *               type: object
  *               properties:
- *                 project_id:
- *                   type: integer
- *                   example: 1
- *                   required: true
  *                 task_id:
  *                   type: integer
  *                   example: 1
@@ -1082,7 +1078,6 @@ router.put(
  *                   example: example comment
  *                   required: true
  *               required:
- *                 - project_id
  *                 - task_id
  *                 - content
  *       responses:
@@ -1161,15 +1156,9 @@ router.put(
  *             schema:
  *               type: object
  *               properties:
- *                 project_id:
- *                   type: integer
- *                   example: 1
  *                 content:
  *                   type: string
  *                   example: example comment
- *                 task_id:
- *                   type: integer
- *                   example: 1
  *                 parent_id:
  *                   type: integer
  *                   example: 2
@@ -1236,7 +1225,11 @@ router.delete(
  *       security:
  *         - bearerAuth: []
  *       parameters:
- *         - name: id
+ *         - name: task_id
+ *           in: query
+ *           type: string
+ *           required: true
+ *         - name: parent_id
  *           in: query
  *           type: string
  *           required: true
@@ -1251,6 +1244,5 @@ router.delete(
  *           description: Internal Server Error
  */
 router.get('/comment', authenticator.verifyToken, comment.get);
-
 
 export default router;

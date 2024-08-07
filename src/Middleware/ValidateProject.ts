@@ -28,6 +28,17 @@ export const validateCreate = function () {
             key: key.toLowerCase(),
           },
         });
+      }),
+    body('key')
+      .notEmpty()
+      .withMessage('Please enter project key')
+      .trim()
+      .custom(async (key) => {
+        let project_found = await Project.findOne({
+          where: {
+            key: key.toLowerCase(),
+          },
+        });
 
         if (project_found) {
           throw new Error('project key already been used');

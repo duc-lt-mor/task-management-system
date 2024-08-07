@@ -34,13 +34,21 @@ export const addKeyword = async function (
 };
 
 export const search = async function (query: any) {
-  const { names, priority, status, assignee_id, project_id } = query;
-  if (!names && !priority && !status && !assignee_id && !project_id) {
+  const {
+    names,
+    priority,
+    status,
+    assignee_id,
+    project_id,
+    start_date,
+    end_date,
+  } = query;
+  if (!names && !priority && !status && !assignee_id && !start_date && !end_date) {
     return await Task.findAll();
   }
 
   const filter: any = {
-    where: {},
+    where: {project_id: project_id},
   };
 
   if (names) {
@@ -55,28 +63,34 @@ export const search = async function (query: any) {
       },
       attributes: ['id'],
     });
-    const keywordIDs = await keywords.map((keyword: { id: any }) => keyword.id);
+    if (keywords.length == 0) {
+      return [];
+    } else {
+      const keywordIDs = await keywords.map(
+        (keyword: { id: any }) => keyword.id,
+      );
 
-    const taskKeywords: any = await TaskKeyword.findAll({
-      where: {
-        keyword_id: {
-          [Op.in]: keywordIDs,
+      const taskKeywords: any = await TaskKeyword.findAll({
+        where: {
+          keyword_id: {
+            [Op.in]: keywordIDs,
+          },
         },
-      },
-      attributes: ['task_id'], // Only select the taskId
-      group: ['task_id'],
-      having: sequelize.literal(
-        `COUNT(DISTINCT keyword_id) = ${keywordsArray.length}`,
-      ),
-    });
-    const taskIds = await taskKeywords.map(
-      (taskKeyword: { task_id: any }) => taskKeyword.task_id,
-    );
+        attributes: ['task_id'], // Only select the taskId
+        group: ['task_id'],
+        having: sequelize.literal(
+          `COUNT(DISTINCT keyword_id) = ${keywordsArray.length}`,
+        ),
+      });
+      const taskIds = await taskKeywords.map(
+        (taskKeyword: { task_id: any }) => taskKeyword.task_id,
+      );
 
-    if (taskIds.length > 0) {
-      filter.where.id = {
-        [Op.in]: taskIds,
-      };
+      if (taskIds.length > 0) {
+        filter.where.id = {
+          [Op.in]: taskIds,
+        };
+      }
     }
   }
 
@@ -98,6 +112,12 @@ export const search = async function (query: any) {
 
   if (project_id) {
     filter.where.project_id = project_id;
+  }
+
+  if (start_date && end_date) {
+    filter.where.createdAt = {
+      [Op.between]: [new Date(start_date), new Date(end_date)],
+    };
   }
 
   const tasks: any = await Task.findAll(filter);

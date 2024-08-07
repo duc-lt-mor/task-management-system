@@ -25,13 +25,6 @@ export const postRegister = async function (
   next: express.NextFunction,
 ) {
   try {
-    // Validate the incoming request
-    // const errors = validationResult(req);
-    // if (!errors.isEmpty()) {
-    //   // If there are validation errors, pass them to the error handler
-    //   return next(createHttpError(400, 'Validation errors', { errors: errors.array() }));
-    // }
-
     const data = {
       name: req.body.name,
       email: req.body.email,

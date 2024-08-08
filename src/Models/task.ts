@@ -56,10 +56,10 @@ Task.belongsTo(Project, {
   foreignKey: 'project_id',
 });
 Colum.hasMany(Task, {
-  foreignKey: 'colum_id',
+  foreignKey: 'column_id',
 });
 Task.belongsTo(Colum, {
-  foreignKey: 'colum_id',
+  foreignKey: 'column_id',
 });
 User.hasMany(Task, {
   foreignKey: 'assignee_id',

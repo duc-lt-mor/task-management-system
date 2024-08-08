@@ -657,7 +657,7 @@ router.put(
 
 /**
  * @swagger
- * /api/projects/owner:
+ * /api/project/owner:
  *    put:
  *       summary: Change owner of a project
  *       tags:
@@ -673,10 +673,10 @@ router.put(
  *               properties:
  *                 project_id:
  *                   type: integer
- *                   example: project 1
+ *                   example: 1
  *                 new_project_role_id:
  *                   type: integer
- *                   example: this is description of project 1
+ *                   example: 1
  *                 new_owner_id:
  *                   type: integer
  *                   example: 1
@@ -695,7 +695,7 @@ router.put(
  *           description: Internal Server Error
  */
 router.put(
-  '/projects/owner',
+  '/project/owner',
   authenticator.verifyToken,
   ProjectAut.authenticateProject(0),
   ...validateRole.validateChangeOwnerProject(),

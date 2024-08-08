@@ -57,11 +57,13 @@ export const changeProjectOwner = async function (
   next: express.NextFunction,
 ) {
   try {
+    console.log(req.body.project_id)
     let new_owner: any = await RoleServices.changeProjectOwner(req);
     return res
       .status(200)
       .json({ message: 'change owner success', data: new_owner });
   } catch (err) {
+    console.log(err)
     next(err);
   }
 };

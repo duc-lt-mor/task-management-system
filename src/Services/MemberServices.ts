@@ -106,7 +106,7 @@ export const remove = async function (id: number) {
 //cap nhat role cua thanh vien trong project
 export const editRole = async function (id: number, data: MemberData) {
   const t = await sequelize.transaction();
-
+  
   try {
     await Member.update(
       { project_role_id: Number(data.project_role_id) },

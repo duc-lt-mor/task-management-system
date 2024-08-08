@@ -10,6 +10,7 @@ import { CustomRequest } from '../Middleware/UserAuthenticator';
 import { Project_role } from '../Models/project_role';
 import { Op } from 'sequelize';
 import { Task } from '../Models/task';
+import { TaskKeyword } from '../Models/task_keyword';
 // lay ra 1 project
 export const findProjectById = async (id: number) => {
   let project = await Project.findOne({
@@ -164,6 +165,19 @@ export const destroy = async (id: number) => {
       },
       transaction: t,
     });
+    let tasks: any = await Task.findAll({
+      where: {
+        project_id: id
+      }
+    })
+  
+    for (let task of tasks) {
+      await TaskKeyword.destroy({
+        where: {
+          task_id: task.id
+        }
+      })
+    }
     await Promise.all([
       Task.destroy({
         where: {

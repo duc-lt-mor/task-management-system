@@ -56,7 +56,13 @@ export const edit = async function (
 ) {
   const t = await sequelize.transaction();
   let role: any = await findRoleById(id);
-
+  if (!role) {
+    const error = createHttpError(
+      400,
+      JSON.stringify('role is not exist', null, 2),
+    );
+    throw error;
+  }
   if (!data.name) {
     data.name = role.name;
   }
@@ -145,29 +151,28 @@ export const changeProjectOwner = async function (req: CustomRequest) {
         throw error;
       }
     }
-    let new_owner: any = await Member.findOne({
+
+    let current_owner: any = await Member.findOne({
       where: {
         project_id: req.body.project_id,
-        user_id: req.body.new_owner_id,
+        user_id: req.user?.id,
       },
     });
-
     await Promise.all([
-      //update role new owner to pm
-      Project_role.update(
+      //update role of new owner to pm role
+      Member.update(
         {
-          is_pm: true,
-          permissions: [0],
+          project_role_id: current_owner.project_role_id,
         },
         {
           where: {
             project_id: req.body.project_id,
-            id: new_owner.project_role_id,
+            user_id: req.body.new_owner_id,
           },
           transaction: t,
         },
       ),
-      //update role old owner to other roles
+      //update role of current owner to other roles
       Member.update(
         {
           project_role_id: req.body.new_project_role_id,
@@ -182,6 +187,12 @@ export const changeProjectOwner = async function (req: CustomRequest) {
       ),
     ]);
     await t.commit();
+    let new_owner: any = await Member.findOne({
+      where: {
+        project_id: req.body.project_id,
+        user_id: req.body.new_owner_id,
+      },
+    });
     return new_owner;
   } catch (error) {
     await t.rollback();

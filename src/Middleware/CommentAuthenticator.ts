@@ -20,7 +20,7 @@ export const authenticateCreateComment = function (permission: number) {
         return;
       }
       let task:any = []
-      if (req.body.task_id !== null) {
+      if (!isNaN(req.body.task_id)) {
         task = await Task.findByPk(req.body.task_id);
       } 
       else {

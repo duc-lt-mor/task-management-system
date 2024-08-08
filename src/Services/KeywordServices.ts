@@ -43,7 +43,7 @@ export const search = async function (query: any) {
     start_date,
     end_date,
   } = query;
-  if (!names && !priority && !status && !assignee_id && !start_date && !end_date) {
+  if (!names && !priority && !status && !assignee_id && !start_date && !end_date && !project_id) {
     return await Task.findAll();
   }
 
@@ -90,6 +90,8 @@ export const search = async function (query: any) {
         filter.where.id = {
           [Op.in]: taskIds,
         };
+      } else if (taskIds.length == 0) {
+        return []
       }
     }
   }

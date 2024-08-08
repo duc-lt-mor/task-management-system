@@ -200,9 +200,9 @@ router.get('/user', authenticator.verifyToken, user.find);
  *                 key:
  *                   type: string
  *                   example: proj1
- *                 decripstion:
+ *                 description:
  *                   type: string
- *                   example: this is decripstion of project 1
+ *                   example: this is description of project 1
  *                 expected_end_date:
  *                   type: string
  *                   format: date
@@ -248,9 +248,9 @@ router.post(
  *                 name:
  *                   type: string
  *                   example: project 1
- *                 decripstion:
+ *                 description:
  *                   type: string
- *                   example: this is decripstion of project 1
+ *                   example: this is description of project 1
  *                 expected_end_date:
  *                   type: string
  *                   format: date
@@ -676,7 +676,7 @@ router.put(
  *                   example: project 1
  *                 new_project_role_id:
  *                   type: integer
- *                   example: this is decripstion of project 1
+ *                   example: this is description of project 1
  *                 new_owner_id:
  *                   type: integer
  *                   example: 1
@@ -705,11 +705,11 @@ router.put(
 
 /**
  * @swagger
- * /colum:
+ * /column:
  *    post:
- *       summary: Create a colum in a project
+ *       summary: Create a column in a project
  *       tags:
- *         - Colum
+ *         - Column
  *       security:
  *         - bearerAuth: []
  *       requestBody:
@@ -739,7 +739,7 @@ router.put(
  *           description: Internal Server Error
  */
 router.post(
-  '/colum',
+  '/column',
   authenticator.verifyToken,
   ProjectAut.authenticateProject(13),
   ...ValidateColum.validateCreate(),
@@ -748,11 +748,11 @@ router.post(
 
 /**
  * @swagger
- * /colum/{col_id}:
+ * /column/{col_id}:
  *    put:
- *       summary: Update a colum in a project
+ *       summary: Update a column in a project
  *       tags:
- *         - Colum
+ *         - Column
  *       parameters:
  *         - name: col_id
  *           in: path
@@ -798,7 +798,7 @@ router.post(
  *           description: Internal Server Error
  */
 router.put(
-  '/colum/:col_id',
+  '/column/:col_id',
   authenticator.verifyToken,
   ProjectAut.authenticateProject(14),
   ...ValidateColum.validateUpdate(),
@@ -807,11 +807,11 @@ router.put(
 
 /**
  * @swagger
- * /colum/{col_id}:
+ * /column/{col_id}:
  *    delete:
- *       summary: Delete a colum in a project
+ *       summary: Delete a column in a project
  *       tags:
- *         - Colum
+ *         - Column
  *       parameters:
  *         - name: col_id
  *           in: path
@@ -840,7 +840,7 @@ router.put(
  *           description: Internal Server Error
  */
 router.delete(
-  '/colum/:col_id',
+  '/column/:col_id',
   authenticator.verifyToken,
   ProjectAut.authenticateProject(15),
   ...ValidateColum.validateDelete(),
@@ -1232,11 +1232,9 @@ router.delete(
  *         - name: task_id
  *           in: query
  *           type: string
- *           required: true
  *         - name: parent_id
  *           in: query
  *           type: string
- *           required: true
  *       responses:
  *         '200':
  *           description: OK

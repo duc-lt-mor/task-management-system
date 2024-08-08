@@ -101,14 +101,16 @@ export const get = async function (
     const parent_id = Number(req.query.parent_id);
     let comments: any = [];
     let replies: any = [];
-    if (task_id !== null) {
+    console.log(task_id, parent_id)
+    if (!isNaN(task_id)) {
       comments = await services.get(task_id);
+      return res.status(200).json({ comments })
     }
 
-    if (parent_id !== null) {
+    if (!isNaN(parent_id)) {
       replies = await services.getReplies(parent_id);
+      return res.status(200).json({ replies })
     }
-    return res.status(200).json({ comments, replies });
   } catch (err) {
     return next(err);
   }

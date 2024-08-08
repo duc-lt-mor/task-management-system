@@ -1041,7 +1041,7 @@ router.delete(
  *                   example: 2024-08-09
  *                 column_id:
  *                   type: integer
- *                   example: 2024-08-09
+ *                   example: 1
  *                 assignee_id:
  *                   type: integer
  *                   example: 11

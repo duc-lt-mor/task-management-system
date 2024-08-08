@@ -1,4 +1,4 @@
-import { Op, Transaction } from 'sequelize';
+import { col, Op, Transaction } from 'sequelize';
 import { Keyword } from '../Models/keyword';
 import { Task } from '../Models/task';
 import { TaskKeyword } from '../Models/task_keyword';
@@ -34,13 +34,15 @@ export const addKeyword = async function (
 };
 
 export const search = async function (query: any) {
-  const { names, priority, status, assignee_id, project_id, startDate, endDate } = query;
-  if (!names && !priority && !status && !assignee_id && !project_id) {
+  const { names, priority, status, assignee_id, start_date, expected_end_date, project_id } = query;
+  console.log(query);
+  if (!names && !priority && !status && !assignee_id && !start_date && !expected_end_date) {
     return await Task.findAll();
   }
-
   const filter: any = {
-    where: {},
+    where: {
+      project_id: project_id
+    },
     
   };
 
@@ -56,29 +58,38 @@ export const search = async function (query: any) {
       },
       attributes: ['id'],
     });
-    const keywordIDs = await keywords.map((keyword: { id: any }) => keyword.id);
-
-    const taskKeywords: any = await TaskKeyword.findAll({
-      where: {
-        keyword_id: {
-          [Op.in]: keywordIDs,
-        },
-      },
-      attributes: ['task_id'], // Only select the taskId
-      group: ['task_id'],
-      having: sequelize.literal(
-        `COUNT(DISTINCT keyword_id) = ${keywordsArray.length}`,
-      ),
-    });
-    const taskIds = await taskKeywords.map(
-      (taskKeyword: { task_id: any }) => taskKeyword.task_id,
-    );
-
-    if (taskIds.length > 0) {
-      filter.where.id = {
-        [Op.in]: taskIds,
-      };
+    if (keywords.length == 0) {
+      filter.where.name = {
+        [Op.like]: `${names}%`
+      }
     }
+    else {
+      const keywordIDs = await keywords.map((keyword: { id: any }) => keyword.id);
+
+      const taskKeywords: any = await TaskKeyword.findAll({
+        where: {
+          keyword_id: {
+            [Op.in]: keywordIDs,
+          },
+        },
+        attributes: ['task_id'], // Only select the taskId
+        group: ['task_id'],
+        having: sequelize.literal(
+          `COUNT(DISTINCT keyword_id) = ${keywordsArray.length}`,
+        ),
+      });
+      console.log(taskKeywords)
+      const taskIds = await taskKeywords.map(
+        (taskKeyword: { task_id: any }) => taskKeyword.task_id,
+      );
+      console.log(taskIds.length)
+      if (taskIds.length > 0) {
+        filter.where.id = {
+          [Op.in]: taskIds,
+        };
+      }
+    }
+   
   }
 
   if (priority) {
@@ -97,17 +108,23 @@ export const search = async function (query: any) {
     filter.where.assignee_id = assignee_id;
   }
 
-  if (project_id) {
-    filter.where.project_id = project_id;
+  if (start_date ) {
+    filter.where.start_date = {
+      [Op.gt]: new Date(start_date)
+    }
   }
 
-  if (startDate && endDate) {
-    filter.where.createdAt = {
-      [Op.between]: [new Date(startDate), new Date(endDate)],
-    };
+  if (expected_end_date) {
+    filter.where.expected_end_date = {
+      [Op.lt]: new Date(expected_end_date) 
+    }
   }
-
+  console.log(new Date(expected_end_date))
   const tasks: any = await Task.findAll(filter);
 
+  if (!tasks) {
+    return [];
+
+  }
   return tasks;
 };

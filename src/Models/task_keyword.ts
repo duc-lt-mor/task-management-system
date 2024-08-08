@@ -45,3 +45,4 @@ Keyword.hasMany(TaskKeyword, {
 TaskKeyword.belongsTo(Keyword, {
   foreignKey: 'keyword_id',
 });
+

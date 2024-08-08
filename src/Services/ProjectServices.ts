@@ -1,6 +1,6 @@
 import { Project } from '../Models/project';
 import { Member } from '../Models/member';
-import { Colum } from '../Models/colum';
+import { Column } from '../Models/column';
 import { ProjectData } from '../Interfaces/ProjectInterface';
 import { sequelize } from '../Config/config';
 import { validationResult } from 'express-validator';
@@ -39,7 +39,7 @@ export const create = async function (req: CustomRequest, data: ProjectData) {
       {
         name: data.name.toLowerCase(),
         key: data.key.toUpperCase(),
-        decripstion: data.decriptstion,
+        description: data.description,
         creator_id: req.user?.id,
         expected_end_date: data.expected_end_date,
       },
@@ -47,7 +47,7 @@ export const create = async function (req: CustomRequest, data: ProjectData) {
     );
 
     // khoi tao 3 cot mac dinh
-    await Colum.bulkCreate(
+    await Column.bulkCreate(
       [
         {
           col_type: 'todo',
@@ -138,7 +138,7 @@ export const edit = async function (
     await Project.update(
       {
         name: data.name.toLowerCase(),
-        decripstion: data.decriptstion,
+        description: data.description,
         expected_end_date: data.expected_end_date,
       },
       { where: { id: id }, transaction: t },
@@ -177,7 +177,7 @@ export const destroy = async (id: number) => {
         transaction: t,
       }),
 
-      Colum.destroy({
+      Column.destroy({
         where: {
           project_id: id,
         },

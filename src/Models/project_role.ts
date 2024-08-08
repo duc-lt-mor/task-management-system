@@ -27,3 +27,4 @@ export const Project_role = sequelize.define('project_roles', {
     allowNull: false,
   },
 });
+

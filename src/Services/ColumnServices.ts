@@ -1,4 +1,4 @@
-import { Colum } from '../Models/colum';
+import { Column } from '../Models/column';
 import { Op } from 'sequelize';
 import { ColumnData } from '../Interfaces/ColumnInterface';
 import { sequelize } from '../Config/config';
@@ -9,7 +9,7 @@ import createHttpError from 'http-errors';
 export const create = async function (data: ColumnData, req: express.Request) {
   const t = await sequelize.transaction();
 
-  let cols: number = await Colum.count({
+  let cols: number = await Column.count({
     where: {
       project_id: data.project_id,
     },
@@ -23,7 +23,7 @@ export const create = async function (data: ColumnData, req: express.Request) {
       const error = createHttpError(400, JSON.stringify(errorMessages));
       throw error;
     }
-    let colum: any = await Colum.create(
+    let column: any = await Column.create(
       {
         col_type: data.col_type,
         name: data.name.toLowerCase(),
@@ -33,7 +33,7 @@ export const create = async function (data: ColumnData, req: express.Request) {
       { transaction: t },
     );
     await t.commit();
-    return colum;
+    return Column;
   } catch (err) {
     await t.rollback();
     throw err;
@@ -49,18 +49,18 @@ export const edit = async function (
 
   let indexs = JSON.parse(`[${data.array_index}]`);
   //lay ra cot can sua
-  let colum: any = await Colum.findOne({
+  let column: any = await Column.findOne({
     where: {
       id: id,
     },
   });
 
   if (!data.name) {
-    data.name = colum.name;
+    data.name = Column.name;
   }
 
   if (!data.col_type) {
-    data.col_type = colum.col_type;
+    data.col_type = column.col_type;
   }
   try {
     const errors = validationResult(req);
@@ -73,14 +73,14 @@ export const edit = async function (
     await Promise.all([
       await Promise.all(
         indexs.map(async (inde: any) =>
-          Colum.update(
+          Column.update(
             { col_index: inde.index },
             { where: { id: inde.id }, transaction: t },
           ),
         ),
       ),
 
-      await Colum.update(
+      await Column.update(
         {
           name: data.name.toLowerCase(),
           col_type: data.col_type,
@@ -90,7 +90,7 @@ export const edit = async function (
     ]);
 
     await t.commit();
-    let colum_updated: any = await Colum.findOne({
+    let colum_updated: any = await Column.findOne({
       where: {
         id: id,
       },
@@ -105,16 +105,16 @@ export const edit = async function (
 export const destroy = async function (id: number, req: express.Request) {
   const t = await sequelize.transaction();
 
-  let colum: any = await Colum.findOne({
+  let column: any = await Column.findOne({
     where: {
       id: id,
     },
   });
 
   //dem so luong task trong 1 project
-  let last_index: number = await Colum.count({
+  let last_index: number = await Column.count({
     where: {
-      project_id: colum.project_id,
+      project_id: column.project_id,
     },
   });
   try {
@@ -126,10 +126,10 @@ export const destroy = async function (id: number, req: express.Request) {
       throw error;
     }
     //giam gia tri index cua cac cot o cuoi den vi tri cua cot can xoa
-    for (let i: number = last_index; i >= colum.col_index; i--) {
-      let col: any = await Colum.findOne({
+    for (let i: number = last_index; i >= column.col_index; i--) {
+      let col: any = await Column.findOne({
         where: {
-          [Op.and]: [{ col_index: i }, { project_id: colum.project_id }],
+          [Op.and]: [{ col_index: i }, { project_id: column.project_id }],
         },
       });
 
@@ -141,7 +141,7 @@ export const destroy = async function (id: number, req: express.Request) {
       );
     }
 
-    await Colum.destroy({
+    await Column.destroy({
       where: {
         id: id,
       },

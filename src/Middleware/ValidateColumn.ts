@@ -1,4 +1,4 @@
-import { Colum } from '../Models/colum';
+import { Column } from '../Models/column';
 import { Task } from '../Models/task';
 import { Op } from 'sequelize';
 import { body, param } from 'express-validator';
@@ -10,14 +10,14 @@ export const validateCreate = function () {
       .trim()
       .custom(async (name, { req }) => {
         
-        let colum: any = await Colum.findOne({
+        let column: any = await Column.findOne({
           where: {
             name: name.toLowerCase(),
             project_id: Number(req.body.project_id),
           },
         });
 
-        if (colum) {
+        if (column) {
           throw new Error('name already been used');
         }
       }),
@@ -31,7 +31,7 @@ export const validateUpdate = function () {
         throw new Error('Project ID must be a number');
       }
 
-      const check_name = await Colum.findOne({
+      const check_name = await Column.findOne({
         where: {
           name: req.body.name,
           project_id: Number(project_id),
@@ -59,7 +59,7 @@ export const validateDelete = function () {
       });
 
       //lay ra thong tin cot can xoa
-      let colum_found: any = Colum.findOne({
+      let colum_found: any = Column.findOne({
         where: {
           id: id,
         },

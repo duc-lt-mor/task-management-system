@@ -1,7 +1,7 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../Config/config';
 import { Project } from '../Models/project';
-export const Colum = sequelize.define('colums', {
+export const Column = sequelize.define('columns', {
   id: {
     type: DataTypes.INTEGER,
     allowNull: false,
@@ -21,9 +21,9 @@ export const Colum = sequelize.define('colums', {
     allowNull: true,
   },
 });
-Project.hasMany(Colum, {
+Project.hasMany(Column, {
   foreignKey: 'project_id',
 });
-Colum.belongsTo(Project, {
+Column.belongsTo(Project, {
   foreignKey: 'project_id',
 });

@@ -8,7 +8,7 @@ export const search = async function (
   next: express.NextFunction,
 ) {
   try {
-    const searchValue = req.query.searchValue?.toString();
+    const searchValue = req.query.searchValue;
 
     if (!searchValue) {
       throw createHttpError(400, `Search value is required`);

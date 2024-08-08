@@ -10,7 +10,7 @@ export const validateCreate = function () {
       .notEmpty()
       .trim()
       .custom(async (name, { req }) => {
-        let column: any = await Column.findOne({
+        let column = await Column.findOne({
           where: {
             name: name.toLowerCase(),
             project_id: Number(req.body.project_id),

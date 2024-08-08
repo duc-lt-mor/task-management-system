@@ -2,7 +2,7 @@ import express from 'express';
 import * as services from '../Services/TaskServices';
 import * as authenticator from '../Middleware/UserAuthenticator';
 import createHttpError from 'http-errors';
-import { Colum } from '../Models/colum';
+import { Column } from '../Models/column';
 import { TaskKeyword } from '../Models/task_keyword';
 import { sequelize } from '../Config/config';
 import * as keywords from '../Services/KeywordServices';
@@ -32,7 +32,7 @@ export const generateTask = async function (
 
     const project_id: number = Number(req.body.project_id);
     const creator_id: number = req.user?.id;
-    let column: any = await Colum.findOne({
+    let column: any = await Column.findOne({
       where: {
         project_id: project_id,
         col_index: 1,

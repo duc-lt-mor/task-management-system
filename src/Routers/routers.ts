@@ -1,7 +1,7 @@
 import * as ProjectController from '../Controller/ProjectController';
 import * as ValidateProject from '../Middleware/ValidateProject';
 import * as ColumController from '../Controller/ColumnController';
-import * as ValidateColum from '../Middleware/ValidateColum';
+import * as ValidateColumn from '../Middleware/ValidateColumn';
 import * as ValidateMember from '../Middleware/ValidateMember';
 import * as MemberController from '../Controller/MemberController';
 import * as RoleController from '../Controller/RoleController';
@@ -742,7 +742,7 @@ router.post(
   '/columns',
   authenticator.verifyToken,
   ProjectAut.authenticateProject(13),
-  ...ValidateColum.validateCreate(),
+  ...ValidateColumn.validateCreate(),
   ColumController.create,
 );
 
@@ -801,7 +801,7 @@ router.put(
   '/columns/:col_id',
   authenticator.verifyToken,
   ProjectAut.authenticateProject(14),
-  ...ValidateColum.validateUpdate(),
+  ...ValidateColumn.validateUpdate(),
   ColumController.edit,
 );
 
@@ -843,7 +843,7 @@ router.delete(
   '/columns/:col_id',
   authenticator.verifyToken,
   ProjectAut.authenticateProject(15),
-  ...ValidateColum.validateDelete(),
+  ...ValidateColumn.validateDelete(),
   ColumController.destroy,
 );
 
@@ -1041,7 +1041,7 @@ router.delete(
  *                   example: 2024-08-09
  *                 column_id:
  *                   type: integer
- *                   example: 2024-08-09
+ *                   example: 1
  *                 assignee_id:
  *                   type: integer
  *                   example: 11

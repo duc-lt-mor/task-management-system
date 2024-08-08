@@ -1,7 +1,7 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../Config/config';
 import { Project } from './project';
-import { Colum } from './colum';
+import { Column } from './column';
 import { User } from './user';
 export const Task = sequelize.define(
   'tasks',
@@ -55,11 +55,11 @@ Project.hasMany(Task, {
 Task.belongsTo(Project, {
   foreignKey: 'project_id',
 });
-Colum.hasMany(Task, {
-  foreignKey: 'colum_id',
+Column.hasMany(Task, {
+  foreignKey: 'column_id',
 });
-Task.belongsTo(Colum, {
-  foreignKey: 'colum_id',
+Task.belongsTo(Column, {
+  foreignKey: 'column_id',
 });
 User.hasMany(Task, {
   foreignKey: 'assignee_id',

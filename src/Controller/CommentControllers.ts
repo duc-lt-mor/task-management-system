@@ -99,18 +99,33 @@ export const get = async function (
   try {
     const task_id = Number(req.query.task_id);
     const parent_id = Number(req.query.parent_id);
+    console.log(task_id, parent_id)
+    if ( task_id && parent_id) {
+      let comment: any = await Comment.findOne({
+        where: {
+          parent_id: parent_id,
+          task_id: task_id
+        }
+      })
+  
+      if(!comment) {
+        return res.status(404).json([]) ;
+      }
+    }
+
     let comments: any = [];
     let replies: any = [];
-    console.log(task_id, parent_id)
-    if (!isNaN(task_id)) {
-      comments = await services.get(task_id);
-      return res.status(200).json({ comments })
-    }
 
     if (!isNaN(parent_id)) {
       replies = await services.getReplies(parent_id);
       return res.status(200).json({ replies })
     }
+
+    if (!isNaN(task_id)) {
+      comments = await services.get(task_id);
+      return res.status(200).json({ comments })
+    }
+
   } catch (err) {
     return next(err);
   }

@@ -84,23 +84,23 @@ export const validateDelete = function () {
       });
 
       //lay ra thong tin cot can xoa
-      let colum_found: any = Column.findOne({
+      let column_found: any = Column.findOne({
         where: {
           id: id,
         },
       });
 
-      let [tasks, colum] = await Promise.all([tasks_count, colum_found]);
+      let [tasks, column] = await Promise.all([tasks_count, column_found]);
 
-      if (colum?.col_type != 'custom') {
+      if (column?.col_type != 'custom') {
         //kiem tra xem cot can xoa co phai cot default khong
-        throw new Error("you can't delete default colum");
+        throw new Error("you can't delete default column");
       }
 
       if (tasks > 0) {
         //kiem tra xem con task nao trong cot khong
         throw new Error(
-          'you have move all tasks of this colum to other colum before you delete it',
+          'you have move all tasks of this column to other column before you delete it',
         );
       }
     }),

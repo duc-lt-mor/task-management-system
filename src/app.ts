@@ -11,7 +11,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 const port = process.env.PORT;
-app.use('/', router);
+app.use('/api', router);
 app.use(exceptionHandler);
 
 // // Load the Swagger JSON file

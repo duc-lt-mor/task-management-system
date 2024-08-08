@@ -2,6 +2,7 @@ import { Colum } from '../Models/colum';
 import { Task } from '../Models/task';
 import { Op } from 'sequelize';
 import { body, param } from 'express-validator';
+import createHttpError from 'http-errors';
 
 export const validateCreate = function () {
   return [
@@ -9,7 +10,6 @@ export const validateCreate = function () {
       .notEmpty()
       .trim()
       .custom(async (name, { req }) => {
-        
         let colum: any = await Colum.findOne({
           where: {
             name: name.toLowerCase(),
@@ -43,6 +43,31 @@ export const validateUpdate = function () {
         throw new Error('Column name already in use within the project');
       }
     }),
+    body('array_index')
+      .customSanitizer((arrayStr) => {
+        return JSON.parse(`[${arrayStr}]`) as { id: number; index: number }[];
+      })
+      .custom(async (array_index: { id: number; index: number }[], { req }) => {
+        const count = await Colum.count({
+          where: {
+            project_id: req.body.project_id,
+          },
+        });
+        array_index
+          .map((value) => {
+            if (value.index > count || value.index < 1) {
+              throw createHttpError(400, 'Invalid column index');
+            }
+            return value;
+          })
+          .sort((a, b) => {
+            if (a.index === b.index) {
+              throw createHttpError(400, 'Duplicate column index');
+            }
+
+            return a.index - b.index;
+          });
+      }),
   ];
 };
 

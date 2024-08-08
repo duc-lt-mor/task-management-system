@@ -11,7 +11,7 @@ export const add = async function (
 
     return res
       .status(201)
-      .send({ message: 'add member success', 'added member': member });
+      .send({ message: 'add member success', data: member });
   } catch (err) {
     next(err);
   }
@@ -25,7 +25,7 @@ export const remove = async function (
   try {
     await MemberServices.remove(Number(req.params.member_id));
 
-    return res.status(200).send('delete member success');
+    return res.status(200).json({message:'delete member success'});
   } catch (err) {
     next(err);
   }
@@ -44,7 +44,7 @@ export const editRole = async function (
 
     return res
       .status(200)
-      .send({ message: 'edit member role success', 'member ': member });
+      .send({ message: 'edit member role success', data: member });
   } catch (err) {
     next(err);
   }

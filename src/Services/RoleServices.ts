@@ -37,7 +37,7 @@ export const create = async function (req: express.Request, data: RoleData) {
         name: data.name.toLowerCase(),
         is_pm: false,
         project_id: data.project_id,
-        permissions: data.permissions,
+        permissions: JSON.parse(`[${data.permissions}]`),
       },
       { transaction: t },
     );

@@ -24,7 +24,7 @@ export const validateTask = function () {
       .custom((value) => {
         const start_date = new Date(value);
         const current_date = new Date();
-        if (start_date.getTime() <= current_date.getTime()) {
+        if (start_date.getTime() < current_date.getTime()) {
           throw new Error(
             'Start date must be set after the current date and time',
           );

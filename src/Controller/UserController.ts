@@ -84,7 +84,7 @@ export const showProject = async function (
 ) {
   try {
     let projects: any = await services.showProject(Number(req.user?.id));
-    return res.status(200).json({ message: projects });
+    return res.status(200).json({ data: projects });
   } catch (err) {
     next(err);
   }
@@ -99,7 +99,7 @@ export const find = async function (
     let email: any = req.query?.email;
     let user = await services.find(email);
     if (user) {
-      return res.status(200).json({ message: user });
+      return res.status(200).json({ data: user });
     } else {
       return res.status(404).json('user not found');
     }

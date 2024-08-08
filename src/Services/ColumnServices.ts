@@ -46,17 +46,17 @@ export const edit = async function (
   req: express.Request,
 ) {
   const t = await sequelize.transaction();
-
-  let indexs = JSON.parse(`[${data.array_index}]`);
+  let indexs = data.array_index;
+  // let indexs = JSON.parse(`[${data.array_index}]`);
   //lay ra cot can sua
-  let colum: any = await Colum.findOne({
+  let column: any = await Colum.findOne({
     where: {
       id: id,
     },
   });
 
   if (!data.name) {
-    data.name = colum.name;
+    data.name = column.name;
   }
 
   try {

@@ -12,6 +12,10 @@ export const Task = sequelize.define(
       autoIncrement: true,
       primaryKey: true,
     },
+    key: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
     name: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -28,13 +32,17 @@ export const Task = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    start_date: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
     expected_end_date: {
       type: DataTypes.DATE,
       allowNull: false,
     },
     real_end_date: {
       type: DataTypes.DATE,
-      allowNull: false,
+      allowNull: true,
     },
   },
   {

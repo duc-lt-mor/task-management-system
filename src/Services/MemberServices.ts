@@ -5,6 +5,7 @@ import { sequelize } from '../Config/config';
 import { validationResult } from 'express-validator';
 import express from 'express';
 import createHttpError from 'http-errors';
+import * as ProjectServices from '../Services/ProjectServices';
 import { Op } from 'sequelize';
 import { Project_role } from '../Models/project_role';
 
@@ -26,6 +27,50 @@ export const add = async function (req: express.Request, data: MemberData) {
       const error = createHttpError(400, JSON.stringify(errorMessages));
       throw error;
     }
+    let role: any = await Project_role.findOne({
+      where: {
+        id: data.project_role_id,
+      },
+    });
+    if (!role) {
+      const error = createHttpError(400, JSON.stringify('role is not exit'));
+      throw error;
+    }
+
+    if (role.is_pm) {
+      const error = createHttpError(400, JSON.stringify("you can not chose role pm"));
+      throw error;
+    }
+
+    let project_id: number = Number(req.body.project_id);
+
+    let project: any = await ProjectServices.findProjectById(project_id);
+
+    if (!project) {
+      //kiem tra project co ton tai hay khong
+      const error = createHttpError(400, JSON.stringify('project is not exit'));
+      throw error;
+    }
+
+    if (!user) {
+      //kiem ta user co ton tai hay khong truoc khi them vao project
+      const error = createHttpError(400, JSON.stringify("user is not exit"));
+      throw error;
+    }
+
+    let check_member: any = await Member.findOne({
+      where: {
+        user_id: user.id,
+        project_id: project_id,
+      },
+    });
+
+    if (check_member) {
+      //kiem tra xem user da duoc add vao project hay chua
+      const error = createHttpError(400, JSON.stringify("user already been addded"));
+      throw error;
+    }
+
     let member: any = await Member.create(
       {
         user_id: user.id,
@@ -90,6 +135,9 @@ export const show = async function (id: number) {
       {
         model: User,
       },
+      {
+        model: Project_role
+      }
     ],
   });
 

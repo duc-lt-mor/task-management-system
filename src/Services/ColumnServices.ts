@@ -1,12 +1,12 @@
 import { Colum } from '../Models/colum';
 import { Op } from 'sequelize';
-import { ColumData } from '../Interfaces/ColumInterface';
+import { ColumnData } from '../Interfaces/ColumnInterface';
 import { sequelize } from '../Config/config';
 import { validationResult } from 'express-validator';
 import express from 'express';
 import createHttpError from 'http-errors';
 
-export const create = async function (data: ColumData, req: express.Request) {
+export const create = async function (data: ColumnData, req: express.Request) {
   const t = await sequelize.transaction();
 
   let cols: number = await Colum.count({
@@ -25,7 +25,7 @@ export const create = async function (data: ColumData, req: express.Request) {
     }
     let colum: any = await Colum.create(
       {
-        col_type: data.col_type,
+        col_type: 'custom',
         name: data.name.toLowerCase(),
         col_index: cols + 1,
         project_id: data.project_id,
@@ -42,7 +42,7 @@ export const create = async function (data: ColumData, req: express.Request) {
 
 export const edit = async function (
   id: number,
-  data: ColumData,
+  data: ColumnData,
   req: express.Request,
 ) {
   const t = await sequelize.transaction();
@@ -59,9 +59,6 @@ export const edit = async function (
     data.name = colum.name;
   }
 
-  if (!data.col_type) {
-    data.col_type = colum.col_type;
-  }
   try {
     const errors = validationResult(req);
 
@@ -83,7 +80,6 @@ export const edit = async function (
       await Colum.update(
         {
           name: data.name.toLowerCase(),
-          col_type: data.col_type,
         },
         { where: { id: id }, transaction: t },
       ),

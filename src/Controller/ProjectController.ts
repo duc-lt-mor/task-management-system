@@ -23,7 +23,11 @@ export const edit = async function (
   next: express.NextFunction,
 ) {
   try {
-    let project: any = await ProjectServices.edit(Number(req.params.project_id), req, req.body);
+    let project: any = await ProjectServices.edit(
+      Number(req.params.project_id),
+      req,
+      req.body,
+    );
     return res
       .status(200)
       .json({ message: 'update project success', 'updated project': project });
@@ -42,5 +46,23 @@ export const destroy = async function (
     return res.status(200).send('delete project success');
   } catch (err) {
     next(err);
+  }
+};
+
+export const search = async function (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
+) {
+  try {
+    let project: any = await ProjectServices.search(req.query);
+
+    if (project == null) {
+      return res.status(404).json({ 'project found ': project });
+    } else {
+      return res.status(200).json('project not found ');
+    }
+  } catch (error) {
+    next(error);
   }
 };

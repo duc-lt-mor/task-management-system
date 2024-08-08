@@ -13,7 +13,7 @@ export const create = async function (
       message: 'create role success',
       'role updated': role,
     });
-  } catch (err) {
+  } catch (err: any) {
     next(err);
   }
 };
@@ -72,7 +72,7 @@ export const showRole = async function name(
   next: express.NextFunction,
 ) {
   try {
-    let roles = await RoleServices.showRole(Number(req.params.project_id));
+    let roles = await RoleServices.showRole(Number(req.query.project_id));
     return res.status(200).send(roles);
   } catch (err) {
     next(err);

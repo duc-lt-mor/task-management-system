@@ -14,6 +14,6 @@ export const exceptionHandler = (
   }
 
   res.status(500).json({
-    message: 'Internal Server Error',
+    message: 'Internal Server Error ' + err,
   });
 };

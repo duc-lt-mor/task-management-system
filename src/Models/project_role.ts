@@ -15,15 +15,15 @@ export const Project_role = sequelize.define('project_roles', {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  decripstion: {
+  description: {
     type: DataTypes.STRING,
     allowNull: true,
   },
   project_id: {
-    type: DataTypes.INTEGER
+    type: DataTypes.INTEGER,
   },
   permissions: {
     type: DataTypes.JSON,
-    allowNull: false
-  }
+    allowNull: false,
+  },
 });

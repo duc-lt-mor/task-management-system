@@ -56,7 +56,7 @@ export const show = async function (
   next: express.NextFunction,
 ) {
   try {
-    let members = await MemberServices.show(Number(req.params.project_id));
+    let members = await MemberServices.show(Number(req.query.project_id));
 
     res.status(200).send(members);
   } catch (err) {

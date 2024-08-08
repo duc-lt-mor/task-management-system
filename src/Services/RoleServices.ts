@@ -31,6 +31,7 @@ export const create = async function (req: express.Request, data: RoleData) {
         throw error;
       }
     }
+
     let role: any = await Project_role.create(
       {
         name: data.name.toLowerCase(),
@@ -72,7 +73,7 @@ export const edit = async function (
         throw error;
       }
     }
-    let role_updated: any = await Project_role.update(
+    await Project_role.update(
       {
         name: data.name.toLowerCase(),
         permissions: data.permissions,
@@ -81,6 +82,11 @@ export const edit = async function (
     );
 
     await t.commit();
+    let role_updated: any = await Project_role.findOne({
+      where: {
+        id: id,
+      },
+    });
     return role_updated;
   } catch (err) {
     await t.rollback();
@@ -92,15 +98,16 @@ export const destroy = async function (id: number, req: express.Request) {
   const t = await sequelize.transaction();
 
   try {
-    const errors = validationResult(req);
-
+    const errors: any = validationResult(req);
     if (!errors.isEmpty()) {
       const errorMessages = errors.array().map((e: any) => e.msg);
-      const error = createHttpError(
-        400,
-        JSON.stringify(errorMessages, null, 2),
-      );
-      throw error;
+      if (errorMessages != 'Invalid value') {
+        const error = createHttpError(
+          400,
+          JSON.stringify(errorMessages, null, 2),
+        );
+        throw error;
+      }
     }
 
     await Member.destroy({
@@ -127,17 +134,17 @@ export const destroy = async function (id: number, req: express.Request) {
 export const changeProjectOwner = async function (req: CustomRequest) {
   const t = await sequelize.transaction();
   try {
-    const errors = validationResult(req);
-
+    const errors: any = validationResult(req);
     if (!errors.isEmpty()) {
       const errorMessages = errors.array().map((e: any) => e.msg);
-      const error = createHttpError(
-        400,
-        JSON.stringify(errorMessages, null, 2),
-      );
-      throw error;
+      if (errorMessages != 'Invalid value') {
+        const error = createHttpError(
+          400,
+          JSON.stringify(errorMessages, null, 2),
+        );
+        throw error;
+      }
     }
-
     let new_owner: any = await Member.findOne({
       where: {
         project_id: req.body.project_id,

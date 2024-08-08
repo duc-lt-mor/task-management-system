@@ -8,6 +8,8 @@ import express from 'express';
 import createHttpError from 'http-errors';
 import { CustomRequest } from '../Middleware/UserAuthenticator';
 import { Project_role } from '../Models/project_role';
+import { Op } from 'sequelize';
+import { Task } from '../Models/task';
 // lay ra 1 project
 export const findProjectById = async (id: number) => {
   let project = await Project.findOne({
@@ -37,7 +39,7 @@ export const create = async function (req: CustomRequest, data: ProjectData) {
       {
         name: data.name.toLowerCase(),
         key: data.key.toUpperCase(),
-        decripstion: data.decriptstion,
+        description: data.description,
         creator_id: req.user?.id,
         expected_end_date: data.expected_end_date,
       },
@@ -68,7 +70,7 @@ export const create = async function (req: CustomRequest, data: ProjectData) {
       ],
       { transaction: t },
     );
-    // khoi tao 2 role mac dinh
+    // khoi tao 3 role mac dinh
     let project_role: any = await Project_role.bulkCreate(
       [
         {
@@ -80,13 +82,13 @@ export const create = async function (req: CustomRequest, data: ProjectData) {
         {
           is_pm: false,
           name: 'Leader',
-          permissions: [8, 9, 10, 11, 12],
+          permissions: [1, 5, 8, 9, 10, 11, 12, 13, 14, 15],
           project_id: project.id,
         },
         {
           is_pm: false,
           name: 'User',
-          permissions: [],
+          permissions: [1, 5, 11],
           project_id: project.id,
         },
       ],
@@ -118,7 +120,6 @@ export const edit = async function (
 ) {
   const t = await sequelize.transaction();
   let project: any = await findProjectById(id);
-
   if (!data.name) {
     data.name = project.name;
   }
@@ -137,14 +138,16 @@ export const edit = async function (
     await Project.update(
       {
         name: data.name.toLowerCase(),
-        decripstion: data.decriptstion,
+        description: data.description,
         expected_end_date: data.expected_end_date,
+        real_end_date: data.real_end_date
       },
       { where: { id: id }, transaction: t },
     );
 
     await t.commit();
-    return project;
+    let project_updated: any = await findProjectById(id);
+    return project_updated;
   } catch (err) {
     await t.rollback();
     throw err;
@@ -162,6 +165,12 @@ export const destroy = async (id: number) => {
       transaction: t,
     });
     await Promise.all([
+      Task.destroy({
+        where: {
+          project_id: id,
+        },
+        transaction: t,
+      }),
       Member.destroy({
         where: {
           project_id: id,
@@ -189,4 +198,31 @@ export const destroy = async (id: number) => {
     await t.rollback();
     throw error;
   }
+};
+
+export const search = async function (query: any) {
+  let { name, key } = query;
+  if (!name && !key) {
+    return await Project.findAll();
+  }
+
+  const filter: any = {
+    where: {},
+  };
+
+  if (name) {
+    filter.where.name = {
+      [Op.like]: `${name}%`,
+    };
+  }
+
+  if (key) {
+    filter.where.key = {
+      [Op.like]: `${key}%`,
+    };
+  }
+
+  let project = await Project.findAll(filter);
+
+  return project;
 };

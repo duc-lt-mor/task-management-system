@@ -25,20 +25,13 @@ export const postRegister = async function (
   next: express.NextFunction,
 ) {
   try {
-    // Validate the incoming request
-    // const errors = validationResult(req);
-    // if (!errors.isEmpty()) {
-    //   // If there are validation errors, pass them to the error handler
-    //   return next(createHttpError(400, 'Validation errors', { errors: errors.array() }));
-    // }
-
     const data = {
       name: req.body.name,
       email: req.body.email,
       password: req.body.password,
       passwordConfirm: req.body.passwordConfirm,
       phone_number: req.body.phone_number,
-      system_role_id: req.body.system_role_id,
+      system_role_id: 2,
     };
 
     // Check if email is provided and valid
@@ -53,11 +46,11 @@ export const postRegister = async function (
     }
 
     // Register the new user
-    const result = await services.register(data);
+    const result: any = await services.register(data);
 
     // Send response if the user was created successfully
     if (result) {
-      return res.status(201).json({ message: 'User created', user: result });
+      return res.status(201).json({ message: 'User created', user: {"id": result.id, "name": result.name, "email": result.email} });
     }
 
     // Handle unexpected situations

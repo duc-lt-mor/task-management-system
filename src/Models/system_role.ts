@@ -15,7 +15,7 @@ export const System_role = sequelize.define('system_roles', {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  decripstion: {
+  description: {
     type: DataTypes.STRING,
     allowNull: true,
   },

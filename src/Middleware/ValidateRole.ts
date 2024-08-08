@@ -30,6 +30,7 @@ export const validateRole = function () {
           if (!PERMISSIONS.includes(Number(p))) {
             err.push(p + ' is not exit in permissions');
           }
+          
         }
         if (arr.includes(PM_PERMISSIONS)) {
           err.push('you can not have pm permission');
@@ -96,9 +97,16 @@ export const validateChangeOwnerProject = function () {
             id: Number(new_project_role_id),
           },
         });
+        
+        if (!role) {
+          throw new Error('role not exit');
+        } 
+
         if (role.is_pm) {
           throw new Error('you can not chose pm role');
         }
+
+        
       }),
   ];
 };

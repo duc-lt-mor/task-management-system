@@ -34,7 +34,7 @@ export const generate = async function (
     if (!comment) {
       throw createHttpError(400, `Could not generate comment`);
     }
-    return res.status(200).json({ 'Commented successfully': comment });
+    return res.status(200).json({ data: comment });
   } catch (err) {
     return next(err);
   }
@@ -118,12 +118,12 @@ export const get = async function (
 
     if (!isNaN(parent_id)) {
       replies = await services.getReplies(parent_id);
-      return res.status(200).json({ replies })
+      return res.status(200).json({ data: replies })
     }
 
     if (!isNaN(task_id)) {
       comments = await services.get(task_id);
-      return res.status(200).json({ comments })
+      return res.status(200).json({ data: comments })
     }
 
   } catch (err) {
@@ -159,7 +159,7 @@ export const getReplies = async function (
     if (!replies) {
       return [];
     }
-    return res.status(200).json(replies);
+    return res.status(200).json({data: replies});
   } catch (err) {
     next(err);
   }
@@ -181,7 +181,7 @@ export const update = async function (
 
     let comment_updated = await services.update(id, content);
 
-    return res.status(200).json(comment_updated);
+    return res.status(200).json({data: comment_updated});
   } catch (err) {
     return next(err);
   }
@@ -217,7 +217,7 @@ export const destroy = async function (
       }
 
       await services.destroy(id);
-      return res.status(200).json(`Deleted`);
+      return res.status(200).json({message: `Deleted`});
     }
   } catch (err) {
     return next(err);

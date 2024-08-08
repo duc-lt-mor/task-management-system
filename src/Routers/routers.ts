@@ -1,7 +1,7 @@
 import * as ProjectController from '../Controller/ProjectController';
 import * as ValidateProject from '../Middleware/ValidateProject';
 import * as ColumController from '../Controller/ColumnController';
-import * as ValidateColum from '../Middleware/ValidateColum';
+import * as ValidateColumn from '../Middleware/ValidateColumn';
 import * as ValidateMember from '../Middleware/ValidateMember';
 import * as MemberController from '../Controller/MemberController';
 import * as RoleController from '../Controller/RoleController';
@@ -22,11 +22,11 @@ const router = express.Router();
 
 /**
  * @swagger
- * /login:
+ * /api/auth/login:
  *    post:
  *       summary: Login
  *       tags:
- *         - User
+ *         - Auth
  *       requestBody:
  *         required: true
  *         content:
@@ -53,15 +53,15 @@ const router = express.Router();
  *         '500':
  *           description: Internal Server Error
  */
-router.post('/login', user.getLogin);
+router.post('/auth/login', user.getLogin);
 
 /**
  * @swagger
- * /register:
+ * /api/auth/register:
  *    post:
  *       summary: Register
  *       tags:
- *         - User
+ *         - Auth
  *       requestBody:
  *         required: true
  *         content:
@@ -101,14 +101,14 @@ router.post('/login', user.getLogin);
  *           description: Internal Server Error
  */
 router.post(
-  '/register',
+  '/auth/register',
   ...userValidator.validateRegister(),
   user.postRegister,
 );
 
 /**
  * @swagger
- * /user/{userId}:
+ * /api/users/{userId}:
  *    delete:
  *       summary: Delete a user
  *       tags:
@@ -130,11 +130,11 @@ router.post(
  *         '500':
  *           description: Internal Server Error
  */
-router.delete('/user/:userId', authenticator.isServerAdmin, user.deleteUser);
+router.delete('/users/:userId', authenticator.isServerAdmin, user.deleteUser);
 
 /**
  * @swagger
- * /project:
+ * /api/projects:
  *    get:
  *       summary: Return a list of projects in which user is a member
  *       tags:
@@ -151,11 +151,11 @@ router.delete('/user/:userId', authenticator.isServerAdmin, user.deleteUser);
  *         '500':
  *           description: Internal Server Error
  */
-router.get('/project', authenticator.verifyToken, user.showProject);
+router.get('/projects', authenticator.verifyToken, user.showProject);
 
 /**
  * @swagger
- * /user:
+ * /api/users:
  *    get:
  *       summary: find a user
  *       tags:
@@ -175,12 +175,12 @@ router.get('/project', authenticator.verifyToken, user.showProject);
  *         '500':
  *           description: Internal Server Error
  */
-router.get('/user', authenticator.verifyToken, user.find);
+router.get('/users', authenticator.verifyToken, user.find);
 
 
 /**
  * @swagger
- * /project:
+ * /api/projects:
  *    post:
  *       summary: Create a project
  *       tags:
@@ -218,7 +218,7 @@ router.get('/user', authenticator.verifyToken, user.find);
  *           description: Internal Server Error
  */
 router.post(
-  '/project',
+  '/projects',
   authenticator.verifyToken,
   ...ValidateProject.validateCreate(),
   ProjectController.create,
@@ -226,7 +226,7 @@ router.post(
 
 /**
  * @swagger
- * /project/{project_id}:
+ * /api/projects/{project_id}:
  *    put:
  *       summary: Update a project
  *       tags:
@@ -273,7 +273,7 @@ router.post(
  *           description: Internal Server Error
  */
 router.put(
-  '/project/:project_id',
+  '/projects/:project_id',
   authenticator.verifyToken,
   ProjectAut.authenticateProject(0),
   ...ValidateProject.validateUpdate(),
@@ -282,7 +282,7 @@ router.put(
 
 /**
  * @swagger
- * /project/{project_id}:
+ * /api/projects/{project_id}:
  *    delete:
  *       summary: Delete a project
  *       tags:
@@ -305,7 +305,7 @@ router.put(
  *           description: Internal Server Error
  */
 router.delete(
-  '/project/:project_id',
+  '/projects/:project_id',
   authenticator.verifyToken,
   ProjectAut.authenticateProject(0),
   ProjectController.destroy,
@@ -313,7 +313,7 @@ router.delete(
 
 /**
  * @swagger
- * /role:
+ * /api/roles:
  *    get:
  *       summary: Show roles of a project
  *       tags:
@@ -336,7 +336,7 @@ router.delete(
  *           description: Internal Server Error
  */
 router.get(
-  '/role',
+  '/roles',
   authenticator.verifyToken,
   ProjectAut.authenticateProject(1),
   RoleController.showRole,
@@ -345,7 +345,7 @@ router.get(
 
 /**
  * @swagger
- * /role:
+ * /api/roles:
  *    post:
  *       summary: Create a role
  *       tags:
@@ -381,7 +381,7 @@ router.get(
  *           description: Internal Server Error
  */
 router.post(
-  '/role',
+  '/roles',
   authenticator.verifyToken,
   ProjectAut.authenticateProject(0),
   ...validateRole.validateRole(),
@@ -390,7 +390,7 @@ router.post(
 
 /**
  * @swagger
- * /role/{role_id}:
+ * /api/roles/{role_id}:
  *    put:
  *       summary: Update a role
  *       tags:
@@ -435,7 +435,7 @@ router.post(
  *           description: Internal Server Error
  */
 router.put(
-  '/role/:role_id',
+  '/roles/:role_id',
   authenticator.verifyToken,
   ProjectAut.authenticateProject(0),
   ...validateRole.validateRole(),
@@ -444,7 +444,7 @@ router.put(
 
 /**
  * @swagger
- * /role/{role_id}:
+ * /api/roles/{role_id}:
  *    delete:
  *       summary: Delete a role
  *       tags:
@@ -479,7 +479,7 @@ router.put(
  *           description: Internal Server Error
  */
 router.delete(
-  '/role/:role_id',
+  '/roles/:role_id',
   authenticator.verifyToken,
   ProjectAut.authenticateProject(0),
   ...validateRole.validateDelete(),
@@ -488,7 +488,7 @@ router.delete(
 
 /**
  * @swagger
- * /member:
+ * /api/members:
  *    get:
  *       summary: Return a list member of a project
  *       tags:
@@ -511,7 +511,7 @@ router.delete(
  *           description: Internal Server Error
  */
 router.get(
-  '/member',
+  '/members',
   authenticator.verifyToken,
   ProjectAut.authenticateProject(5),
   MemberController.show,
@@ -519,7 +519,7 @@ router.get(
 
 /**
  * @swagger
- * /member:
+ * /api/members:
  *    post:
  *       summary: Add a user to a project
  *       tags:
@@ -557,7 +557,7 @@ router.get(
  *           description: Internal Server Error
  */
 router.post(
-  '/member',
+  '/members',
   authenticator.verifyToken,
   ProjectAut.authenticateProject(3),
   ...ValidateMember.addUser(),
@@ -566,7 +566,7 @@ router.post(
 
 /**
  * @swagger
- * /member/{member_id}:
+ * /api/members/{member_id}:
  *    delete:
  *       summary: Remove a user from project
  *       tags:
@@ -601,7 +601,7 @@ router.post(
  *           description: Internal Server Error
  */
 router.delete(
-  '/member/:member_id',
+  '/members/:member_id',
   authenticator.verifyToken,
   ProjectAut.authenticateProject(4),
   MemberController.remove,
@@ -609,7 +609,7 @@ router.delete(
 
 /**
  * @swagger
- * /member/{member_id}:
+ * /api/members/{member_id}:
  *    put:
  *       summary: Edit role of a user in a project
  *       tags:
@@ -648,7 +648,7 @@ router.delete(
  *           description: Internal Server Error
  */
 router.put(
-  '/member/:member_id',
+  '/members/:member_id',
   authenticator.verifyToken,
   ProjectAut.authenticateProject(2),
   MemberController.editRole,
@@ -657,7 +657,7 @@ router.put(
 
 /**
  * @swagger
- * /change_owner:
+ * /api/project/owner:
  *    put:
  *       summary: Change owner of a project
  *       tags:
@@ -673,10 +673,10 @@ router.put(
  *               properties:
  *                 project_id:
  *                   type: integer
- *                   example: project 1
+ *                   example: 1
  *                 new_project_role_id:
  *                   type: integer
- *                   example: this is description of project 1
+ *                   example: 1
  *                 new_owner_id:
  *                   type: integer
  *                   example: 1
@@ -695,7 +695,7 @@ router.put(
  *           description: Internal Server Error
  */
 router.put(
-  '/change_owner',
+  '/project/owner',
   authenticator.verifyToken,
   ProjectAut.authenticateProject(0),
   ...validateRole.validateChangeOwnerProject(),
@@ -705,7 +705,7 @@ router.put(
 
 /**
  * @swagger
- * /column:
+ * /api/columns:
  *    post:
  *       summary: Create a column in a project
  *       tags:
@@ -739,16 +739,16 @@ router.put(
  *           description: Internal Server Error
  */
 router.post(
-  '/column',
+  '/columns',
   authenticator.verifyToken,
   ProjectAut.authenticateProject(13),
-  ...ValidateColum.validateCreate(),
+  ...ValidateColumn.validateCreate(),
   ColumController.create,
 );
 
 /**
  * @swagger
- * /column/{col_id}:
+ * /api/columns/{col_id}:
  *    put:
  *       summary: Update a column in a project
  *       tags:
@@ -798,16 +798,16 @@ router.post(
  *           description: Internal Server Error
  */
 router.put(
-  '/column/:col_id',
+  '/columns/:col_id',
   authenticator.verifyToken,
   ProjectAut.authenticateProject(14),
-  ...ValidateColum.validateUpdate(),
+  ...ValidateColumn.validateUpdate(),
   ColumController.edit,
 );
 
 /**
  * @swagger
- * /column/{col_id}:
+ * /api/columns/{col_id}:
  *    delete:
  *       summary: Delete a column in a project
  *       tags:
@@ -840,16 +840,16 @@ router.put(
  *           description: Internal Server Error
  */
 router.delete(
-  '/column/:col_id',
+  '/columns/:col_id',
   authenticator.verifyToken,
   ProjectAut.authenticateProject(15),
-  ...ValidateColum.validateDelete(),
+  ...ValidateColumn.validateDelete(),
   ColumController.destroy,
 );
 
 /**
  * @swagger
- * /task:
+ * /api/tasks:
  *    post:
  *       summary: Create a task in a project
  *       tags:
@@ -905,7 +905,7 @@ router.delete(
  *           description: Internal Server Error
  */
 router.post(
-  '/task',
+  '/tasks',
   authenticator.verifyToken,
   ProjectAut.authenticateProject(8),
   ...validateTask(),
@@ -914,7 +914,7 @@ router.post(
 
 /**
  * @swagger
- * /task:
+ * /api/tasks:
  *    get:
  *       summary: Search task in a project
  *       tags:
@@ -954,7 +954,7 @@ router.get(
 
 /**
  * @swagger
- * /task/{id}:
+ * /api/tasks/{id}:
  *    delete:
  *       summary: Delete a task in a project
  *       tags:
@@ -988,7 +988,7 @@ router.get(
  */
 
 router.delete(
-  '/task/:id',
+  '/tasks/:id',
   authenticator.verifyToken,
   ProjectAut.authenticateProject(10),
   task.deleteTask,
@@ -996,7 +996,7 @@ router.delete(
 
 /**
  * @swagger
- * /task/{id}:
+ * /api/tasks/{id}:
  *    put:
  *       summary: Upddate a task in a project
  *       tags:
@@ -1036,6 +1036,12 @@ router.delete(
  *                 expected_end_date:
  *                   type: string
  *                   example: 2024-08-19
+ *                 real_end_date:
+ *                   type: string
+ *                   example: 2024-08-09
+ *                 column_id:
+ *                   type: integer
+ *                   example: 1
  *                 assignee_id:
  *                   type: integer
  *                   example: 11
@@ -1052,7 +1058,7 @@ router.delete(
  *           description: Internal Server Error
  */
 router.put(
-  '/task/:id',
+  '/tasks/:id',
   authenticator.verifyToken,
   TaskAut.authenticateUpdateTask(),
   ...validateTask(),
@@ -1061,7 +1067,7 @@ router.put(
 
 /**
  * @swagger
- * /comment:
+ * /api/comments:
  *    post:
  *       summary: Create a comment in a project
  *       tags:
@@ -1097,7 +1103,7 @@ router.put(
  *           description: Internal Server Error
  */
 router.post(
-  '/comment',
+  '/comments',
   authenticator.verifyToken,
   CommentAut.authenticateCreateComment(12),
   comment.generate,
@@ -1105,7 +1111,7 @@ router.post(
 
 /**
  * @swagger
- * /comment/{id}:
+ * /api/comments/{id}:
  *    put:
  *       summary: Edit a comment in a project
  *       tags:
@@ -1140,7 +1146,7 @@ router.post(
  *           description: Internal Server Error
  */
 router.put(
-  '/comment/:id',
+  '/comments/:id',
   authenticator.verifyToken,
   CommentAut.authenticateUDComment(),
   comment.update,
@@ -1148,7 +1154,7 @@ router.put(
 
 /**
  * @swagger
- * /comment/reply:
+ * /api/comments/reply:
  *    post:
  *       summary: Reply a comment in a project
  *       tags:
@@ -1182,7 +1188,7 @@ router.put(
  *           description: Internal Server Error
  */
 router.post(
-  '/comment/reply',
+  '/comments/reply',
   authenticator.verifyToken,
   CommentAut.authenticateCreateComment(12),
   comment.reply,
@@ -1190,7 +1196,7 @@ router.post(
 
 /**
  * @swagger
- * /comment/{id}:
+ * /api/comments/{id}:
  *    delete:
  *       summary: Delete a comment in a project
  *       tags:
@@ -1213,7 +1219,7 @@ router.post(
  *           description: Internal Server Error
  */
 router.delete(
-  '/comment/:id',
+  '/comments/:id',
   authenticator.verifyToken,
   CommentAut.authenticateUDComment(),
   comment.destroy,
@@ -1221,7 +1227,7 @@ router.delete(
 
 /**
  * @swagger
- * /comment:
+ * /api/comments:
  *    get:
  *       summary: Get comment in a task
  *       tags:
@@ -1245,6 +1251,6 @@ router.delete(
  *         '500':
  *           description: Internal Server Error
  */
-router.get('/comment', authenticator.verifyToken, comment.get);
+router.get('/comments', authenticator.verifyToken, comment.get);
 
 export default router;

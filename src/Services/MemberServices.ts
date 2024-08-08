@@ -74,8 +74,8 @@ export const add = async function (req: express.Request, data: MemberData) {
     let member: any = await Member.create(
       {
         user_id: user.id,
-        project_id: data.project_id,
-        project_role_id: data.project_role_id,
+        project_id: Number(data.project_id),
+        project_role_id: Number(data.project_role_id),
       },
       { transaction: t },
     );
@@ -106,7 +106,7 @@ export const remove = async function (id: number) {
 //cap nhat role cua thanh vien trong project
 export const editRole = async function (id: number, data: MemberData) {
   const t = await sequelize.transaction();
-
+  
   try {
     await Member.update(
       { project_role_id: Number(data.project_role_id) },

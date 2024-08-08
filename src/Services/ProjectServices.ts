@@ -1,6 +1,6 @@
 import { Project } from '../Models/project';
 import { Member } from '../Models/member';
-import { Colum } from '../Models/colum';
+import { Column } from '../Models/column';
 import { ProjectData } from '../Interfaces/ProjectInterface';
 import { sequelize } from '../Config/config';
 import { validationResult } from 'express-validator';
@@ -10,6 +10,7 @@ import { CustomRequest } from '../Middleware/UserAuthenticator';
 import { Project_role } from '../Models/project_role';
 import { Op } from 'sequelize';
 import { Task } from '../Models/task';
+import { TaskKeyword } from '../Models/task_keyword';
 // lay ra 1 project
 export const findProjectById = async (id: number) => {
   let project = await Project.findOne({
@@ -47,7 +48,7 @@ export const create = async function (req: CustomRequest, data: ProjectData) {
     );
 
     // khoi tao 3 cot mac dinh
-    await Colum.bulkCreate(
+    await Column.bulkCreate(
       [
         {
           col_type: 'todo',
@@ -164,6 +165,19 @@ export const destroy = async (id: number) => {
       },
       transaction: t,
     });
+    let tasks: any = await Task.findAll({
+      where: {
+        project_id: id
+      }
+    })
+  
+    for (let task of tasks) {
+      await TaskKeyword.destroy({
+        where: {
+          task_id: task.id
+        }
+      })
+    }
     await Promise.all([
       Task.destroy({
         where: {
@@ -178,7 +192,7 @@ export const destroy = async (id: number) => {
         transaction: t,
       }),
 
-      Colum.destroy({
+      Column.destroy({
         where: {
           project_id: id,
         },

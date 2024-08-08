@@ -11,7 +11,7 @@ export const create = async function (
     let role: any = await RoleServices.create(req, req.body);
     return res.status(201).json({
       message: 'create role success',
-      'role updated': role,
+      data: role,
     });
   } catch (err: any) {
     next(err);
@@ -31,7 +31,7 @@ export const edit = async function (
     );
     return res.status(200).json({
       message: 'edit role success',
-      'role updated': role,
+      data: role,
     });
   } catch (err) {
     next(err);
@@ -57,11 +57,13 @@ export const changeProjectOwner = async function (
   next: express.NextFunction,
 ) {
   try {
+    console.log(req.body.project_id)
     let new_owner: any = await RoleServices.changeProjectOwner(req);
     return res
       .status(200)
-      .json({ message: 'change owner success', new_owner: new_owner });
+      .json({ message: 'change owner success', data: new_owner });
   } catch (err) {
+    console.log(err)
     next(err);
   }
 };

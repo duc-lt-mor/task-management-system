@@ -11,7 +11,7 @@ export const create = async function (
     let project: any = await ProjectServices.create(req, req.body);
     return res
       .status(201)
-      .json({ message: 'create project success', 'new project': project });
+      .json({ message: 'create project success', data: project });
   } catch (err) {
     next(err);
   }
@@ -30,7 +30,7 @@ export const edit = async function (
     );
     return res
       .status(200)
-      .json({ message: 'update project success', 'updated project': project });
+      .json({ message: 'update project success', data: project });
   } catch (err) {
     next(err);
   }
@@ -43,7 +43,7 @@ export const destroy = async function (
 ) {
   try {
     await ProjectServices.destroy(Number(req.params.project_id));
-    return res.status(200).send('delete project success');
+    return res.status(200).json({message:'delete project success'});
   } catch (err) {
     next(err);
   }
@@ -57,10 +57,10 @@ export const search = async function (
   try {
     let project: any = await ProjectServices.search(req.query);
 
-    if (project == null) {
-      return res.status(404).json({ 'project found ': project });
+    if (project) {
+      return res.status(200).json({message: 'project found ', data: project });
     } else {
-      return res.status(200).json('project not found ');
+      return res.status(404).json({message: 'project not found '});
     }
   } catch (error) {
     next(error);

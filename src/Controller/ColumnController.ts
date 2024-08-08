@@ -9,7 +9,7 @@ export const create = async function (
   try {
     let column: any = await ColumnServices.create(req.body, req);
 
-    res.status(201).send({ message: 'create success', 'new column': column });
+    res.status(201).json({ message: 'create success', data: column });
   } catch (error) {
     next(error);
   }
@@ -27,7 +27,7 @@ export const edit = async function (
       req,
     );
 
-    res.status(200).send({ message: 'edit success', 'edited column': column });
+    res.status(200).json({ message: 'edit success', data: column });
   } catch (error) {
     next(error);
   }
@@ -41,7 +41,7 @@ export const destroy = async function (
   try {
     await ColumnServices.destroy(Number(req.params.col_id), req);
 
-    res.status(200).send('delete success');
+    res.status(200).json({message: 'delete success'});
   } catch (error) {
     next(error);
   }

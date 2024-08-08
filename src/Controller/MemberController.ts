@@ -1,5 +1,7 @@
 import * as MemberServices from '../Services/MemberServices';
 import express from 'express';
+import { findRoleById } from '../Services/RoleServices';
+import createHttpError from 'http-errors';
 
 export const add = async function (
   req: express.Request,
@@ -11,7 +13,7 @@ export const add = async function (
 
     return res
       .status(201)
-      .send({ message: 'add member success', 'added member': member });
+      .send({ message: 'add member success', data: member });
   } catch (err) {
     next(err);
   }
@@ -25,7 +27,7 @@ export const remove = async function (
   try {
     await MemberServices.remove(Number(req.params.member_id));
 
-    return res.status(200).send('delete member success');
+    return res.status(200).json({ message: 'delete member success' });
   } catch (err) {
     next(err);
   }
@@ -37,6 +39,16 @@ export const editRole = async function (
   next: express.NextFunction,
 ) {
   try {
+    let role: any = await findRoleById(req.body?.project_role_id);
+
+    if (!role) {
+      const error = createHttpError(
+        400,
+        JSON.stringify('role is not exist', null, 2),
+      );
+      throw error;
+    }
+
     let member: any = await MemberServices.editRole(
       Number(req.params.member_id),
       req.body,
@@ -44,7 +56,7 @@ export const editRole = async function (
 
     return res
       .status(200)
-      .send({ message: 'edit member role success', 'member ': member });
+      .send({ message: 'edit member role success', data: member });
   } catch (err) {
     next(err);
   }

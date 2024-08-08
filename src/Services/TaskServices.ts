@@ -28,16 +28,14 @@ export const get = function () {
   return Task.findAll();
 };
 
-
-export const update = async function (id: number, data: any) {
+export const update = async function (id: number, data: any, user_id: any) {
   try {
-
     let task: any = await find(id);
 
-    if (task.assignee_id == data.assignee_id) {
+    if (task.assignee_id == user_id) {
       await Task.update(
         {
-          colum_id: data.colum_id,
+          column_id: data.column_id,
           real_end_date: data.real_end_date,
         },
         {
@@ -46,22 +44,12 @@ export const update = async function (id: number, data: any) {
           },
         },
       );
-    }
-    else {
-      await Task.update(
-        {
-          colum_id: data.colum_id,
-          real_end_date: data.real_end_date,
-          priority: data.priority,
-          assignee_id: data.assignee_id,
-          start_date: data.start_date,
+    } else {
+      await Task.update(data, {
+        where: {
+          id: id,
         },
-        {
-          where: {
-            id: id,
-          },
-        },
-      );
+      });
     }
     let updated_task: any = await find(id);
     return updated_task;

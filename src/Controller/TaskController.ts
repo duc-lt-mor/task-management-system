@@ -2,7 +2,7 @@ import express from 'express';
 import * as services from '../Services/TaskServices';
 import * as authenticator from '../Middleware/UserAuthenticator';
 import createHttpError from 'http-errors';
-import { Colum } from '../Models/colum';
+import { Column } from '../Models/column';
 import { TaskKeyword } from '../Models/task_keyword';
 import { sequelize } from '../Config/config';
 import * as keywords from '../Services/KeywordServices';
@@ -32,13 +32,13 @@ export const generateTask = async function (
 
     const project_id: number = Number(req.body.project_id);
     const creator_id: number = req.user?.id;
-    let colum: any = await Colum.findOne({
+    let column: any = await Column.findOne({
       where: {
         project_id: project_id,
         col_index: 1,
       },
     });
-    const colum_id: number = colum.id;
+    const column_id: number = column.id;
     const key = await services.generateKey(project_id); // Ensure this is awaited
     const taskData = {
       project_id,
@@ -50,7 +50,7 @@ export const generateTask = async function (
       priority: req.body.priority,
       start_date: req.body.start_date,
       expected_end_date: req.body.expected_end_date,
-      colum_id,
+      column_id,
     };
 
     const task: any = await services.create(taskData, transaction);
@@ -73,7 +73,7 @@ export const generateTask = async function (
 
     return res
       .status(201)
-      .json({ message: 'Task generated successfully', task });
+      .json({ message: 'Task generated successfully', data: task });
   } catch (err) {
     await transaction.rollback();
     next(err);
@@ -120,7 +120,7 @@ export const getTasks = async function (
 };
 
 export const update = async function (
-  req: express.Request,
+  req: authenticator.CustomRequest,
   res: express.Response,
   next: express.NextFunction,
 ) {
@@ -140,20 +140,12 @@ export const update = async function (
     if (isNaN(taskId)) {
       return res.status(400).json({ message: 'Invalid task ID' });
     }
-
-    const updateData = {
-      colum_id: req.body.colum_id,
-      real_end_date: req.body.real_end_date,
-      priority: req.body.priority,
-      assignee_id: req.body.assignee_id,
-      start_date: req.body.start_date,
-    };
-    let result: any = await services.update(taskId, updateData);
+    let result: any = await services.update(taskId, req.body, req.user?.id);
     if (!result) {
       throw createHttpError(400, `Couldn't update task data`);
     }
 
-    return res.status(200).json({ 'update task success': result });
+    return res.status(200).json({ message: 'update task success', data: result });
   } catch (err) {
     console.log(err);
     return next(err);

@@ -17,7 +17,7 @@ export const validateRole = function () {
         }) 
 
         if (role) {
-          throw new Error('this name is already exit');
+          throw new Error('this name is already exist');
         }
       }),
     body('permissions')
@@ -28,7 +28,7 @@ export const validateRole = function () {
         let arr = JSON.parse(`[${permissions}]`);
         for (let p of arr) {
           if (!PERMISSIONS.includes(Number(p))) {
-            err.push(p + ' is not exit in permissions');
+            err.push(p + ' is not exist in permissions');
           }
           
         }
@@ -99,7 +99,7 @@ export const validateChangeOwnerProject = function () {
         });
         
         if (!role) {
-          throw new Error('role not exit');
+          throw new Error('role not exist');
         } 
 
         if (role.is_pm) {

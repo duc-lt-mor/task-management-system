@@ -1,4 +1,4 @@
-import * as ColumServices from '../Services/ColumServices';
+import * as ColumnServices from '../Services/ColumnServices';
 import express from 'express';
 
 export const create = async function (
@@ -7,9 +7,9 @@ export const create = async function (
   next: express.NextFunction,
 ) {
   try {
-    let comlum: any = await ColumServices.create(req.body, req);
+    let column: any = await ColumnServices.create(req.body, req);
 
-    res.status(201).send({ message: 'create success', 'new colum': comlum });
+    res.status(201).json({ message: 'create success', data: column });
   } catch (error) {
     next(error);
   }
@@ -21,13 +21,13 @@ export const edit = async function (
   next: express.NextFunction,
 ) {
   try {
-    let colum: any = await ColumServices.edit(
+    let column: any = await ColumnServices.edit(
       Number(req.params.col_id),
       req.body,
       req,
     );
 
-    res.status(200).send({ message: 'edit success', 'edited colum': colum });
+    res.status(200).json({ message: 'edit success', data: column });
   } catch (error) {
     next(error);
   }
@@ -39,9 +39,9 @@ export const destroy = async function (
   next: express.NextFunction,
 ) {
   try {
-    await ColumServices.destroy(Number(req.params.col_id), req);
+    await ColumnServices.destroy(Number(req.params.col_id), req);
 
-    res.status(200).send('delete success');
+    res.status(200).json({message: 'delete success'});
   } catch (error) {
     next(error);
   }

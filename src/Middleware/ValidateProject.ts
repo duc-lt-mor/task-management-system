@@ -4,42 +4,58 @@ import { body } from 'express-validator';
 
 export const validateCreate = function () {
   return [
-    body('name').notEmpty().withMessage("Please enter project name").trim().custom(async (name) => {
-      
-      let project_found = await Project.findOne({
-        where: {
-          name: name.toLowerCase(),
-        },
-      });
+    body('name')
+      .notEmpty()
+      .withMessage('Please enter project name')
+      .trim()
+      .custom(async (name) => {
+        let project_found = await Project.findOne({
+          where: {
+            name: name.toLowerCase(),
+          },
+        });
+        if (project_found) {
+          throw new Error('project name already been used');
+        }
+      }),
+    body('key')
+      .notEmpty()
+      .withMessage('Please enter project key')
+      .trim()
+      .custom(async (key) => {
+        let project_found = await Project.findOne({
+          where: {
+            key: key.toLowerCase(),
+          },
+          
+        });
+        if (project_found) {
+          throw new Error('project name already been used');
+        }
+      }),
+    body('key')
+      .notEmpty()
+      .withMessage('Please enter project key')
+      .trim()
+      .custom(async (key) => {
+        let project_found = await Project.findOne({
+          where: {
+            key: key.toLowerCase(),
+          },
+        });
 
-      if (project_found) {
-        throw new Error( 'project name already been used');
-      }
-    }),
-
-    body('key').notEmpty().withMessage('Please enter project key').trim().custom(async (key) => {
-
-      let project_found = await Project.findOne({
-        where: {
-          key: key.toLowerCase(),
-        },
-      });
-
-      if (project_found) {
-        throw new Error('project key already been used');
-      }
-    }),
+        if (project_found) {
+          throw new Error('project key already been used');
+        }
+      }),
 
     body('expected_end_date').custom(async (expected_end_date) => {
-      validateExpectED(expected_end_date)
+      validateExpectED(expected_end_date);
     }),
   ];
-}
+};
 
-
-export const validateUpdate = function (
-
-) {
+export const validateUpdate = function () {
   return [
     body('name').custom(async (name, { req }) => {
       let project_found = await Project.findOne({
@@ -55,8 +71,11 @@ export const validateUpdate = function (
     }),
 
     body('expected_end_date').custom(async (expected_end_date) => {
-      validateExpectED(expected_end_date)
+      validateExpectED(expected_end_date);
     }),
+    body('real_end_date').custom(async (real_end_date) => {
+      validateExpectED(real_end_date);
+    })
   ];
 };
 
@@ -69,6 +88,6 @@ const validateExpectED = (expected_end_date: string) => {
   let current_date: Date = new Date();
 
   if (create_date < current_date || isNaN(create_date.getTime())) {
-    throw new Error(`expected end date must later than ${current_date}`);
+    throw new Error(`end date must later than ${current_date}`);
   }
-}
+};

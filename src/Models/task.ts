@@ -1,7 +1,7 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../Config/config';
 import { Project } from './project';
-import { Colum } from './colum';
+import { Column } from './column';
 import { User } from './user';
 export const Task = sequelize.define(
   'tasks',
@@ -11,6 +11,10 @@ export const Task = sequelize.define(
       allowNull: false,
       autoIncrement: true,
       primaryKey: true,
+    },
+    key: {
+      type: DataTypes.STRING,
+      allowNull: false
     },
     name: {
       type: DataTypes.STRING,
@@ -28,13 +32,17 @@ export const Task = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    start_date: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
     expected_end_date: {
       type: DataTypes.DATE,
       allowNull: false,
     },
     real_end_date: {
       type: DataTypes.DATE,
-      allowNull: false,
+      allowNull: true,
     },
   },
   {
@@ -47,11 +55,11 @@ Project.hasMany(Task, {
 Task.belongsTo(Project, {
   foreignKey: 'project_id',
 });
-Colum.hasMany(Task, {
-  foreignKey: 'colum_id',
+Column.hasMany(Task, {
+  foreignKey: 'column_id',
 });
-Task.belongsTo(Colum, {
-  foreignKey: 'colum_id',
+Task.belongsTo(Column, {
+  foreignKey: 'column_id',
 });
 User.hasMany(Task, {
   foreignKey: 'assignee_id',

@@ -37,7 +37,7 @@ export const authenticateUpdateTask = function () {
       }
     } catch (err) {
       console.log(req.user?.id);
-      return res.status(500).json({ message: 'Internal error ' + err });
+      return res.status(500).json({ message: 'Internal error ' });
     }
   };
 };

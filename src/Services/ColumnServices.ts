@@ -40,6 +40,11 @@ export const create = async function (data: ColumnData, req: express.Request) {
   }
 };
 
+export const get = async function (id: number) {
+  const columns = await Column.findAll({where: {project_id: id}})
+  return columns
+}
+
 export const edit = async function (
   id: number,
   data: ColumnData,

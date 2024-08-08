@@ -79,7 +79,7 @@ export const validateDelete = function () {
       //dem so task hien co trong mot cot
       let tasks_count: any = Task.count({
         where: {
-          colum_id: id,
+          column_id: id,
         },
       });
 

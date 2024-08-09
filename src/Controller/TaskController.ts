@@ -170,6 +170,7 @@ export const deleteTask = async function (
     }
     await services.deleteTask(id);
     return res.status(201).json({ message: `Task deleted` });
+    
   } catch (err) {
     return next(err);
   }

@@ -3,6 +3,7 @@ import { Project } from '../Models/project';
 import { Transaction } from 'sequelize';
 import { sequelize } from '../Config/config';
 import { TaskKeyword } from '../Models/task_keyword';
+import { Comment } from '../Models/comment'
 
 export const create = function (data: any, transaction: Transaction) {
   return Task.create(data, { transaction });
@@ -61,6 +62,7 @@ export const update = async function (id: number, data: any, user_id: any) {
 export const deleteTask = async function (id: number) {
   const t = await sequelize.transaction();
   try {
+    await Comment.destroy({where: {task_id: id}, transaction: t})
     await TaskKeyword.destroy({ where: { task_id: id }, transaction: t });
     await Task.destroy({ where: { id }, transaction: t });
     await t.commit();

@@ -1,6 +1,6 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../Config/config';
-import { Project } from './project';
+import { Project } from '../Models/project';
 export const Column = sequelize.define('columns', {
   id: {
     type: DataTypes.INTEGER,

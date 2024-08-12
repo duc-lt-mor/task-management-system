@@ -7,6 +7,7 @@ import { TaskKeyword } from '../Models/task_keyword';
 import { sequelize } from '../Config/config';
 import * as keywords from '../Services/KeywordServices';
 import { validationResult } from 'express-validator';
+import { ColumnData } from '../Interfaces/ColumnInterface';
 
 export const generateTask = async function (
   req: authenticator.CustomRequest,
@@ -32,12 +33,14 @@ export const generateTask = async function (
 
     const project_id: number = Number(req.body.project_id);
     const creator_id: number = req.user?.id;
+
     let column: any = await Column.findOne({
       where: {
         project_id: project_id,
-        col_type: "todo",
+        col_type: 'todo',
       },
     });
+    console.log(column)
     const column_id: number = column.id;
     const key = await services.generateKey(project_id); // Ensure this is awaited
     const taskData = {
@@ -167,6 +170,7 @@ export const deleteTask = async function (
     }
     await services.deleteTask(id);
     return res.status(201).json({ message: `Task deleted` });
+    
   } catch (err) {
     return next(err);
   }

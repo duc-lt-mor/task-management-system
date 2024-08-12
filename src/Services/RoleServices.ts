@@ -162,7 +162,7 @@ export const changeProjectOwner = async function (req: CustomRequest) {
       //update role of new owner to pm role
       Member.update(
         {
-          project_role_id: current_owner.project_role_id,
+          project_role_id: current_owner?.project_role_id,
         },
         {
           where: {

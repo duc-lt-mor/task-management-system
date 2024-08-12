@@ -1,3 +1,4 @@
+import { Col } from 'sequelize/types/utils';
 import * as ColumnServices from '../Services/ColumnServices';
 import express from 'express';
 
@@ -14,6 +15,25 @@ export const create = async function (
     next(error);
   }
 };
+
+type GetColumnQuery = {
+  project_id: number;
+}
+
+export const get = async function(
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) {
+  try {
+    const project_id: number = (req.query as unknown as GetColumnQuery).project_id
+    const columns = await ColumnServices.get(project_id)
+    return res.status(200).json({data: columns})
+  } catch(err) {
+    next(err)
+  }
+  
+}
 
 export const edit = async function (
   req: express.Request,

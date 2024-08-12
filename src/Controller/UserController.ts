@@ -2,6 +2,7 @@ import express from 'express';
 import * as services from '../Services/UserServices';
 import createHttpError from 'http-errors';
 import { CustomRequest } from '../Middleware/UserAuthenticator';
+import { Member } from '../Models/member';
 
 export const getLogin = async function (
   req: express.Request,
@@ -69,10 +70,18 @@ export const deleteUser = async function (
   next: express.NextFunction,
 ) {
   try {
-    const id = Number(req.params.id);
-    console.log(id);
-    await services.deleteUser(id);
-    return res.status(200).json({ message: `Deleted user` });
+    const id = parseInt(req.params.id);
+    const member: any = await Member.findAll({
+      where: {
+        user_id: id
+      }
+    })
+    if (member.length > 0) {
+      return res.status(400).json({message: 'Cannot delete user who is in a project'})
+    } else {
+      await services.deleteUser(id);
+      return res.status(200).json({ message: `Deleted` });
+    }
   } catch (err) {
     next(err);
   }

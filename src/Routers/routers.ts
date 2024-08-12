@@ -16,6 +16,7 @@ import { validateTask } from '../Middleware/TaskValidator';
 import * as userValidator from '../Middleware/UserValidator';
 import * as comment from '../Controller/CommentControllers';
 import express from 'express';
+import * as permissions from '../Constant/Permissions';
 const router = express.Router();
 
 
@@ -130,7 +131,7 @@ router.post(
  *         '500':
  *           description: Internal Server Error
  */
-router.delete('/users/:id', authenticator.verifyToken ,authenticator.isServerAdmin, user.deleteUser);
+router.delete('/users/:id', authenticator.verifyToken, authenticator.isServerAdmin, user.deleteUser);
 
 /**
  * @swagger
@@ -275,7 +276,7 @@ router.post(
 router.put(
   '/projects/:project_id',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject(0),
+  ProjectAut.authenticateProject(permissions.PM_PERMISSIONS),
   ...ValidateProject.validateUpdate(),
   ProjectController.edit,
 );
@@ -307,7 +308,7 @@ router.put(
 router.delete(
   '/projects/:project_id',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject(0),
+  ProjectAut.authenticateProject(permissions.PM_PERMISSIONS),
   ProjectController.destroy,
 );
 
@@ -338,7 +339,7 @@ router.delete(
 router.get(
   '/roles',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject(1),
+  ProjectAut.authenticateProject(permissions.VIEW_ROLE),
   RoleController.showRole,
 );
 
@@ -383,7 +384,7 @@ router.get(
 router.post(
   '/roles',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject(0),
+  ProjectAut.authenticateProject(permissions.PM_PERMISSIONS),
   ...validateRole.validateRole(),
   RoleController.create,
 );
@@ -437,7 +438,7 @@ router.post(
 router.put(
   '/roles/:role_id',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject(0),
+  ProjectAut.authenticateProject(permissions.PM_PERMISSIONS),
   ...validateRole.validateRole(),
   RoleController.edit,
 );
@@ -481,7 +482,7 @@ router.put(
 router.delete(
   '/roles/:role_id',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject(0),
+  ProjectAut.authenticateProject(permissions.PM_PERMISSIONS),
   ...validateRole.validateDelete(),
   RoleController.destroy,
 );
@@ -513,7 +514,7 @@ router.delete(
 router.get(
   '/members',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject(5),
+  ProjectAut.authenticateProject(permissions.VIEW_MEMBER),
   MemberController.show,
 );
 
@@ -559,7 +560,7 @@ router.get(
 router.post(
   '/members',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject(3),
+  ProjectAut.authenticateProject(permissions.ADD_USER),
   ...ValidateMember.addUser(),
   MemberController.add,
 );
@@ -603,7 +604,7 @@ router.post(
 router.delete(
   '/members/:member_id',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject(4),
+  ProjectAut.authenticateProject(permissions.REMOVE_USER),
   MemberController.remove,
 );
 
@@ -650,7 +651,7 @@ router.delete(
 router.put(
   '/members/:member_id',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject(2),
+  ProjectAut.authenticateProject(permissions.UPDATE_ROLE_USER),
   MemberController.editRole,
 );
 
@@ -697,7 +698,7 @@ router.put(
 router.put(
   '/project/owner',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject(0),
+  ProjectAut.authenticateProject(permissions.PM_PERMISSIONS),
   ...validateRole.validateChangeOwnerProject(),
   RoleController.changeProjectOwner,
 );
@@ -741,9 +742,40 @@ router.put(
 router.post(
   '/columns',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject(13),
+  ProjectAut.authenticateProject(permissions.CREATE_COLUMN),
   ...ValidateColumn.validateCreate(),
   ColumController.create,
+);
+
+/**
+ * @swagger
+ * /api/columns/:
+ *    get:
+ *       summary: get columns in a project
+ *       tags:
+ *         - Column
+ *       parameters:
+ *         - name: project_id
+ *           in: query
+ *           type: integer
+ *           required: true
+ *       security:
+ *         - bearerAuth: []
+ *       responses:
+ *         '200':
+ *           description: OK
+ *         '401':
+ *           description: Unauthorized
+ *         '403':
+ *           description: Forbiden
+ *         '500':
+ *           description: Internal Server Error
+ */
+router.get(
+  '/columns/',
+  authenticator.verifyToken,
+  ProjectAut.authenticateProject(permissions.VIEW_COLUMN),
+  ColumController.get,
 );
 
 /**
@@ -800,7 +832,7 @@ router.post(
 router.put(
   '/columns/:col_id',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject(14),
+  ProjectAut.authenticateProject(permissions.UPDATE_COLUMN),
   ...ValidateColumn.validateUpdate(),
   ColumController.edit,
 );
@@ -842,7 +874,7 @@ router.put(
 router.delete(
   '/columns/:col_id',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject(15),
+  ProjectAut.authenticateProject(permissions.DELETE_COLUMN),
   ...ValidateColumn.validateDelete(),
   ColumController.destroy,
 );
@@ -907,7 +939,7 @@ router.delete(
 router.post(
   '/tasks',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject(8),
+  ProjectAut.authenticateProject(permissions.CREATE_TASK),
   ...validateTask(),
   task.generateTask,
 );
@@ -948,7 +980,7 @@ router.post(
 router.get(
   '/tasks',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject(11),
+  ProjectAut.authenticateProject(permissions.VIEW_TASK),
   task.getTasks,
 );
 
@@ -990,7 +1022,7 @@ router.get(
 router.delete(
   '/tasks/:id',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject(10),
+  ProjectAut.authenticateProject(permissions.DELETE_TASK),
   task.deleteTask,
 );
 
@@ -1105,7 +1137,7 @@ router.put(
 router.post(
   '/comments',
   authenticator.verifyToken,
-  CommentAut.authenticateCreateComment(12),
+  CommentAut.authenticateCreateComment(permissions.CREATE_COMMENT),
   comment.generate,
 );
 
@@ -1190,7 +1222,7 @@ router.put(
 router.post(
   '/comments/reply',
   authenticator.verifyToken,
-  CommentAut.authenticateCreateComment(12),
+  CommentAut.authenticateCreateComment(permissions.CREATE_COMMENT),
   comment.reply,
 );
 

@@ -2,6 +2,9 @@ import * as MemberServices from '../Services/MemberServices';
 import express from 'express';
 import { findRoleById } from '../Services/RoleServices';
 import createHttpError from 'http-errors';
+import { Task } from '../Models/task';
+import { Member } from '../Models/member';
+import { Project_role } from '../Models/project_role';
 
 export const add = async function (
   req: express.Request,
@@ -25,9 +28,32 @@ export const remove = async function (
   next: express.NextFunction,
 ) {
   try {
-    await MemberServices.remove(Number(req.params.member_id));
+    const member: any = await Member.findOne({
+      where: {
+        id: Number(req.params.member_id),
+        project_id: Number(req.body.project_id),
+      },
+      include: [
+        {
+          model: Project_role,
+        },
+      ],
+    });
+    if (member?.project_role.is_pm) {
+      return res.status(400).json({ message: 'Project manager cannot be removed from project' });
 
-    return res.status(200).json({ message: 'delete member success' });
+    }else {
+      const tasks: any = await Task.findAll({
+        where: { project_id: req.body.project_id, assignee_id: member?.user_id },
+      });
+      if (tasks.length > 0) {
+        return res.status(400).json({ message: 'User must not be working in a task' });
+      } else {
+        await MemberServices.remove(Number(req.params.member_id));
+        return res.status(200).json({ message: 'delete member success' });
+      }
+    }
+   
   } catch (err) {
     next(err);
   }

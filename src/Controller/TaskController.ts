@@ -35,7 +35,7 @@ export const generateTask = async function (
     let column: any = await Column.findOne({
       where: {
         project_id: project_id,
-        col_index: 1,
+        col_type: "todo",
       },
     });
     const column_id: number = column.id;

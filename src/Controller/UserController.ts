@@ -69,7 +69,8 @@ export const deleteUser = async function (
   next: express.NextFunction,
 ) {
   try {
-    const id = parseInt(req.params.id);
+    const id = Number(req.params.id);
+    console.log(id);
     await services.deleteUser(id);
     return res.status(200).json({ message: `Deleted user` });
   } catch (err) {

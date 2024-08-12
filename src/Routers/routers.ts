@@ -108,13 +108,13 @@ router.post(
 
 /**
  * @swagger
- * /api/users/{userId}:
+ * /api/users/{id}:
  *    delete:
  *       summary: Delete a user
  *       tags:
  *         - User
  *       parameters:
- *         - name: UserId
+ *         - name: id
  *           in: path
  *           type: string
  *           required: true
@@ -130,7 +130,7 @@ router.post(
  *         '500':
  *           description: Internal Server Error
  */
-router.delete('/users/:userId', authenticator.isServerAdmin, user.deleteUser);
+router.delete('/users/:id', authenticator.verifyToken ,authenticator.isServerAdmin, user.deleteUser);
 
 /**
  * @swagger

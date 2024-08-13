@@ -6,8 +6,8 @@ import { Project_role } from '../Models/project_role';
 import { Op } from 'sequelize';
 
 let transporter: nodemailer.Transporter;
-const email = process.env.EMAIL
-const password = process.env.EMAIL_PASSWORD
+const email = process.env.EMAIL;
+const password = process.env.EMAIL_PASSWORD;
 
 export const initializeEmail = (service: 'gmail' | 'outlook') => {
   transporter = nodemailer.createTransport({
@@ -48,7 +48,7 @@ export const send = async (
       Please check your tasks for more details.
       
       Best regards,
-      ${senderEmail}`,
+      Admin`,
   };
   try {
     const info = await transporter.sendMail(options);
@@ -71,7 +71,10 @@ export const notifyReplies = async (senderID: number, receiverID: number) => {
     from: email,
     to: receiver.email,
     subject: `Comment notification`,
-    text: `${receiver.name}, ${sender.name} has replied to your comment, please open to see details`,
+    text: `${receiver.name}, ${sender.name} has replied to your comment, please open to see details
+    
+    Best regards,
+      Admin`,
   };
   console.log(receiver.email);
   try {
@@ -93,7 +96,10 @@ export const notifyComment = async (senderID: number, receiverID: number) => {
     from: email,
     to: receiver.email,
     subject: `Comment notification`,
-    text: `${receiver.name}, ${sender.name} has just commented on your assigned task, please log in to check further details`,
+    text: `${receiver.name}, ${sender.name} has just commented on your assigned task, please log in to check further details
+    
+    Best regards,
+    Admin`,
   };
   try {
     console.log(receiver.email);
@@ -105,7 +111,7 @@ export const notifyComment = async (senderID: number, receiverID: number) => {
 };
 
 export const sendmailMemConfirm = async (
-  receviver_email: string,
+  receiver_email: string,
   project_id: number,
   project_role_id: number,
   link: string,
@@ -120,12 +126,12 @@ export const sendmailMemConfirm = async (
 
   const options = {
     from: process.env.EMAIL,
-    to: receviver_email,
+    to: receiver_email,
     subject: '',
     text: ``,
     html: `<div>
     <p> 
-    Hello, ${receviver_email}
+    Hello, ${receiver_email}
        <br>
       You have been invited to a project ${project.name} as a ${role.name}
        <br>
@@ -133,7 +139,8 @@ export const sendmailMemConfirm = async (
       <br>
       Best regards,
        <br>
-      ${process.env.EMAIL}
+      Best regards,
+      Admin
     </p>
     <br>
     <a href=${link}>Click here to accept</a>
@@ -145,8 +152,8 @@ export const sendmailMemConfirm = async (
     return info.response;
   } catch (err) {
     console.log(err);
-}
-}
+  }
+};
 
 export const notifyUpdates = async (task_id: number) => {
   const task: any = await Task.findByPk(task_id, {
@@ -155,10 +162,7 @@ export const notifyUpdates = async (task_id: number) => {
 
   const users: any = await User.findAll({
     where: {
-      [Op.or]: [
-        { id: task.creator_id },
-        { id: task.assignee_id }
-      ]
+      [Op.or]: [{ id: task.creator_id }, { id: task.assignee_id }],
     },
     attributes: ['name', 'email'],
   });
@@ -168,14 +172,16 @@ export const notifyUpdates = async (task_id: number) => {
     from: email,
     to: emails,
     subject: 'Task update',
-    text: `Task ${task.key} of project ${task.project_id} has been updated. Please log in for further details`
-  }
-  console.log(emails)
+    text: `Task ${task.key} of project ${task.project_id} has been updated. Please log in for further details
+    
+    Best regards,
+    Admin`,
+  };
+  console.log(emails);
   try {
-    const update = await transporter.sendMail(details)
-    return update.response
-  } catch(err) {
-    return err
+    const update = await transporter.sendMail(details);
+    return update.response;
+  } catch (err) {
+    return err;
   }
-}
-
+};

@@ -2,6 +2,8 @@ import nodemailer from 'nodemailer';
 import { Task } from '../Models/task';
 import { User } from '../Models/user';
 import { Comment } from '../Models/comment';
+import { Project } from '../Models/project';
+import { Project_role } from '../Models/project_role';
 
 let transporter: nodemailer.Transporter;
 
@@ -68,7 +70,7 @@ export const notifyReplies = async (senderID: number, receiverID: number) => {
     subject: `Comment notification`,
     text: `${receiver.name}, ${sender.name} has replied to your comment, please open to see details`,
   };
-  console.log(receiver.email)
+  console.log(receiver.email);
   try {
     const reply = await transporter.sendMail(options);
     return reply.response;
@@ -91,10 +93,54 @@ export const notifyComment = async (senderID: number, receiverID: number) => {
     text: `${receiver.name}, ${sender.name} has just commented on your assigned task, please log in to check further details`,
   };
   try {
-    console.log(receiver.email)
-    const comment = transporter.sendMail(notification)
-    return comment
-  } catch(err) {
-    return err
+    console.log(receiver.email);
+    const comment = transporter.sendMail(notification);
+    return comment;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const sendmailMemConfirm = async (
+  receviver_email: string,
+  project_id: number,
+  project_role_id: number,
+  link: string,
+) => {
+  let project: any = await Project.findByPk(project_id);
+
+  let role: any = await Project_role.findByPk(project_role_id);
+
+  if (!transporter) {
+    throw new Error(`Email service not initialized`);
+  }
+
+  const options = {
+    from: process.env.EMAIL,
+    to: receviver_email,
+    subject: '',
+    text: ``,
+    html: `<div>
+    <p> 
+    Hello, ${receviver_email}
+       <br>
+      You have been invited to a project ${project.name} as a ${role.name}
+       <br>
+      Please check click the link down here to accept. It will expired in 1 hours.
+      <br>
+      Best regards,
+       <br>
+      ${process.env.EMAIL}
+    </p>
+    <br>
+    <a href=${link}>Click here to accept</a>
+    
+    </div>`,
+  };
+  try {
+    const info = await transporter.sendMail(options);
+    return info.response;
+  } catch (err) {
+    console.log(err);
   }
 };

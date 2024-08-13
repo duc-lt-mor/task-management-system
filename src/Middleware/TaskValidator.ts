@@ -56,7 +56,7 @@ export const validateTask = function () {
           console.log(member)
           throw new Error('User is not in this project')
         }
-        console.log("sjhefdgjhsdjhfgjhkjsdhfk")
+        
       }),
   ];
 };

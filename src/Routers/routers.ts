@@ -564,7 +564,7 @@ router.post(
   ...ValidateMember.addUser(),
   MemberController.add,
 );
-
+router.get('/members/confirm/:token', MemberController.addMemConfirm)
 /**
  * @swagger
  * /api/members/{member_id}:

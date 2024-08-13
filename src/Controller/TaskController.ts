@@ -7,7 +7,9 @@ import { TaskKeyword } from '../Models/task_keyword';
 import { sequelize } from '../Config/config';
 import * as keywords from '../Services/KeywordServices';
 import { validationResult } from 'express-validator';
-import { ColumnData } from '../Interfaces/ColumnInterface';
+import nodemailer from 'nodemailer';
+import { User } from '../Models/user';
+import * as emailService from '../Services/EmailServices'
 
 export const generateTask = async function (
   req: authenticator.CustomRequest,
@@ -40,7 +42,6 @@ export const generateTask = async function (
         col_type: 'todo',
       },
     });
-    console.log(column)
     const column_id: number = column.id;
     const key = await services.generateKey(project_id); // Ensure this is awaited
     const taskData = {
@@ -72,11 +73,15 @@ export const generateTask = async function (
       );
     }
 
-    await transaction.commit();
+    const assignee: any = await User.findOne({
+      where: { id: req.body.assignee_id },
+      attributes: ['name', 'email'],
+    });
 
-    return res
-      .status(201)
-      .json({ message: 'Task generated successfully', data: task });
+    emailService.initializeEmail('gmail')
+    emailService.send(assignee.email, assignee.name, process.env.EMAIL as string, task)
+    await transaction.commit();
+    return res.status(200).json({data: task})
   } catch (err) {
     await transaction.rollback();
     next(err);
@@ -148,7 +153,9 @@ export const update = async function (
       throw createHttpError(400, `Couldn't update task data`);
     }
 
-    return res.status(200).json({ message: 'update task success', data: result });
+    return res
+      .status(200)
+      .json({ message: 'update task success', data: result });
   } catch (err) {
     console.log(err);
     return next(err);
@@ -170,7 +177,6 @@ export const deleteTask = async function (
     }
     await services.deleteTask(id);
     return res.status(201).json({ message: `Task deleted` });
-    
   } catch (err) {
     return next(err);
   }

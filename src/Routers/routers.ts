@@ -1030,7 +1030,7 @@ router.delete(
  * @swagger
  * /api/tasks/{id}:
  *    put:
- *       summary: Upddate a task in a project
+ *       summary: Update a task in a project
  *       tags:
  *         - Task
  *       security:

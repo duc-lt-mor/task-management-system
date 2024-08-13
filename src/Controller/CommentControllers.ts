@@ -5,6 +5,10 @@ import * as authenticator from '../Middleware/UserAuthenticator';
 import { sequelize } from '../Config/config';
 import { Comment } from '../Models/comment';
 import { Task } from '../Models/task';
+import * as emailServices from '../Services/EmailServices'
+import { User } from '../Models/user';
+
+emailServices.initializeEmail('gmail')
 
 export const generate = async function (
   req: authenticator.CustomRequest,
@@ -12,10 +16,11 @@ export const generate = async function (
   next: express.NextFunction,
 ) {
   const transaction = await sequelize.transaction();
+
   try {
     
     const task_id = req.body.task_id;
-    const task = await Task.findByPk(task_id)
+    const task: any = await Task.findByPk(task_id)
     if (task == null) {
       throw new Error('Task not found')
     } 
@@ -34,7 +39,12 @@ export const generate = async function (
     if (!comment) {
       throw createHttpError(400, `Could not generate comment`);
     }
-    return res.status(200).json({ data: comment });
+    if(comment.user_id == task.assignee_id) {
+      return res.status(200).json({ data: comment });
+    } else {
+      await emailServices.notifyComment(comment.user_id, task.assignee_id)
+      return res.status(200).json({message: 'Notified users', data: comment})
+    }
   } catch (err) {
     return next(err);
   }
@@ -82,7 +92,13 @@ export const reply = async function (
       });
 
       await transaction.commit();
-      return res.status(200).json(replyComment);
+      if (req.user?.id == comment.user_id) {
+        return res.status(200).json({data: replyComment})
+      } else {
+        await emailServices.notifyReplies(req.user?.id as number, comment.user_id)
+        return res.status(200).json({message: 'Notified', data: replyComment})
+      }
+      
     } catch (error) {
       throw createHttpError(500, 'Failed to create reply comment' + error);
     }

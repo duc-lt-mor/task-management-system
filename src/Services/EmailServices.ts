@@ -162,13 +162,15 @@ export const notifyUpdates = async (task_id: number) => {
     },
     attributes: ['name', 'email'],
   });
+  const emails = users.map((user: any) => user.email).join(', ');
 
   const details = {
     from: email,
-    to: users.email,
+    to: emails,
     subject: 'Task update',
     text: `Task ${task.key} of project ${task.project_id} has been updated. Please log in for further details`
   }
+  console.log(emails)
   try {
     const update = await transporter.sendMail(details)
     return update.response

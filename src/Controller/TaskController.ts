@@ -7,9 +7,10 @@ import { TaskKeyword } from '../Models/task_keyword';
 import { sequelize } from '../Config/config';
 import * as keywords from '../Services/KeywordServices';
 import { validationResult } from 'express-validator';
-import nodemailer from 'nodemailer';
 import { User } from '../Models/user';
 import * as emailService from '../Services/EmailServices'
+
+emailService.initializeEmail('gmail')
 
 export const generateTask = async function (
   req: authenticator.CustomRequest,
@@ -77,7 +78,6 @@ export const generateTask = async function (
       attributes: ['name', 'email'],
     });
 
-    emailService.initializeEmail('gmail')
     emailService.send(assignee.email, assignee.name, process.env.EMAIL as string, task)
     await transaction.commit();
     return res.status(200).json({data: task})

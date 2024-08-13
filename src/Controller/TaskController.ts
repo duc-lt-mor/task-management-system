@@ -8,6 +8,9 @@ import { sequelize } from '../Config/config';
 import * as keywords from '../Services/KeywordServices';
 import { validationResult } from 'express-validator';
 import { ColumnData } from '../Interfaces/ColumnInterface';
+import { User } from '../Models/user';
+import nodemailer from 'nodemailer';
+import { Project } from '../Models/project';
 
 export const generateTask = async function (
   req: authenticator.CustomRequest,
@@ -40,7 +43,10 @@ export const generateTask = async function (
         col_type: 'todo',
       },
     });
-    console.log(column)
+
+    let user: any = await User.findByPk(Number(req.body.assignee_id));
+    let project: any = await Project.findByPk(project_id);
+
     const column_id: number = column.id;
     const key = await services.generateKey(project_id); // Ensure this is awaited
     const taskData = {
@@ -55,7 +61,33 @@ export const generateTask = async function (
       expected_end_date: req.body.expected_end_date,
       column_id,
     };
+    let transporter = nodemailer.createTransport({
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false,
+      auth: {
+        user: 'nguyentienmanh003@gmail.com',
+        pass: 'ccss gvyg rwvo sxun',
+      },
+    });
 
+    let mailOptions = {
+      from: 'nguyentienmanh003@gmail.com',
+      to: user.email,
+      subject: 'Task assigne',
+      text: `You had been assigned for task ${key} in project ${project.name}`,
+    };
+
+    transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        throw createHttpError(
+          500,
+          `Could not send mail. Please try again` + error,
+        );
+      } else {
+        console.log('Email sent: ' + info.response);
+      }
+    });
     const task: any = await services.create(taskData, transaction);
     if (!task) {
       throw createHttpError(400, `Could not create task. Please try again`);
@@ -143,12 +175,25 @@ export const update = async function (
     if (isNaN(taskId)) {
       return res.status(400).json({ message: 'Invalid task ID' });
     }
-    let result: any = await services.update(taskId, req.body, req.user?.id);
-    if (!result) {
-      throw createHttpError(400, `Couldn't update task data`);
-    }
 
-    return res.status(200).json({ message: 'update task success', data: result });
+    let col: any = await Column.findOne({
+      where: {
+        id: req.body.column_id,
+        project_id: req.body.project_id,
+      },
+    });
+    if (!col) {
+      return res.status(400).json({ message: 'Invalid column id' });
+    } else {
+      let result: any = await services.update(taskId, req.body, req.user?.id);
+      if (!result) {
+        throw createHttpError(400, `Couldn't update task data`);
+      }
+
+      return res
+        .status(200)
+        .json({ message: 'update task success', data: result });
+    }
   } catch (err) {
     console.log(err);
     return next(err);
@@ -170,7 +215,6 @@ export const deleteTask = async function (
     }
     await services.deleteTask(id);
     return res.status(201).json({ message: `Task deleted` });
-    
   } catch (err) {
     return next(err);
   }

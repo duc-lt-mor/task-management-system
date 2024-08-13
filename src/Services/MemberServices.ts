@@ -38,7 +38,10 @@ export const add = async function (req: express.Request, data: MemberData) {
     }
 
     if (role.is_pm) {
-      const error = createHttpError(400, JSON.stringify("you can not chose role pm"));
+      const error = createHttpError(
+        400,
+        JSON.stringify('you can not chose role pm'),
+      );
       throw error;
     }
 
@@ -54,7 +57,7 @@ export const add = async function (req: express.Request, data: MemberData) {
 
     if (!user) {
       //kiem ta user co ton tai hay khong truoc khi them vao project
-      const error = createHttpError(400, JSON.stringify("user is not exit"));
+      const error = createHttpError(400, JSON.stringify('user is not exit'));
       throw error;
     }
 
@@ -67,7 +70,10 @@ export const add = async function (req: express.Request, data: MemberData) {
 
     if (check_member) {
       //kiem tra xem user da duoc add vao project hay chua
-      const error = createHttpError(400, JSON.stringify("user already been addded"));
+      const error = createHttpError(
+        400,
+        JSON.stringify('user already been addded'),
+      );
       throw error;
     }
 
@@ -106,7 +112,7 @@ export const remove = async function (id: number) {
 //cap nhat role cua thanh vien trong project
 export const editRole = async function (id: number, data: MemberData) {
   const t = await sequelize.transaction();
-  
+
   try {
     await Member.update(
       { project_role_id: Number(data.project_role_id) },
@@ -132,12 +138,10 @@ export const show = async function (id: number) {
       project_id: id,
     },
     include: [
+      { attributes: { exclude: ['password'] }, model: User },
       {
-        model: User,
+        model: Project_role,
       },
-      {
-        model: Project_role
-      }
     ],
   });
 

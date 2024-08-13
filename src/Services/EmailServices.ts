@@ -1,16 +1,18 @@
 import nodemailer from 'nodemailer';
 import { Task } from '../Models/task';
 import { User } from '../Models/user';
-import { Comment } from '../Models/comment';
+import { Op } from 'sequelize';
 
 let transporter: nodemailer.Transporter;
+const email = process.env.EMAIL
+const password = process.env.EMAIL_PASSWORD
 
 export const initializeEmail = (service: 'gmail' | 'outlook') => {
   transporter = nodemailer.createTransport({
     service: service === 'gmail' ? 'Gmail' : 'Outlook365',
     auth: {
-      user: process.env.EMAIL,
-      pass: process.env.EMAIL_PASSWORD,
+      user: email,
+      pass: password,
     },
   });
 };
@@ -26,7 +28,7 @@ export const send = async (
   }
 
   const options = {
-    from: process.env.EMAIL,
+    from: email,
     to,
     subject: '',
     text: `Hello, ${assigneeName}
@@ -35,6 +37,7 @@ export const send = async (
       
       Task Details:
       - Task Name: ${task.name}
+      - Assigner: ${task.creator_id}
       - Description: ${task.description}
       - Priority: ${task.priority}
       - Start Date: ${task.start_date}
@@ -63,12 +66,12 @@ export const notifyReplies = async (senderID: number, receiverID: number) => {
     attributes: ['name', 'email'],
   });
   const options = {
-    from: process.env.EMAIL,
+    from: email,
     to: receiver.email,
     subject: `Comment notification`,
     text: `${receiver.name}, ${sender.name} has replied to your comment, please open to see details`,
   };
-  console.log(receiver.email)
+  console.log(receiver.email);
   try {
     const reply = await transporter.sendMail(options);
     return reply.response;
@@ -85,15 +88,44 @@ export const notifyComment = async (senderID: number, receiverID: number) => {
     attributes: ['name', 'email'],
   });
   const notification = {
-    from: process.env.EMAIL,
+    from: email,
     to: receiver.email,
     subject: `Comment notification`,
     text: `${receiver.name}, ${sender.name} has just commented on your assigned task, please log in to check further details`,
   };
   try {
-    console.log(receiver.email)
-    const comment = transporter.sendMail(notification)
-    return comment
+    console.log(receiver.email);
+    const comment = transporter.sendMail(notification);
+    return comment;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const notifyUpdates = async (task_id: number) => {
+  const task: any = await Task.findByPk(task_id, {
+    attributes: ['key', 'project_id', 'assignee_id', 'creator_id'],
+  });
+
+  const users: any = await User.findAll({
+    where: {
+      [Op.or]: [
+        { id: task.creator_id },
+        { id: task.assignee_id }
+      ]
+    },
+    attributes: ['name', 'email'],
+  });
+
+  const details = {
+    from: email,
+    to: users.email,
+    subject: 'Task update',
+    text: `Task ${task.key} of project ${task.project_id} has been updated. Please log in for further details`
+  }
+  try {
+    const update = await transporter.sendMail(details)
+    return update.response
   } catch(err) {
     return err
   }

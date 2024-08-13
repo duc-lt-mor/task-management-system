@@ -152,7 +152,7 @@ export const update = async function (
     if (!result) {
       throw createHttpError(400, `Couldn't update task data`);
     }
-
+    await emailService.notifyUpdates(taskId)
     return res
       .status(200)
       .json({ message: 'update task success', data: result });

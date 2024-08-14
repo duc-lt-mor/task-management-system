@@ -2,7 +2,7 @@ import { Task } from '../Models/task';
 import { Op, Sequelize } from 'sequelize';
 
 export const totalTask = async function (id: number) {
-  let tasks: number = await Task.count({
+  const tasks: number = await Task.count({
     where: {
       project_id: id,
     },
@@ -11,47 +11,66 @@ export const totalTask = async function (id: number) {
   return tasks;
 };
 
-
-
 export const showFinishOnDateTask = async function (id: number) {
-  let onDateTask: any = await Task.findAll({
+  const onDateTask = await Task.findAll({
     where: {
-      expected_end_date: {
-        [Op.gt]: Sequelize.col(`real_end_date`)
-      },
       project_id: id,
-    }
+      expected_end_date: {
+        [Op.gt]: Sequelize.col(`real_end_date`),
+      },
+    },
   });
+  const tasks = (await totalTask(id)) as number;
+  const percentage = onDateTask.length / tasks * 100;
 
-  return onDateTask;
+  return {
+    count: onDateTask.length,
+    percentage: Number(percentage.toFixed(2)) + `%`  
+  };
 };
 
 export const showUnfinishedTask = async function (id: number) {
   const unfinishedTasks = await Task.findAll({
     where: {
-      real_end_date: null
-    }
-  })
-  if (unfinishedTasks.length === 0) {
-    return `Project ${id} has no unfinished tasks.`;
-  } else {
-    return `Project ${id} has unfinished tasks: ${JSON.stringify(unfinishedTasks, null, 2)}`;
-  }
-}
+      project_id: id,
+      real_end_date: null,
+    },
+  });
+
+  const tasks = (await totalTask(id)) as number;
+  const percentage = unfinishedTasks.length / tasks * 100;
+  return {
+    count: unfinishedTasks.length,
+    percentage: Number(percentage.toFixed(2)) + `%`  };
+};
 
 export const showFinishBehindDateTask = async function (id: number) {
   const lateTasks: any = await Task.findAll({
     where: {
-      real_end_date: {
-        [Op.gt]: Sequelize.col(`expected_end_date`)
-      },
       project_id: id,
-    }
+      real_end_date: {
+        [Op.gt]: Sequelize.col(`expected_end_date`),
+      },
+    },
   });
-  if (lateTasks.length === 0) {
-    return `Project ${id} has no tasks that finished behind schedule.`;
-  } else {
-    return `Project ${id} has tasks that finished behind schedule: ${JSON.stringify(lateTasks, null, 2)}`;
-  }
+  const tasks = (await totalTask(id)) as number;
+  const percentage = lateTasks.length / tasks * 100;
+  return {
+    count: lateTasks.length,
+    percentage: Number(percentage.toFixed(2)) + `%`,
+  };
 };
 
+export const taskStatistics = async function (projectId: number) {
+  const totalTasks = await totalTask(projectId);
+  const onDateTasks = await showFinishOnDateTask(projectId);
+  const unfinishedTasks = await showUnfinishedTask(projectId);
+  const behindScheduleTasks = await showFinishBehindDateTask(projectId);
+
+  return {
+    totalTasks,
+    onDateTasks,
+    unfinishedTasks,
+    behindScheduleTasks,
+  };
+};

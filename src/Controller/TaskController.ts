@@ -9,6 +9,7 @@ import * as keywords from '../Services/KeywordServices';
 import { validationResult } from 'express-validator';
 import { User } from '../Models/user';
 import * as emailService from '../Services/EmailServices';
+import * as statistics from '../Services/StatisticServices';
 import cron from 'node-cron';
 
 emailService.initializeEmail('gmail');
@@ -125,7 +126,8 @@ export const getTasks = async function (
     if (tasks.length == 0) {
       return res.send(`[]`);
     } else {
-      return res.status(200).json(tasks);
+      const taskInfo = await statistics.taskStatistics(Number(req.query.project_id));
+      return res.status(200).json({data: tasks, taskInfo});
     }
   } catch (err) {
     return next(err);
@@ -170,7 +172,7 @@ export const update = async function (
       await emailService.notifyUpdates(taskId);
       return res
         .status(200)
-        .json({ message: 'update task success', data: result });
+        .json({ message: 'update task success', data: { result } });
     }
   } catch (err) {
     console.log(err);
@@ -198,9 +200,7 @@ export const deleteTask = async function (
   }
 };
 
-export const dailyNotice = async function (
-  next: express.NextFunction,
-) {
+export const dailyNotice = async function (next: express.NextFunction) {
   try {
     cron.schedule('0 17 * * *', async () => {
       try {

@@ -172,12 +172,13 @@ export const notifyUpdates = async (task_id: number) => {
     from: email,
     to: emails,
     subject: 'Task update',
-    text: `Task ${task.key} of project ${task.project_id} has been updated. Please log in for further details
+    text: `
+    Task ${task.key} of project ${task.project_id} has been updated. Please log in for further details
     
     Best regards,
     Admin`,
   };
-  console.log(emails);
+
   try {
     const update = await transporter.sendMail(details);
     return update.response;
@@ -185,3 +186,26 @@ export const notifyUpdates = async (task_id: number) => {
     return err;
   }
 };
+
+export const notifyTask = async () => {
+  const users = await User.findAll({attributes: ['email']})
+  const emails = users.map((user:any) => user.email).join(', ')
+  console.log(emails)
+
+  const details = {
+    from: email,
+    to: emails,
+    subject: 'Keep tasks up to date',
+    text: `
+    Please log in to update task and check all the unfinished work before checking out
+    
+    Best regards,
+    Admin`,
+  } 
+  try {
+    const notify = await transporter.sendMail(details)
+    return notify.response
+  } catch (err) {
+    return err
+  }
+}

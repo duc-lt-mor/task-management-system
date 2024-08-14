@@ -8,9 +8,10 @@ import { sequelize } from '../Config/config';
 import * as keywords from '../Services/KeywordServices';
 import { validationResult } from 'express-validator';
 import { User } from '../Models/user';
-import * as emailService from '../Services/EmailServices'
+import * as emailService from '../Services/EmailServices';
+import cron from 'node-cron';
 
-emailService.initializeEmail('gmail')
+emailService.initializeEmail('gmail');
 
 export const generateTask = async function (
   req: authenticator.CustomRequest,
@@ -78,9 +79,14 @@ export const generateTask = async function (
       attributes: ['name', 'email'],
     });
 
-    emailService.send(assignee.email, assignee.name, process.env.EMAIL as string, task)
+    emailService.send(
+      assignee.email,
+      assignee.name,
+      process.env.EMAIL as string,
+      task,
+    );
     await transaction.commit();
-    return res.status(200).json({data: task})
+    return res.status(200).json({ data: task });
   } catch (err) {
     await transaction.rollback();
     next(err);
@@ -161,7 +167,7 @@ export const update = async function (
       if (!result) {
         throw createHttpError(400, `Couldn't update task data`);
       }
-      await emailService.notifyUpdates(taskId)
+      await emailService.notifyUpdates(taskId);
       return res
         .status(200)
         .json({ message: 'update task success', data: result });
@@ -189,5 +195,22 @@ export const deleteTask = async function (
     return res.status(201).json({ message: `Task deleted` });
   } catch (err) {
     return next(err);
+  }
+};
+
+export const dailyNotice = async function (
+  next: express.NextFunction,
+) {
+  try {
+    cron.schedule('0 17 * * *', async () => {
+      try {
+        const response = await emailService.notifyTask();
+        console.log('Users notified', response);
+      } catch (err) {
+        next(err);
+      }
+    });
+  } catch (err) {
+    next(err);
   }
 };

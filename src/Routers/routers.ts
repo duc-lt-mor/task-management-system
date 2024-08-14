@@ -954,7 +954,7 @@ router.post(
  *       parameters:
  *         - name: project_id
  *           in: query
- *           type: string
+ *           type: integer
  *           required: true
  *         - name: names
  *           in: query
@@ -964,7 +964,7 @@ router.post(
  *           type: string
  *         - name: assignee_id
  *           in: query
- *           type: string
+ *           type: integer
  *       security:
  *         - bearerAuth: []
  *       responses:

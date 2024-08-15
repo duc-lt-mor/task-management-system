@@ -122,12 +122,11 @@ export const getTasks = async function (
   next: express.NextFunction,
 ) {
   try {
-    let tasks: any = await keywords.search(req.query);
-    if (tasks.length == 0) {
-      return res.send(`[]`);
+    let tasks = await keywords.search(req.query);
+    if (tasks == null) {
+      return res.json(`[]`);
     } else {
-      const taskInfo = await statistics.taskStatistics(Number(req.query.project_id));
-      return res.status(200).json({data: tasks, taskInfo});
+      return res.status(200).json({ data: tasks });
     }
   } catch (err) {
     return next(err);

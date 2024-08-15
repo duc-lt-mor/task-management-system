@@ -3,6 +3,7 @@ import { Keyword } from '../Models/keyword';
 import { Task } from '../Models/task';
 import { TaskKeyword } from '../Models/task_keyword';
 import { sequelize } from '../Config/config';
+import { taskStatistics } from './StatisticServices';
 
 export const addKeyword = async function (
   tasks: string[],
@@ -90,7 +91,7 @@ export const search = async function (query: any) {
         filter.where.id = {
           [Op.in]: taskIds,
         };
-      } else if (taskIds.length == 0) {
+      } else {
         return []
       }
     }
@@ -113,7 +114,7 @@ export const search = async function (query: any) {
   }
 
   if (project_id) {
-    filter.where.project_id = project_id;
+    filter.where.project_id = Number(project_id);
   }
 
   if (start_date && end_date) {
@@ -123,6 +124,6 @@ export const search = async function (query: any) {
   }
 
   const tasks: any = await Task.findAll(filter);
-
-  return tasks;
+  const taskInfo = await taskStatistics(filter);
+  return {tasks, taskInfo};
 };

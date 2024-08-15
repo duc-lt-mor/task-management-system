@@ -1,27 +1,22 @@
 import { Task } from '../Models/task';
 import { Op, Sequelize } from 'sequelize';
 
-export const totalTask = async function (id: number) {
-  const tasks: number = await Task.count({
-    where: {
-      project_id: id,
-    },
-  });
-
+export const totalTask = async function (filter: any) {
+  const tasks = await Task.count(filter);
   return tasks;
 };
 
-export const showFinishOnDateTask = async function (id: number) {
+export const showFinishOnDateTask = async function (filter: any) {
   const onDateTask = await Task.findAll({
     where: {
-      project_id: id,
+      ...filter.where,
       expected_end_date: {
         [Op.gt]: Sequelize.col(`real_end_date`),
       },
     },
   });
-  const tasks = (await totalTask(id)) as number;
-  const percentage = onDateTask.length / tasks * 100;
+  const tasks = (await totalTask(filter)) as unknown as number;
+  const percentage = (onDateTask.length / tasks) * 100;
 
   return {
     count: onDateTask.length,
@@ -29,44 +24,44 @@ export const showFinishOnDateTask = async function (id: number) {
   };
 };
 
-export const showUnfinishedTask = async function (id: number) {
+export const showUnfinishedTask = async function (filter: any) {
   const unfinishedTasks = await Task.findAll({
     where: {
-      project_id: id,
+      ...filter.where,
       real_end_date: null,
     },
   });
 
-  const tasks = (await totalTask(id)) as number;
-  const percentage = unfinishedTasks.length / tasks * 100;
+  const tasks = (await totalTask(filter)) as unknown as number;
+  const percentage = (unfinishedTasks.length / tasks) * 100;
   return {
     count: unfinishedTasks.length,
-    percentage: Number(percentage.toFixed(2)) + `%`  };
+    percentage: Number(percentage.toFixed(2)) + `%`  
+  };
 };
 
-export const showFinishBehindDateTask = async function (id: number) {
+export const showFinishBehindDateTask = async function (filter: any) {
   const lateTasks: any = await Task.findAll({
     where: {
-      project_id: id,
+      ...filter.where,
       real_end_date: {
         [Op.gt]: Sequelize.col(`expected_end_date`),
       },
     },
   });
-  const tasks = (await totalTask(id)) as number;
-  const percentage = lateTasks.length / tasks * 100;
+  const tasks = (await totalTask(filter)) as unknown as number;
+  const percentage = (lateTasks.length / tasks) * 100;
   return {
     count: lateTasks.length,
     percentage: Number(percentage.toFixed(2)) + `%`,
   };
 };
 
-export const taskStatistics = async function (projectId: number) {
-  const totalTasks = await totalTask(projectId);
-  const onDateTasks = await showFinishOnDateTask(projectId);
-  const unfinishedTasks = await showUnfinishedTask(projectId);
-  const behindScheduleTasks = await showFinishBehindDateTask(projectId);
-
+export const taskStatistics = async function (filter: any) {
+  const totalTasks = await totalTask(filter);
+  const onDateTasks = await showFinishOnDateTask(filter);
+  const unfinishedTasks = await showUnfinishedTask(filter);
+  const behindScheduleTasks = await showFinishBehindDateTask(filter);
   return {
     totalTasks,
     onDateTasks,

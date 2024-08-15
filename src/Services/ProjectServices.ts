@@ -10,6 +10,7 @@ import { CustomRequest } from '../Middleware/UserAuthenticator';
 import { Project_role } from '../Models/project_role';
 import { Op } from 'sequelize';
 import { Task } from '../Models/task';
+import { TaskKeyword } from '../Models/task_keyword';
 // lay ra 1 project
 export const findProjectById = async (id: number) => {
   let project = await Project.findOne({
@@ -70,7 +71,7 @@ export const create = async function (req: CustomRequest, data: ProjectData) {
       ],
       { transaction: t },
     );
-    // khoi tao 2 role mac dinh
+    // khoi tao 3 role mac dinh
     let project_role: any = await Project_role.bulkCreate(
       [
         {
@@ -82,13 +83,13 @@ export const create = async function (req: CustomRequest, data: ProjectData) {
         {
           is_pm: false,
           name: 'Leader',
-          permissions: [8, 9, 10, 11, 12],
+          permissions: [1, 5, 8, 9, 10, 11, 12, 13, 14, 15],
           project_id: project.id,
         },
         {
           is_pm: false,
           name: 'User',
-          permissions: [],
+          permissions: [1, 5, 11],
           project_id: project.id,
         },
       ],
@@ -140,6 +141,7 @@ export const edit = async function (
         name: data.name.toLowerCase(),
         description: data.description,
         expected_end_date: data.expected_end_date,
+        real_end_date: data.real_end_date
       },
       { where: { id: id }, transaction: t },
     );
@@ -163,6 +165,19 @@ export const destroy = async (id: number) => {
       },
       transaction: t,
     });
+    let tasks: any = await Task.findAll({
+      where: {
+        project_id: id
+      }
+    })
+  
+    for (let task of tasks) {
+      await TaskKeyword.destroy({
+        where: {
+          task_id: task.id
+        }
+      })
+    }
     await Promise.all([
       Task.destroy({
         where: {

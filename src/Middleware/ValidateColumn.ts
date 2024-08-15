@@ -2,6 +2,7 @@ import { Column } from '../Models/column';
 import { Task } from '../Models/task';
 import { Op } from 'sequelize';
 import { body, param } from 'express-validator';
+import createHttpError from 'http-errors';
 
 export const validateCreate = function () {
   return [
@@ -9,8 +10,7 @@ export const validateCreate = function () {
       .notEmpty()
       .trim()
       .custom(async (name, { req }) => {
-        
-        let column: any = await Column.findOne({
+        let column = await Column.findOne({
           where: {
             name: name.toLowerCase(),
             project_id: Number(req.body.project_id),
@@ -43,6 +43,31 @@ export const validateUpdate = function () {
         throw new Error('Column name already in use within the project');
       }
     }),
+    body('array_index')
+      .customSanitizer((arrayStr) => {
+        return JSON.parse(`[${arrayStr}]`) as { id: number; index: number }[];
+      })
+      .custom(async (array_index: { id: number; index: number }[], { req }) => {
+        const count = await Column.count({
+          where: {
+            project_id: req.body.project_id,
+          },
+        });
+        array_index
+          .map((value) => {
+            if (value.index > count || value.index < 1) {
+              throw createHttpError(400, 'Invalid column index');
+            }
+            return value;
+          })
+          .sort((a, b) => {
+            if (a.index === b.index) {
+              throw createHttpError(400, 'Duplicate column index');
+            }
+
+            return a.index - b.index;
+          });
+      }),
   ];
 };
 
@@ -54,28 +79,28 @@ export const validateDelete = function () {
       //dem so task hien co trong mot cot
       let tasks_count: any = Task.count({
         where: {
-          colum_id: id,
+          column_id: id,
         },
       });
 
       //lay ra thong tin cot can xoa
-      let colum_found: any = Column.findOne({
+      let column_found: any = Column.findOne({
         where: {
           id: id,
         },
       });
 
-      let [tasks, colum] = await Promise.all([tasks_count, colum_found]);
+      let [tasks, column] = await Promise.all([tasks_count, column_found]);
 
-      if (colum?.col_type != 'custom') {
+      if (column?.col_type != 'custom') {
         //kiem tra xem cot can xoa co phai cot default khong
-        throw new Error("you can't delete default colum");
+        throw new Error("you can't delete default column");
       }
 
       if (tasks > 0) {
         //kiem tra xem con task nao trong cot khong
         throw new Error(
-          'you have move all tasks of this colum to other colum before you delete it',
+          'you have move all tasks of this column to other column before you delete it',
         );
       }
     }),

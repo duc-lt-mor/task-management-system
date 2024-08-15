@@ -1,5 +1,5 @@
 import { Comment } from '../Models/comment';
-import { Transaction, where } from 'sequelize';
+import { Op, Transaction } from 'sequelize';
 
 export const generate = async function (data: any, transaction: Transaction) {
   return await Comment.create(data, { transaction });
@@ -10,12 +10,12 @@ export const reply = async function (data: any, transaction: Transaction) {
 };
 
 export const get = function (task_id: number) {
-  return Comment.findAll({where: {parent_id: null, task_id: task_id}});
+  return Comment.findAll({ where: { parent_id: null, task_id: task_id } });
 };
 
-export const getReplies = function(data: any) {
-  return Comment.findAll(data)
-}
+export const getReplies = function (parent_id: number) {
+  return Comment.findAll({ where: { parent_id: parent_id } });
+};
 
 export const find = function (id: number) {
   return Comment.findByPk(id);
@@ -38,5 +38,12 @@ export const update = async function (id: number, content: string) {
 };
 
 export const destroy = function (id: number) {
-  return Comment.destroy({ where: { id: id } });
+  return Comment.destroy({
+    where: {
+      [Op.or]: {
+        id: id,
+        parent_id: id,
+      },
+    },
+  });
 };

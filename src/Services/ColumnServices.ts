@@ -25,7 +25,7 @@ export const create = async function (data: ColumnData, req: express.Request) {
     }
     let column: any = await Column.create(
       {
-        col_type: data.col_type,
+        col_type: 'custom',
         name: data.name.toLowerCase(),
         col_index: cols + 1,
         project_id: data.project_id,
@@ -33,12 +33,17 @@ export const create = async function (data: ColumnData, req: express.Request) {
       { transaction: t },
     );
     await t.commit();
-    return Column;
+    return column;
   } catch (err) {
     await t.rollback();
     throw err;
   }
 };
+
+export const get = async function (id: number) {
+  const columns = await Column.findAll({where: {project_id: id}})
+  return columns
+}
 
 export const edit = async function (
   id: number,
@@ -46,8 +51,8 @@ export const edit = async function (
   req: express.Request,
 ) {
   const t = await sequelize.transaction();
-
-  let indexs = JSON.parse(`[${data.array_index}]`);
+  let indexs = data.array_index;
+  // let indexs = JSON.parse(`[${data.array_index}]`);
   //lay ra cot can sua
   let column: any = await Column.findOne({
     where: {
@@ -56,12 +61,9 @@ export const edit = async function (
   });
 
   if (!data.name) {
-    data.name = Column.name;
+    data.name = column.name;
   }
 
-  if (!data.col_type) {
-    data.col_type = column.col_type;
-  }
   try {
     const errors = validationResult(req);
 
@@ -83,7 +85,6 @@ export const edit = async function (
       await Column.update(
         {
           name: data.name.toLowerCase(),
-          col_type: data.col_type,
         },
         { where: { id: id }, transaction: t },
       ),

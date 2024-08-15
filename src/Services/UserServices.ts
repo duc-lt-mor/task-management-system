@@ -32,7 +32,7 @@ export const login = async function (data: any) {
 
 export const register = async function (data: UserData) {
   const hashedPassword = await bcrypt.hash(data.password, 10);
-  const user = await User.create({
+  const user: any = await User.create({
     name: data.name,
     email: data.email,
     password: hashedPassword,
@@ -49,6 +49,7 @@ export const register = async function (data: UserData) {
 
 export const find = function (email: string) {
   return User.findOne({
+    attributes: { exclude: ['password'] },
     where: {
       email: {
         [Op.like]: `${email}%`,

@@ -1,8 +1,9 @@
-import { col, Op, Transaction } from 'sequelize';
+import { Op, Transaction } from 'sequelize';
 import { Keyword } from '../Models/keyword';
 import { Task } from '../Models/task';
 import { TaskKeyword } from '../Models/task_keyword';
 import { sequelize } from '../Config/config';
+import { taskStatistics } from './StatisticServices';
 
 export const addKeyword = async function (
   tasks: string[],
@@ -34,16 +35,21 @@ export const addKeyword = async function (
 };
 
 export const search = async function (query: any) {
-  const { names, priority, status, assignee_id, start_date, expected_end_date, project_id } = query;
-  console.log(query);
-  if (!names && !priority && !status && !assignee_id && !start_date && !expected_end_date) {
+  const {
+    names,
+    priority,
+    status,
+    assignee_id,
+    project_id,
+    start_date,
+    end_date,
+  } = query;
+  if (!names && !priority && !status && !assignee_id && !start_date && !end_date && !project_id) {
     return await Task.findAll();
   }
+
   const filter: any = {
-    where: {
-      project_id: project_id
-    },
-    
+    where: {project_id: project_id},
   };
 
   if (names) {
@@ -59,12 +65,11 @@ export const search = async function (query: any) {
       attributes: ['id'],
     });
     if (keywords.length == 0) {
-      filter.where.name = {
-        [Op.like]: `${names}%`
-      }
-    }
-    else {
-      const keywordIDs = await keywords.map((keyword: { id: any }) => keyword.id);
+      return [];
+    } else {
+      const keywordIDs = await keywords.map(
+        (keyword: { id: any }) => keyword.id,
+      );
 
       const taskKeywords: any = await TaskKeyword.findAll({
         where: {
@@ -78,18 +83,18 @@ export const search = async function (query: any) {
           `COUNT(DISTINCT keyword_id) = ${keywordsArray.length}`,
         ),
       });
-      console.log(taskKeywords)
       const taskIds = await taskKeywords.map(
         (taskKeyword: { task_id: any }) => taskKeyword.task_id,
       );
-      console.log(taskIds.length)
+
       if (taskIds.length > 0) {
         filter.where.id = {
           [Op.in]: taskIds,
         };
+      } else {
+        return []
       }
     }
-   
   }
 
   if (priority) {
@@ -108,23 +113,17 @@ export const search = async function (query: any) {
     filter.where.assignee_id = assignee_id;
   }
 
-  if (start_date ) {
-    filter.where.start_date = {
-      [Op.gt]: new Date(start_date)
-    }
+  if (project_id) {
+    filter.where.project_id = Number(project_id);
   }
 
-  if (expected_end_date) {
-    filter.where.expected_end_date = {
-      [Op.lt]: new Date(expected_end_date) 
-    }
+  if (start_date && end_date) {
+    filter.where.createdAt = {
+      [Op.between]: [new Date(start_date), new Date(end_date)],
+    };
   }
-  console.log(new Date(expected_end_date))
+
   const tasks: any = await Task.findAll(filter);
-
-  if (!tasks) {
-    return [];
-
-  }
-  return tasks;
+  const taskInfo = await taskStatistics(filter);
+  return {tasks, taskInfo};
 };

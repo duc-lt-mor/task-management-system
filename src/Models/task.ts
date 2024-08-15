@@ -3,7 +3,6 @@ import { sequelize } from '../Config/config';
 import { Project } from './project';
 import { Column } from './column';
 import { User } from './user';
-import { Keyword } from './keyword';
 export const Task = sequelize.define(
   'tasks',
   {
@@ -57,10 +56,10 @@ Task.belongsTo(Project, {
   foreignKey: 'project_id',
 });
 Column.hasMany(Task, {
-  foreignKey: 'colum_id',
+  foreignKey: 'column_id',
 });
 Task.belongsTo(Column, {
-  foreignKey: 'colum_id',
+  foreignKey: 'column_id',
 });
 User.hasMany(Task, {
   foreignKey: 'assignee_id',

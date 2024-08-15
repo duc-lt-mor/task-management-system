@@ -1,8 +1,10 @@
 import { Task } from '../Models/task';
 import { Project } from '../Models/project';
-import { Transaction } from 'sequelize';
+import { Transaction, where } from 'sequelize';
 import { sequelize } from '../Config/config';
 import { TaskKeyword } from '../Models/task_keyword';
+import { Comment } from '../Models/comment';
+import { Column } from '../Models/column';
 
 export const create = function (data: any, transaction: Transaction) {
   return Task.create(data, { transaction });
@@ -28,44 +30,31 @@ export const get = function () {
   return Task.findAll();
 };
 
-export const updateAsAssignee = async function (id: number, data: any) {
+export const update = async function (id: number, data: any, user_id: any) {
   try {
-    let tas: any = await Task.update(
-      {
-        colum_id: data.colum_id,
-        real_end_date: data.real_end_date,
-      },
-      {
-        where: {
-          id: id,
-        },
-      },
-    );
     let task: any = await find(id);
-    return task;
-  } catch (error) {
-    throw error;
-  }
-};
 
-export const update = async function (id: number, data: any) {
-  try {
-    let tas: any = await Task.update(
-      {
-        colum_id: data.colum_id,
-        real_end_date: data.real_end_date,
-        priority: data.priority,
-        assignee_id: data.assignee_id,
-        start_date: data.start_date,
-      },
-      {
+    if (task.assignee_id == user_id) {
+      await Task.update(
+        {
+          column_id: data.column_id,
+          real_end_date: data.real_end_date,
+        },
+        {
+          where: {
+            id: id,
+          },
+        },
+      );
+    } else {
+      await Task.update(data, {
         where: {
           id: id,
         },
-      },
-    );
-    let task: any = await find(id);
-    return task;
+      });
+    }
+    let updated_task: any = await find(id);
+    return updated_task;
   } catch (error) {
     throw error;
   }
@@ -74,6 +63,7 @@ export const update = async function (id: number, data: any) {
 export const deleteTask = async function (id: number) {
   const t = await sequelize.transaction();
   try {
+    await Comment.destroy({ where: { task_id: id }, transaction: t });
     await TaskKeyword.destroy({ where: { task_id: id }, transaction: t });
     await Task.destroy({ where: { id }, transaction: t });
     await t.commit();

@@ -17,7 +17,7 @@ export const validateRole = function () {
         }) 
 
         if (role) {
-          throw new Error('this name is already exit');
+          throw new Error('this name is already exist');
         }
       }),
     body('permissions')
@@ -28,8 +28,9 @@ export const validateRole = function () {
         let arr = JSON.parse(`[${permissions}]`);
         for (let p of arr) {
           if (!PERMISSIONS.includes(Number(p))) {
-            err.push(p + ' is not exit in permissions');
+            err.push(p + ' is not exist in permissions');
           }
+          
         }
         if (arr.includes(PM_PERMISSIONS)) {
           err.push('you can not have pm permission');
@@ -96,9 +97,16 @@ export const validateChangeOwnerProject = function () {
             id: Number(new_project_role_id),
           },
         });
+        
+        if (!role) {
+          throw new Error('role not exist');
+        } 
+
         if (role.is_pm) {
           throw new Error('you can not chose pm role');
         }
+
+        
       }),
   ];
 };

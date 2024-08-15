@@ -14,6 +14,9 @@ export const validateCreate = function () {
             name: name.toLowerCase(),
           },
         });
+        if (project_found) {
+          throw new Error('project name already been used');
+        }
       }),
     body('key')
       .notEmpty()
@@ -22,9 +25,13 @@ export const validateCreate = function () {
       .custom(async (key) => {
         let project_found = await Project.findOne({
           where: {
-            key: key,
+            key: key.toLowerCase(),
           },
+          
         });
+        if (project_found) {
+          throw new Error('project name already been used');
+        }
       }),
     body('key')
       .notEmpty()
@@ -66,6 +73,9 @@ export const validateUpdate = function () {
     body('expected_end_date').custom(async (expected_end_date) => {
       validateExpectED(expected_end_date);
     }),
+    body('real_end_date').custom(async (real_end_date) => {
+      validateExpectED(real_end_date);
+    })
   ];
 };
 
@@ -78,6 +88,6 @@ const validateExpectED = (expected_end_date: string) => {
   let current_date: Date = new Date();
 
   if (create_date < current_date || isNaN(create_date.getTime())) {
-    throw new Error(`expected end date must later than ${current_date}`);
+    throw new Error(`end date must later than ${current_date}`);
   }
 };

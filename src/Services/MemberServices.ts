@@ -2,35 +2,19 @@ import { Member } from '../Models/member';
 import { User } from '../Models/user';
 import { MemberData } from '../Interfaces/MemberInterface';
 import { sequelize } from '../Config/config';
-import { validationResult } from 'express-validator';
 import express from 'express';
-import createHttpError from 'http-errors';
-import { Op } from 'sequelize';
 import { Project_role } from '../Models/project_role';
 
 //them thanh vien vao project
-export const add = async function (req: express.Request, data: MemberData) {
+export const add = async function (data: any) {
   const t = await sequelize.transaction();
-  let add_mem: string = req.body.add_mem;
-
-  let user: any = await User.findOne({
-    where: {
-      [Op.or]: [{ name: add_mem }, { email: add_mem }],
-    },
-  });
   try {
-    const errors = validationResult(req);
 
-    if (!errors.isEmpty()) {
-      const errorMessages = errors.array().map((e: any) => e.msg);
-      const error = createHttpError(400, JSON.stringify(errorMessages));
-      throw error;
-    }
     let member: any = await Member.create(
       {
-        user_id: user.id,
-        project_id: data.project_id,
-        project_role_id: data.project_role_id,
+        user_id: data.user_id,
+        project_id: Number(data.project_id),
+        project_role_id: Number(data.project_role_id),
       },
       { transaction: t },
     );
@@ -87,8 +71,9 @@ export const show = async function (id: number) {
       project_id: id,
     },
     include: [
+      { attributes: { exclude: ['password'] }, model: User },
       {
-        model: User,
+        model: Project_role,
       },
     ],
   });

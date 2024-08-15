@@ -19,17 +19,19 @@ export const authenticateCreateComment = function (permission: number) {
         next();
         return;
       }
-
-      let member: any = await findMember(
-        req.user?.id,
-        Number(req.body.project_id),
-      );
-
-      let task: any = await Task.findOne({
-        where: {
-          id: req.body.task_id,
-        },
-      });
+      let task:any = []
+      if (!isNaN(req.body.task_id)) {
+        task = await Task.findByPk(req.body.task_id);
+      } 
+      else {
+        let comment: any = await Comment.findByPk(req.body.parent_id);
+        task = await Task.findByPk(comment.task_id);
+      }
+      
+      if (!task) {
+        throw new Error('Task not found')
+      }
+      let member: any = await findMember(req.user?.id, task?.project_id);
 
       if (
         member?.project_role.permissions.includes(permission) ||
@@ -44,6 +46,7 @@ export const authenticateCreateComment = function (permission: number) {
           .json({ message: 'You do not have permission to access.' });
       }
     } catch (err) {
+      console.log(err);
       return res.status(500).json({ message: 'Internal error ' + err });
     }
   };
@@ -62,7 +65,7 @@ export const authenticateUDComment = function () {
       if (req.user?.system_role_id == Role.ADMIN) {
         next();
         return;
-      } 
+      }
       let comment: any = await Comment.findOne({
         where: {
           id: req.params.id,

@@ -16,11 +16,172 @@ import { validateTask } from '../Middleware/TaskValidator';
 import * as userValidator from '../Middleware/UserValidator';
 import * as comment from '../Controller/CommentControllers';
 import express from 'express';
+import * as permissions from '../Constant/Permissions';
 const router = express.Router();
+
+
 
 /**
  * @swagger
- * /project:
+ * /api/auth/login:
+ *    post:
+ *       summary: Login
+ *       tags:
+ *         - Auth
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           application/x-www-form-urlencoded:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 email:
+ *                   type: string
+ *                   example: any@gmail.com
+ *                 password:
+ *                   type: string
+ *                   example: password
+ *               required:
+ *                 - email
+ *                 - password
+ *       responses:
+ *         '200':
+ *           description: OK
+ *         '401':
+ *           description: Unauthorized
+ *         '403':
+ *           description: Forbiden
+ *         '500':
+ *           description: Internal Server Error
+ */
+router.post('/auth/login', user.getLogin);
+
+/**
+ * @swagger
+ * /api/auth/register:
+ *    post:
+ *       summary: Register
+ *       tags:
+ *         - Auth
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           application/x-www-form-urlencoded:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 name:
+ *                   type: string
+ *                   example: john sena
+ *                 email:
+ *                   type: string
+ *                   example: any@gmail.com
+ *                 password:
+ *                   type: string
+ *                   example: password
+ *                 passwordConfirm:
+ *                   type: string
+ *                   example: password
+ *                 phone_number:
+ *                   type: string
+ *                   example: 123456
+ *               required: 
+ *                 - name
+ *                 - email
+ *                 - password
+ *                 - passwordConfirm
+ *                 - phone_number
+ *       responses:
+ *         '200':
+ *           description: OK
+ *         '401':
+ *           description: Unauthorized
+ *         '403':
+ *           description: Forbiden
+ *         '500':
+ *           description: Internal Server Error
+ */
+router.post(
+  '/auth/register',
+  ...userValidator.validateRegister(),
+  user.postRegister,
+);
+
+/**
+ * @swagger
+ * /api/users/{id}:
+ *    delete:
+ *       summary: Delete a user
+ *       tags:
+ *         - User
+ *       parameters:
+ *         - name: id
+ *           in: path
+ *           type: string
+ *           required: true
+ *       security:
+ *         - bearerAuth: []
+ *       responses:
+ *         '200':
+ *           description: OK
+ *         '401':
+ *           description: Unauthorized
+ *         '403':
+ *           description: Forbiden
+ *         '500':
+ *           description: Internal Server Error
+ */
+router.delete('/users/:id', authenticator.verifyToken, authenticator.isServerAdmin, user.deleteUser);
+
+/**
+ * @swagger
+ * /api/projects:
+ *    get:
+ *       summary: Return a list of projects in which user is a member
+ *       tags:
+ *         - Project
+ *       security:
+ *         - bearerAuth: []
+ *       responses:
+ *         '200':
+ *           description: OK
+ *         '401':
+ *           description: Unauthorized
+ *         '403':
+ *           description: Forbiden
+ *         '500':
+ *           description: Internal Server Error
+ */
+router.get('/projects', authenticator.verifyToken, user.showProject);
+
+/**
+ * @swagger
+ * /api/users:
+ *    get:
+ *       summary: find a user
+ *       tags:
+ *         - User
+ *       parameters:
+ *         - name: email
+ *           in: query
+ *           type: string
+ *           required: true
+ *       responses:
+ *         '200':
+ *           description: OK
+ *         '401':
+ *           description: Unauthorized
+ *         '403':
+ *           description: Forbiden
+ *         '500':
+ *           description: Internal Server Error
+ */
+router.get('/users', authenticator.verifyToken, user.find);
+
+
+/**
+ * @swagger
+ * /api/projects:
  *    post:
  *       summary: Create a project
  *       tags:
@@ -28,7 +189,7 @@ const router = express.Router();
  *       security:
  *         - bearerAuth: []
  *       requestBody:
- *         require: true
+ *         required: true
  *         content:
  *           application/x-www-form-urlencoded:
  *             schema:
@@ -42,7 +203,7 @@ const router = express.Router();
  *                   example: proj1
  *                 description:
  *                   type: string
- *                   example: this is decripstion of project 1
+ *                   example: this is description of project 1
  *                 expected_end_date:
  *                   type: string
  *                   format: date
@@ -58,7 +219,7 @@ const router = express.Router();
  *           description: Internal Server Error
  */
 router.post(
-  '/project',
+  '/projects',
   authenticator.verifyToken,
   ...ValidateProject.validateCreate(),
   ProjectController.create,
@@ -66,7 +227,7 @@ router.post(
 
 /**
  * @swagger
- * /project/{project_id}:
+ * /api/projects/{project_id}:
  *    put:
  *       summary: Update a project
  *       tags:
@@ -79,7 +240,7 @@ router.post(
  *           type: string
  *           required: true
  *       requestBody:
- *         require: true
+ *         required: true
  *         content:
  *           application/x-www-form-urlencoded:
  *             schema:
@@ -88,9 +249,9 @@ router.post(
  *                 name:
  *                   type: string
  *                   example: project 1
- *                 decripstion:
+ *                 description:
  *                   type: string
- *                   example: this is decripstion of project 1
+ *                   example: this is description of project 1
  *                 expected_end_date:
  *                   type: string
  *                   format: date
@@ -113,16 +274,16 @@ router.post(
  *           description: Internal Server Error
  */
 router.put(
-  '/project/:project_id',
+  '/projects/:project_id',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject(0),
+  ProjectAut.authenticateProject(permissions.PM_PERMISSIONS),
   ...ValidateProject.validateUpdate(),
   ProjectController.edit,
 );
 
 /**
  * @swagger
- * /project/{project_id}:
+ * /api/projects/{project_id}:
  *    delete:
  *       summary: Delete a project
  *       tags:
@@ -132,7 +293,7 @@ router.put(
  *       parameters:
  *         - name: project_id
  *           in: path
- *           type: string
+ *           type: integer
  *           required: true
  *       responses:
  *         '200':
@@ -145,25 +306,25 @@ router.put(
  *           description: Internal Server Error
  */
 router.delete(
-  '/project/:project_id',
+  '/projects/:project_id',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject(0),
+  ProjectAut.authenticateProject(permissions.PM_PERMISSIONS),
   ProjectController.destroy,
 );
 
 /**
  * @swagger
- * /showMember/{project_id}:
+ * /api/roles:
  *    get:
- *       summary: Return a list member of a project
+ *       summary: Show roles of a project
  *       tags:
- *         - Project
+ *         - Role
  *       security:
  *         - bearerAuth: []
  *       parameters:
  *         - name: project_id
- *           in: path
- *           type: string
+ *           in: query
+ *           type: integer
  *           required: true
  *       responses:
  *         '200':
@@ -176,46 +337,190 @@ router.delete(
  *           description: Internal Server Error
  */
 router.get(
-  '/showMember/:project_id',
+  '/roles',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject(5),
+  ProjectAut.authenticateProject(permissions.VIEW_ROLE),
+  RoleController.showRole,
+);
+
+
+/**
+ * @swagger
+ * /api/roles:
+ *    post:
+ *       summary: Create a role
+ *       tags:
+ *         - Role
+ *       security:
+ *         - bearerAuth: []
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           application/x-www-form-urlencoded:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 name:
+ *                   type: string
+ *                   example: project 1
+ *                 project_id:
+ *                   type: integer
+ *                   example: 1
+ *                 permissions:
+ *                   type: array
+ *                   items:
+ *                     type: integer
+ *                   example: [8,9,10,11]
+ *               required:
+ *                 - name
+ *                 - project_id
+ *                 - permissions
+ *       responses:
+ *         '200':
+ *           description: OK
+ *         '500':
+ *           description: Internal Server Error
+ */
+router.post(
+  '/roles',
+  authenticator.verifyToken,
+  ProjectAut.authenticateProject(permissions.PM_PERMISSIONS),
+  ...validateRole.validateRole(),
+  RoleController.create,
+);
+
+/**
+ * @swagger
+ * /api/roles/{role_id}:
+ *    put:
+ *       summary: Update a role
+ *       tags:
+ *         - Role
+ *       parameters:
+ *         - name: role_id
+ *           in: path
+ *           type: string
+ *           required: true
+ *       security:
+ *         - bearerAuth: []
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           application/x-www-form-urlencoded:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 name:
+ *                   type: string
+ *                   example: project 1
+ *                 project_id:
+ *                   type: integer
+ *                   example: 1
+ *                 permissions:
+ *                   type: array
+ *                   items:
+ *                     type: integer
+ *                   example: [8,9,10,11]
+ *               required:
+ *                 - name
+ *                 - project_id
+ *                 - permissions
+ *       responses:
+ *         '200':
+ *           description: OK
+ *         '401':
+ *           description: Unauthorized
+ *         '403':
+ *           description: Forbiden
+ *         '500':
+ *           description: Internal Server Error
+ */
+router.put(
+  '/roles/:role_id',
+  authenticator.verifyToken,
+  ProjectAut.authenticateProject(permissions.PM_PERMISSIONS),
+  ...validateRole.validateRole(),
+  RoleController.edit,
+);
+
+/**
+ * @swagger
+ * /api/roles/{role_id}:
+ *    delete:
+ *       summary: Delete a role
+ *       tags:
+ *         - Role
+ *       parameters:
+ *         - name: role_id
+ *           in: path
+ *           type: string
+ *           required: true
+ *       security:
+ *         - bearerAuth: []
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           application/x-www-form-urlencoded:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 project_id:
+ *                   type: integer
+ *                   example: 1
+ *               required:
+ *                 - project_id
+ *       responses:
+ *         '200':
+ *           description: OK
+ *         '401':
+ *           description: Unauthorized
+ *         '403':
+ *           description: Forbiden
+ *         '500':
+ *           description: Internal Server Error
+ */
+router.delete(
+  '/roles/:role_id',
+  authenticator.verifyToken,
+  ProjectAut.authenticateProject(permissions.PM_PERMISSIONS),
+  ...validateRole.validateDelete(),
+  RoleController.destroy,
+);
+
+/**
+ * @swagger
+ * /api/members:
+ *    get:
+ *       summary: Return a list member of a project
+ *       tags:
+ *         - Member
+ *       security:
+ *         - bearerAuth: []
+ *       parameters:
+ *         - name: project_id
+ *           in: query
+ *           type: integer
+ *           required: true
+ *       responses:
+ *         '200':
+ *           description: OK
+ *         '401':
+ *           description: Unauthorized
+ *         '403':
+ *           description: Forbiden
+ *         '500':
+ *           description: Internal Server Error
+ */
+router.get(
+  '/members',
+  authenticator.verifyToken,
+  ProjectAut.authenticateProject(permissions.VIEW_MEMBER),
   MemberController.show,
 );
 
 /**
  * @swagger
- * /showRole/{project_id}:
- *    get:
- *       summary: Show roles of a project
- *       tags:
- *         - Project
- *       security:
- *         - bearerAuth: []
- *       parameters:
- *         - name: project_id
- *           in: path
- *           type: string
- *           required: true
- *       responses:
- *         '200':
- *           description: OK
- *         '401':
- *           description: Unauthorized
- *         '403':
- *           description: Forbiden
- *         '500':
- *           description: Internal Server Error
- */
-router.get(
-  '/showRole/:project_id',
-  authenticator.verifyToken,
-  ProjectAut.authenticateProject(1),
-  RoleController.showRole,
-);
-
-/**
- * @swagger
- * /member:
+ * /api/members:
  *    post:
  *       summary: Add a user to a project
  *       tags:
@@ -223,18 +528,18 @@ router.get(
  *       security:
  *         - bearerAuth: []
  *       requestBody:
- *         require: true
+ *         required: true
  *         content:
  *           application/x-www-form-urlencoded:
  *             schema:
  *               type: object
  *               properties:
  *                 project_id:
- *                   type: string
+ *                   type: integer
  *                   example: 1
  *                 project_role_id:
- *                   type: string
- *                   example: this is decripstion of project 1
+ *                   type: integer
+ *                   example: 1
  *                 add_mem:
  *                   type: string
  *                   example: abc@gmail.com
@@ -253,16 +558,16 @@ router.get(
  *           description: Internal Server Error
  */
 router.post(
-  '/member',
+  '/members',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject(3),
+  ProjectAut.authenticateProject(permissions.ADD_USER),
   ...ValidateMember.addUser(),
   MemberController.add,
 );
-
+router.get('/members/confirm/:token', MemberController.addMemConfirm)
 /**
  * @swagger
- * /member/{member_id}:
+ * /api/members/{member_id}:
  *    delete:
  *       summary: Remove a user from project
  *       tags:
@@ -270,19 +575,19 @@ router.post(
  *       parameters:
  *         - name: member_id
  *           in: path
- *           type: string
+ *           type: integer
  *           required: true
  *       security:
  *         - bearerAuth: []
  *       requestBody:
- *         require: true
+ *         required: true
  *         content:
  *           application/x-www-form-urlencoded:
  *             schema:
  *               type: object
  *               properties:
  *                 project_id:
- *                   type: string
+ *                   type: integer
  *                   example: 1
  *               required:
  *                 - project_id
@@ -297,15 +602,15 @@ router.post(
  *           description: Internal Server Error
  */
 router.delete(
-  '/member/:member_id',
+  '/members/:member_id',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject(4),
+  ProjectAut.authenticateProject(permissions.REMOVE_USER),
   MemberController.remove,
 );
 
 /**
  * @swagger
- * /member/{member_id}:
+ * /api/members/{member_id}:
  *    put:
  *       summary: Edit role of a user in a project
  *       tags:
@@ -313,23 +618,23 @@ router.delete(
  *       parameters:
  *         - name: member_id
  *           in: path
- *           type: string
+ *           type: integer
  *           required: true
  *       security:
  *         - bearerAuth: []
  *       requestBody:
- *         require: true
+ *         required: true
  *         content:
  *           application/x-www-form-urlencoded:
  *             schema:
  *               type: object
  *               properties:
  *                 project_id:
- *                   type: string
+ *                   type: integer
  *                   example: 1
  *                 project_role_id:
- *                   type: string
- *                   example: this is decripstion of project 1
+ *                   type: integer
+ *                   example: 1
  *               required:
  *                 - project_id
  *                 - project_role_id
@@ -344,45 +649,16 @@ router.delete(
  *           description: Internal Server Error
  */
 router.put(
-  '/member/:member_id',
+  '/members/:member_id',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject(2),
+  ProjectAut.authenticateProject(permissions.UPDATE_ROLE_USER),
   MemberController.editRole,
 );
 
-/**
- * @swagger
- * /member/{member_id}:
- *    get:
- *       summary: Find a user from project
- *       tags:
- *         - Member
- *       parameters:
- *         - name: member_id
- *           in: path
- *           type: string
- *           required: true
- *       security:
- *         - bearerAuth: []
- *       responses:
- *         '200':
- *           description: OK
- *         '401':
- *           description: Unauthorized
- *         '403':
- *           description: Forbiden
- *         '500':
- *           description: Internal Server Error
- */
-router.get(
-  '/member/:member_id',
-  authenticator.verifyToken,
-  MemberController.findById,
-);
 
 /**
  * @swagger
- * /change_owner:
+ * /api/project/owner:
  *    put:
  *       summary: Change owner of a project
  *       tags:
@@ -390,20 +666,20 @@ router.get(
  *       security:
  *         - bearerAuth: []
  *       requestBody:
- *         require: true
+ *         required: true
  *         content:
  *           application/x-www-form-urlencoded:
  *             schema:
  *               type: object
  *               properties:
  *                 project_id:
- *                   type: string
- *                   example: project 1
+ *                   type: integer
+ *                   example: 1
  *                 new_project_role_id:
- *                   type: string
- *                   example: this is decripstion of project 1
+ *                   type: integer
+ *                   example: 1
  *                 new_owner_id:
- *                   type: string
+ *                   type: integer
  *                   example: 1
  *               required:
  *                 - project_id
@@ -420,188 +696,38 @@ router.get(
  *           description: Internal Server Error
  */
 router.put(
-  '/change_owner',
+  '/project/owner',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject(0),
+  ProjectAut.authenticateProject(permissions.PM_PERMISSIONS),
   ...validateRole.validateChangeOwnerProject(),
   RoleController.changeProjectOwner,
 );
 
+
 /**
  * @swagger
- * /role:
+ * /api/columns:
  *    post:
- *       summary: Create a role
+ *       summary: Create a column in a project
  *       tags:
- *         - Role
+ *         - Column
  *       security:
  *         - bearerAuth: []
  *       requestBody:
- *         require: true
+ *         required: true
  *         content:
  *           application/x-www-form-urlencoded:
  *             schema:
  *               type: object
  *               properties:
- *                 name:
- *                   type: string
- *                   example: project 1
  *                 project_id:
- *                   type: string
+ *                   type: integer
  *                   example: 1
- *                 permissions:
- *                   type: array
- *                   items:
- *                     type: integer
- *                   example: [8,9,10,11]
- *               required:
- *                 - name
- *                 - project_id
- *                 - permissions
- *       responses:
- *         '200':
- *           description: OK
- *         '500':
- *           description: Internal Server Error
- */
-router.post(
-  '/role',
-  authenticator.verifyToken,
-  ProjectAut.authenticateProject(0),
-  ...validateRole.validateRole(),
-  RoleController.create,
-);
-
-/**
- * @swagger
- * /role/{role_id}:
- *    put:
- *       summary: Update a role
- *       tags:
- *         - Role
- *       parameters:
- *         - name: role_id
- *           in: path
- *           type: string
- *           required: true
- *       security:
- *         - bearerAuth: []
- *       requestBody:
- *         require: true
- *         content:
- *           application/x-www-form-urlencoded:
- *             schema:
- *               type: object
- *               properties:
- *                 name:
- *                   type: string
- *                   example: project 1
- *                 project_id:
- *                   type: string
- *                   example: 1
- *                 permissions:
- *                   type: array
- *                   items:
- *                     type: integer
- *                   example: [8,9,10,11]
- *               required:
- *                 - name
- *                 - project_id
- *                 - permissions
- *       responses:
- *         '200':
- *           description: OK
- *         '401':
- *           description: Unauthorized
- *         '403':
- *           description: Forbiden
- *         '500':
- *           description: Internal Server Error
- */
-router.put(
-  '/role/:role_id',
-  authenticator.verifyToken,
-  ProjectAut.authenticateProject(0),
-  ...validateRole.validateRole(),
-  RoleController.edit,
-);
-
-/**
- * @swagger
- * /role/{role_id}:
- *    delete:
- *       summary: Delete a role
- *       tags:
- *         - Role
- *       parameters:
- *         - name: role_id
- *           in: path
- *           type: string
- *           required: true
- *       security:
- *         - bearerAuth: []
- *       requestBody:
- *         require: true
- *         content:
- *           application/x-www-form-urlencoded:
- *             schema:
- *               type: object
- *               properties:
- *                 project_id:
- *                   type: string
- *                   example: 1
- *               required:
- *                 - project_id
- *       responses:
- *         '200':
- *           description: OK
- *         '401':
- *           description: Unauthorized
- *         '403':
- *           description: Forbiden
- *         '500':
- *           description: Internal Server Error
- */
-router.delete(
-  '/role/:role_id',
-  authenticator.verifyToken,
-  ProjectAut.authenticateProject(0),
-  ...validateRole.validateDelete(),
-  RoleController.destroy,
-);
-
-/**
- * @swagger
- * /colum:
- *    post:
- *       summary: Create a colum in a project
- *       tags:
- *         - Colum
- *       security:
- *         - bearerAuth: []
- *       requestBody:
- *         require: true
- *         content:
- *           application/x-www-form-urlencoded:
- *             schema:
- *               type: object
- *               properties:
- *                 project_id:
- *                   type: string
- *                   example: project 1
- *                 col_type:
- *                   type: string
- *                   enum:
- *                     - todo
- *                     - in_progress
- *                     - done
- *                     - custom
  *                 name:
  *                   type: string
  *                   example: col 1
  *               required:
  *                 - project_id
- *                 - col_type
  *                 - name
  *       responses:
  *         '200':
@@ -614,20 +740,51 @@ router.delete(
  *           description: Internal Server Error
  */
 router.post(
-  '/colum',
+  '/columns',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject(13),
+  ProjectAut.authenticateProject(permissions.CREATE_COLUMN),
   ...ValidateColumn.validateCreate(),
   ColumController.create,
 );
 
 /**
  * @swagger
- * /colum/{col_id}:
- *    put:
- *       summary: Update a colum in a project
+ * /api/columns/:
+ *    get:
+ *       summary: get columns in a project
  *       tags:
- *         - Colum
+ *         - Column
+ *       parameters:
+ *         - name: project_id
+ *           in: query
+ *           type: integer
+ *           required: true
+ *       security:
+ *         - bearerAuth: []
+ *       responses:
+ *         '200':
+ *           description: OK
+ *         '401':
+ *           description: Unauthorized
+ *         '403':
+ *           description: Forbiden
+ *         '500':
+ *           description: Internal Server Error
+ */
+router.get(
+  '/columns/',
+  authenticator.verifyToken,
+  ProjectAut.authenticateProject(permissions.VIEW_COLUMN),
+  ColumController.get,
+);
+
+/**
+ * @swagger
+ * /api/columns/{col_id}:
+ *    put:
+ *       summary: Update a column in a project
+ *       tags:
+ *         - Column
  *       parameters:
  *         - name: col_id
  *           in: path
@@ -636,22 +793,15 @@ router.post(
  *       security:
  *         - bearerAuth: []
  *       requestBody:
- *         require: true
+ *         required: true
  *         content:
  *           application/x-www-form-urlencoded:
  *             schema:
  *               type: object
  *               properties:
  *                 project_id:
- *                   type: string
- *                   example: project 1
- *                 col_type:
- *                   type: string
- *                   enum:
- *                     - todo
- *                     - in_progress
- *                     - done
- *                     - custom
+ *                   type: integer
+ *                   example: 1
  *                 name:
  *                   type: string
  *                   example: col 1
@@ -667,7 +817,6 @@ router.post(
  *                   example: [{"id":9, "index":2},{"id":9, "index":2},{"id":9, "index":2},{"id":9, "index":2}]
  *               required:
  *                 - project_id
- *                 - col_type
  *                 - name
  *                 - array_index
  *       responses:
@@ -681,20 +830,20 @@ router.post(
  *           description: Internal Server Error
  */
 router.put(
-  '/colum/:col_id',
+  '/columns/:col_id',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject(14),
+  ProjectAut.authenticateProject(permissions.UPDATE_COLUMN),
   ...ValidateColumn.validateUpdate(),
   ColumController.edit,
 );
 
 /**
  * @swagger
- * /colum/{col_id}:
+ * /api/columns/{col_id}:
  *    delete:
- *       summary: Delete a colum in a project
+ *       summary: Delete a column in a project
  *       tags:
- *         - Colum
+ *         - Column
  *       parameters:
  *         - name: col_id
  *           in: path
@@ -703,14 +852,14 @@ router.put(
  *       security:
  *         - bearerAuth: []
  *       requestBody:
- *         require: true
+ *         required: true
  *         content:
  *           application/x-www-form-urlencoded:
  *             schema:
  *               type: object
  *               properties:
  *                 project_id:
- *                   type: string
+ *                   type: integer
  *                   example: 1
  *       responses:
  *         '200':
@@ -723,167 +872,16 @@ router.put(
  *           description: Internal Server Error
  */
 router.delete(
-  '/colum/:col_id',
+  '/columns/:col_id',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject(15),
+  ProjectAut.authenticateProject(permissions.DELETE_COLUMN),
   ...ValidateColumn.validateDelete(),
   ColumController.destroy,
 );
 
 /**
  * @swagger
- * /login:
- *    post:
- *       summary: Login
- *       tags:
- *         - User
- *       requestBody:
- *         require: true
- *         content:
- *           application/x-www-form-urlencoded:
- *             schema:
- *               type: object
- *               properties:
- *                 email:
- *                   type: string
- *                   example: any@gmail.com
- *                 password:
- *                   type: string
- *                   example: password
- *       responses:
- *         '200':
- *           description: OK
- *         '401':
- *           description: Unauthorized
- *         '403':
- *           description: Forbiden
- *         '500':
- *           description: Internal Server Error
- */
-router.post('/login', user.getLogin);
-
-/**
- * @swagger
- * /register:
- *    post:
- *       summary: Register
- *       tags:
- *         - User
- *       requestBody:
- *         require: true
- *         content:
- *           application/x-www-form-urlencoded:
- *             schema:
- *               type: object
- *               properties:
- *                 name:
- *                   type: string
- *                   example: john sena
- *                 email:
- *                   type: string
- *                   example: any@gmail.com
- *                 password:
- *                   type: string
- *                   example: password
- *                 passwordConfirm:
- *                   type: string
- *                   example: password
- *                 phone_number:
- *                   type: string
- *                   example: 123456
- *                 system_role_id:
- *                   type: string
- *                   example: 2
- *       responses:
- *         '200':
- *           description: OK
- *         '401':
- *           description: Unauthorized
- *         '403':
- *           description: Forbiden
- *         '500':
- *           description: Internal Server Error
- */
-router.post(
-  '/register',
-  ...userValidator.validateRegister(),
-  user.postRegister,
-);
-
-/**
- * @swagger
- * /user/{userId}:
- *    put:
- *       summary: Delete a user
- *       tags:
- *         - User
- *       parameters:
- *         - name: UserId
- *           in: path
- *           type: string
- *           required: true
- *       security:
- *         - bearerAuth: []
- *       responses:
- *         '200':
- *           description: OK
- *         '401':
- *           description: Unauthorized
- *         '403':
- *           description: Forbiden
- *         '500':
- *           description: Internal Server Error
- */
-router.delete('/user/:userId', authenticator.isServerAdmin, user.deleteUser);
-
-/**
- * @swagger
- * /user/projects:
- *    get:
- *       summary: Return a list of projects in which user is a member
- *       tags:
- *         - User
- *       security:
- *         - bearerAuth: []
- *       responses:
- *         '200':
- *           description: OK
- *         '401':
- *           description: Unauthorized
- *         '403':
- *           description: Forbiden
- *         '500':
- *           description: Internal Server Error
- */
-router.get('/user/projects', authenticator.verifyToken, user.showProject);
-
-/**
- * @swagger
- * /search/user:
- *    get:
- *       summary: find a user
- *       tags:
- *         - Search
- *       parameters:
- *         - name: email
- *           in: query
- *           type: string
- *           required: true
- *       responses:
- *         '200':
- *           description: OK
- *         '401':
- *           description: Unauthorized
- *         '403':
- *           description: Forbiden
- *         '500':
- *           description: Internal Server Error
- */
-router.get('/search/user', authenticator.verifyToken, user.find);
-
-/**
- * @swagger
- * /task:
+ * /api/tasks:
  *    post:
  *       summary: Create a task in a project
  *       tags:
@@ -891,14 +889,14 @@ router.get('/search/user', authenticator.verifyToken, user.find);
  *       security:
  *         - bearerAuth: []
  *       requestBody:
- *         require: true
+ *         required: true
  *         content:
  *           application/x-www-form-urlencoded:
  *             schema:
  *               type: object
  *               properties:
  *                 project_id:
- *                   type: string
+ *                   type: integer
  *                   example: 1
  *                 name:
  *                   type: string
@@ -919,8 +917,15 @@ router.get('/search/user', authenticator.verifyToken, user.find);
  *                   type: string
  *                   example: 2024-08-19
  *                 assignee_id:
- *                   type: string
+ *                   type: integer
  *                   example: 11
+ *               required:
+ *                 - project_id
+ *                 - name
+ *                 - priority
+ *                 - start_date
+ *                 - expected_end_date
+ *                 - assignee_id
  *       responses:
  *         '200':
  *           description: OK
@@ -932,25 +937,25 @@ router.get('/search/user', authenticator.verifyToken, user.find);
  *           description: Internal Server Error
  */
 router.post(
-  '/task',
+  '/tasks',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject(8),
+  ProjectAut.authenticateProject(permissions.CREATE_TASK),
   ...validateTask(),
   task.generateTask,
 );
 
 /**
  * @swagger
- * /tasks:
+ * /api/tasks:
  *    get:
  *       summary: Search task in a project
  *       tags:
- *         - Search
+ *         - Task
  *       parameters:
  *         - name: project_id
  *           in: query
- *           type: string
- *           require: true
+ *           type: integer
+ *           required: true
  *         - name: names
  *           in: query
  *           type: string
@@ -959,13 +964,7 @@ router.post(
  *           type: string
  *         - name: assignee_id
  *           in: query
- *           type: string
- *         - name: start_date
- *           in: query
- *           type: string
- *         - name: expected_end_date
- *           in: query
- *           type: string
+ *           type: integer
  *       security:
  *         - bearerAuth: []
  *       responses:
@@ -981,13 +980,13 @@ router.post(
 router.get(
   '/tasks',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject(11),
+  ProjectAut.authenticateProject(permissions.VIEW_TASK),
   task.getTasks,
 );
 
 /**
  * @swagger
- * /task/{id}:
+ * /api/tasks/{id}:
  *    delete:
  *       summary: Delete a task in a project
  *       tags:
@@ -1000,14 +999,14 @@ router.get(
  *           type: string
  *           required: true
  *       requestBody:
- *         require: true
+ *         required: true
  *         content:
  *           application/x-www-form-urlencoded:
  *             schema:
  *               type: object
  *               properties:
  *                 project_id:
- *                   type: string
+ *                   type: integer
  *                   example: 1
  *       responses:
  *         '200':
@@ -1021,30 +1020,35 @@ router.get(
  */
 
 router.delete(
-  '/task/:id',
+  '/tasks/:id',
   authenticator.verifyToken,
-  ProjectAut.authenticateProject(10),
+  ProjectAut.authenticateProject(permissions.DELETE_TASK),
   task.deleteTask,
 );
 
 /**
  * @swagger
- * /update/task/{id}:
+ * /api/tasks/{id}:
  *    put:
- *       summary: Upddate a task in a project
+ *       summary: Update a task in a project
  *       tags:
  *         - Task
  *       security:
  *         - bearerAuth: []
+ *       parameters:
+ *         - name: id
+ *           in: path
+ *           type: string
+ *           required: true
  *       requestBody:
- *         require: true
+ *         required: true
  *         content:
  *           application/x-www-form-urlencoded:
  *             schema:
  *               type: object
  *               properties:
  *                 project_id:
- *                   type: string
+ *                   type: integer
  *                   example: 1
  *                 name:
  *                   type: string
@@ -1064,9 +1068,17 @@ router.delete(
  *                 expected_end_date:
  *                   type: string
  *                   example: 2024-08-19
- *                 assignee_id:
+ *                 real_end_date:
  *                   type: string
+ *                   example: 2024-08-09
+ *                 column_id:
+ *                   type: integer
+ *                   example: 1
+ *                 assignee_id:
+ *                   type: integer
  *                   example: 11
+ *               required:
+ *                 - project_id
  *       responses:
  *         '200':
  *           description: OK
@@ -1078,15 +1090,16 @@ router.delete(
  *           description: Internal Server Error
  */
 router.put(
-  '/task/:id',
+  '/tasks/:id',
   authenticator.verifyToken,
   TaskAut.authenticateUpdateTask(),
+  ...validateTask(),
   task.update,
 );
 
 /**
  * @swagger
- * /comment:
+ * /api/comments:
  *    post:
  *       summary: Create a comment in a project
  *       tags:
@@ -1094,21 +1107,23 @@ router.put(
  *       security:
  *         - bearerAuth: []
  *       requestBody:
- *         require: true
+ *         required: true
  *         content:
  *           application/x-www-form-urlencoded:
  *             schema:
  *               type: object
  *               properties:
- *                 project_id:
- *                   type: string
- *                   example: 1
  *                 task_id:
- *                   type: string
+ *                   type: integer
  *                   example: 1
+ *                   required: true
  *                 content:
  *                   type: string
  *                   example: example comment
+ *                   required: true
+ *               required:
+ *                 - task_id
+ *                 - content
  *       responses:
  *         '200':
  *           description: OK
@@ -1120,15 +1135,15 @@ router.put(
  *           description: Internal Server Error
  */
 router.post(
-  '/comment',
+  '/comments',
   authenticator.verifyToken,
-  CommentAut.authenticateCreateComment(12),
+  CommentAut.authenticateCreateComment(permissions.CREATE_COMMENT),
   comment.generate,
 );
 
 /**
  * @swagger
- * /comment/{id}:
+ * /api/comments/{id}:
  *    put:
  *       summary: Edit a comment in a project
  *       tags:
@@ -1141,7 +1156,7 @@ router.post(
  *           type: string
  *           required: true
  *       requestBody:
- *         require: true
+ *         required: true
  *         content:
  *           application/x-www-form-urlencoded:
  *             schema:
@@ -1150,6 +1165,8 @@ router.post(
  *                 content:
  *                   type: string
  *                   example: example comment
+ *               required: 
+ *                 - content
  *       responses:
  *         '200':
  *           description: OK
@@ -1161,7 +1178,7 @@ router.post(
  *           description: Internal Server Error
  */
 router.put(
-  '/comment/:id',
+  '/comments/:id',
   authenticator.verifyToken,
   CommentAut.authenticateUDComment(),
   comment.update,
@@ -1169,7 +1186,7 @@ router.put(
 
 /**
  * @swagger
- * /reply:
+ * /api/comments/reply:
  *    post:
  *       summary: Reply a comment in a project
  *       tags:
@@ -1177,24 +1194,21 @@ router.put(
  *       security:
  *         - bearerAuth: []
  *       requestBody:
- *         require: true
+ *         required: true
  *         content:
  *           application/x-www-form-urlencoded:
  *             schema:
  *               type: object
  *               properties:
- *                 project_id:
- *                   type: string
- *                   example: 1
  *                 content:
  *                   type: string
  *                   example: example comment
- *                 task_id:
- *                   type: string
- *                   example: 1
  *                 parent_id:
- *                   type: string
+ *                   type: integer
  *                   example: 2
+ *               required:
+ *                 - parent_id
+ *                 - content
  *       responses:
  *         '200':
  *           description: OK
@@ -1206,15 +1220,15 @@ router.put(
  *           description: Internal Server Error
  */
 router.post(
-  '/reply',
+  '/comments/reply',
   authenticator.verifyToken,
-  CommentAut.authenticateCreateComment(12),
+  CommentAut.authenticateCreateComment(permissions.CREATE_COMMENT),
   comment.reply,
 );
 
 /**
  * @swagger
- * /comment/{id}:
+ * /api/comments/{id}:
  *    delete:
  *       summary: Delete a comment in a project
  *       tags:
@@ -1237,27 +1251,28 @@ router.post(
  *           description: Internal Server Error
  */
 router.delete(
-  '/comment/:id',
+  '/comments/:id',
   authenticator.verifyToken,
   CommentAut.authenticateUDComment(),
   comment.destroy,
 );
 
-
 /**
  * @swagger
- * /task/{id}/comment:
+ * /api/comments:
  *    get:
  *       summary: Get comment in a task
  *       tags:
- *         - Task
+ *         - Comment
  *       security:
  *         - bearerAuth: []
  *       parameters:
- *         - name: id
- *           in: path
+ *         - name: task_id
+ *           in: query
  *           type: string
- *           required: true
+ *         - name: parent_id
+ *           in: query
+ *           type: string
  *       responses:
  *         '200':
  *           description: OK
@@ -1268,11 +1283,6 @@ router.delete(
  *         '500':
  *           description: Internal Server Error
  */
-router.get(
-  '/task/:id/comment',
-  authenticator.verifyToken,
-  CommentAut.authenticateUDComment(),
-  comment.get,
-);
+router.get('/comments', authenticator.verifyToken, comment.get);
 
 export default router;

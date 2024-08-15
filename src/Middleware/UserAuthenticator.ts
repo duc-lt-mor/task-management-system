@@ -58,8 +58,10 @@ export const isServerAdmin = (
   next: express.NextFunction,
 ) => {
   if (req.user?.system_role_id == Role.ADMIN) {
+   
     next();
   } else {
+    console.log(req.user?.system_role_id )
     return res.status(403).send('You do not have permission');
   }
 };

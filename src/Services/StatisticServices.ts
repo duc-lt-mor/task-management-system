@@ -16,12 +16,18 @@ export const showFinishOnDateTask = async function (filter: any) {
     },
   });
   const tasks = (await totalTask(filter)) as unknown as number;
-  const percentage = (onDateTask.length / tasks) * 100;
-
-  return {
-    count: onDateTask.length,
-    percentage: Number(percentage.toFixed(2)) + `%`  
-  };
+  if (onDateTask.length == 0) {
+    return {
+      count: onDateTask.length,
+      percentage: 0 + `%`,
+    }; 
+  } else {
+    const percentage = (onDateTask.length / tasks) * 100;
+    return {
+      count: onDateTask.length,
+      percentage: Number(percentage.toFixed(2)) + `%`,
+    };
+  }
 };
 
 export const showUnfinishedTask = async function (filter: any) {
@@ -33,11 +39,18 @@ export const showUnfinishedTask = async function (filter: any) {
   });
 
   const tasks = (await totalTask(filter)) as unknown as number;
-  const percentage = (unfinishedTasks.length / tasks) * 100;
-  return {
-    count: unfinishedTasks.length,
-    percentage: Number(percentage.toFixed(2)) + `%`  
-  };
+  if (unfinishedTasks.length == 0) {
+    return {
+      count: unfinishedTasks.length,
+      percentage: 0 + `%`,
+    }; 
+  } else {
+    const percentage = (unfinishedTasks.length / tasks) * 100;
+    return {
+      count: unfinishedTasks.length,
+      percentage: Number(percentage.toFixed(2)) + `%`,
+    };
+  }
 };
 
 export const showFinishBehindDateTask = async function (filter: any) {
@@ -50,11 +63,18 @@ export const showFinishBehindDateTask = async function (filter: any) {
     },
   });
   const tasks = (await totalTask(filter)) as unknown as number;
-  const percentage = (lateTasks.length / tasks) * 100;
-  return {
-    count: lateTasks.length,
-    percentage: Number(percentage.toFixed(2)) + `%`,
-  };
+  if (lateTasks.length == 0) {
+    return {
+      count: lateTasks.length,
+      percentage: 0 + `%`,
+    }; 
+  } else {
+    const percentage = (lateTasks.length / tasks) * 100;
+    return {
+      count: lateTasks.length,
+      percentage: Number(percentage.toFixed(2)) + `%`,
+    };
+  }
 };
 
 export const taskStatistics = async function (filter: any) {
